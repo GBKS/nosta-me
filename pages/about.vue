@@ -6,6 +6,8 @@
     <p>Lots of cool stuff will be built on Nostr, but maybe not every service needs to build their own profile setup feature. Nosta could also be a place to outsource that. But we'll see. So far it's just an experiment.</p>
 
     <p>This site is a total playground and work-in-progress. It probably doesn't properly work right now. There might also be a <NuxtLink to="/directory">directory</NuxtLink>.</p>
+
+    <p>You can find the code for this website on <NuxtLink to="https://github.com/GBKS/nosta-me" target="_blank" rel="nofollow noopener noreferrer">GitHub</NuxtLink>.</p>
   </div>
 </template>
 
@@ -25,8 +27,8 @@
   }
 
   p {
-    color: rgba(var(--theme-front-rgb), 0.75);
-    font-weight: 600;
+    color: rgba(var(--theme-front-rgb), 0.85);
+    font-weight: 500;
     @include r('font-size', 18, 24);
     text-align: center;
 
@@ -35,7 +37,7 @@
     }
 
     a {
-      color: rgba(var(--theme-front-rgb), 0.75);
+      color: rgba(var(--theme-front-rgb), 0.85);
     }
   }
 }
