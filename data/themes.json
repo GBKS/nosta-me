@@ -1,0 +1,42 @@
+{
+    "space": {
+        "name": "Space",
+        "color": "#0F1050",
+        "brightness": "dark"
+    },
+    "winter": {
+        "name": "Winter",
+        "color": "#ADB8DB",
+        "brightness": "dark"
+    },
+    "black": {
+        "name": "Black",
+        "color": "#1F1D1F",
+        "brightness": "dark"
+    },
+    "white": {
+        "name": "White",
+        "color": "#F0F0F0",
+        "brightness": "light"
+    },
+    "gold": {
+        "name": "Gold",
+        "color": "#664F2D",
+        "brightness": "dark"
+    },
+    "flowers": {
+        "name": "Flowers",
+        "color": "#263D08",
+        "brightness": "dark"
+    },
+    "city": {
+        "name": "City",
+        "color": "#664B68",
+        "brightness": "dark"
+    },
+    "bubbles": {
+        "name": "Bubbles",
+        "color": "#5F002D",
+        "brightness": "dark"
+    }
+}

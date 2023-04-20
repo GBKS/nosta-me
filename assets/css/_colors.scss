@@ -1,0 +1,52 @@
+
+:root {
+  --backRGB: 255, 255, 255;
+  --frontRGB: 0, 0, 0;
+
+  --front-r: 0;
+  --front-g: 0;
+  --front-b: 0;
+
+  --back-r: 255;
+  --back-g: 255;
+  --back-b: 255;
+
+  --back: #ffffff;
+  --front: #000000;
+
+  --text-dark: #000000;
+  --text-light: #606060;
+
+  --siteBackground: #000000;
+
+  --green: #44BC31;
+  --blue: #3895BC;
+  --red: #FF2E9F;
+
+  --green-rgb: 68, 188, 49;
+  --blue-rgb: 56, 149, 188;
+  --red-rgb: 255, 46, 159;
+
+  // Theme-specific things
+  --theme-front: white;
+  --theme-back: black;
+  --theme-front-rgb: 255, 255, 255;
+  --theme-back-rgb: 0, 0, 0;
+
+  --theme-text-bright: white;
+  --theme-text-medium: rgba(255, 255, 255, 0.8);
+  --theme-text-dim: rgba(255, 255, 255, 0.6);
+  --theme-active: white;
+}
+
+.-brightness-light {
+  --theme-front: black;
+  --theme-back: white;
+  --theme-front-rgb: 0, 0, 0;
+  --theme-back-rgb: 255, 255, 255;
+
+  --theme-text-bright: black;
+  --theme-text-medium: rgba(0, 0, 0, 0.8);
+  --theme-text-dim: rgba(0, 0, 0, 0.6);
+  --theme-active: black;
+}

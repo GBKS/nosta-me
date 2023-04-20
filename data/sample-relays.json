@@ -1,0 +1,65 @@
+{
+    "relays": [
+        {
+            "id": "damus-io",
+            "name": "Damus",
+            "url": "wss://relay.damus.io",
+            "primary": true
+        },
+        {
+            "id": "nostr-land",
+            "name": "Nostr.land",
+            "url": "wss://eden.nostr.land"
+        },
+        {
+            "id": "nostr-wine",
+            "name": "Nostr.wine",
+            "url": "wss://nostr.wine"
+        },
+        {
+            "id": "nos-lol",
+            "name": "NOS",
+            "url": "wss://nos.lol"
+        },
+        {
+            "id": "fmt-wiz-biz",
+            "name": "Wiz",
+            "url": "wss://nostr.fmt.wiz.biz"
+        },
+        {
+            "id": "wellorder-net",
+            "name": "Wellorder",
+            "url": "wss://nostr-pub.wellorder.net"
+        },
+        {
+            "id": "nostr-info",
+            "name": "Nostr.info",
+            "url": "wss://relay.nostr.info"
+        },
+        {
+            "id": "offchain-pub",
+            "name": "Offchain",
+            "url": "wss://offchain.pub"
+        },
+        {
+            "id": "brb-io",
+            "name": "BRB",
+            "url": "wss://brb.io"
+        },
+        {
+            "id": "snort-social",
+            "name": "Snort",
+            "url": "wss://relay.snort.social"
+        },
+        {
+            "id": "current-fyi",
+            "name": "Current",
+            "url": "wss://relay.current.fyi"
+        },
+        {
+            "id": "relayer-se",
+            "name": "Relayer",
+            "url": "wss://nostr.relayer.se"
+        }
+    ]
+}

@@ -1,0 +1,113 @@
+{
+  "apps": [
+    {
+      "id": "damus",
+      "name": "Damus",
+      "description": "Social",
+      "platform": "iOS",
+      "url": "https://damus.io/",
+      "image": "damus"
+    },
+    {
+      "id": "amethyst",
+      "name": "Amethyst",
+      "description": "Social",
+      "platform": "Android",
+      "url": "https://play.google.com/store/apps/details?id=com.vitorpamplona.amethyst",
+      "image": "amethyst"
+    },
+    {
+      "id": "primal",
+      "name": "Primal",
+      "description": "Social",
+      "platform": "Web",
+      "url": "https://primal.net",
+      "image": "primal"
+    },
+    {
+      "id": "snort",
+      "name": "Snort",
+      "description": "Social",
+      "platform": "Web",
+      "url": "https://snort.social/",
+      "profileUrl": "https://snort.social/p/{#npub}",
+      "image": "snort"
+    },
+    {
+      "id": "astral",
+      "name": "Astral",
+      "description": "Social",
+      "platform": "Web",
+      "url": "https://astral.ninja/",
+      "profileUrl": "https://astral.ninja/{#npub}",
+      "image": "astral"
+    },
+    {
+      "id": "hamstr",
+      "name": "Hamstr",
+      "description": "Social",
+      "platform": "Web",
+      "url": "https://hamstr.to/",
+      "profileUrl": "https://hamstr.to/profile/{#npub}",
+      "image": "hamstr"
+    },
+    {
+      "id": "blogstack",
+      "name": "Blogstack",
+      "description": "Blogging",
+      "platform": "Web",
+      "url": "https://hamstr.to/",
+      "profileUrl": "https://hamstr.to/profile/{#npub}",
+      "image": "blogstack"
+    },
+    {
+      "id": "alby",
+      "name": "Alby",
+      "description": "Key holder",
+      "platform": "Web",
+      "url": "https://getalby.com",
+      "image": "alby"
+    },
+    {
+      "id": "bolt-fun",
+      "name": "Bolt Fun",
+      "description": "Community",
+      "platform": "Web",
+      "url": "https://makers.bolt.fun/",
+      "image": "bolt-fun"
+    },
+    {
+      "id": "blockcore",
+      "name": "Blockcore",
+      "description": "Social",
+      "platform": "Web",
+      "url": "https://notes.blockcore.net/",
+      "image": "blockcore"
+    },
+    {
+      "id": "habla",
+      "name": "habla",
+      "description": "Blogging",
+      "platform": "Web",
+      "url": "https://habla.news/",
+      "profileUrl": "https://habla.news/{#npub}",
+      "image": "habla"
+    },
+    {
+      "id": "nostrchat",
+      "name": "nostrchat",
+      "description": "Chat & DM",
+      "platform": "Web",
+      "url": "https://www.nostrchat.io/",
+      "image": "nostrchat"
+    },
+    {
+      "id": "badges",
+      "name": "badges",
+      "description": "Badges",
+      "platform": "Web",
+      "url": "https://badges.page",
+      "image": "badges"
+    }
+  ]
+}

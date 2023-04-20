@@ -1,0 +1,75 @@
+
+@mixin r($property, $minSize, $maxSize) {
+  $multiplier: math.div($maxSize - $minSize, 1280 - 375)*100;
+  $baseSize: $minSize - math.div(375, 100) * $multiplier + 'px';
+
+  #{$property}: calc(#{$baseSize} + 1vw * #{$multiplier});
+
+  @include media-query(large) {
+    #{$property}: $maxSize+px;
+  }
+}
+
+// Media queries
+
+@mixin media-query($media-query) {
+  @if $media-query == small {
+    @media only screen and (max-width:($small-width - 1)) {
+      @content;
+    }
+  }
+
+  @if $media-query == medium {
+    @media only screen and (min-width:$small-width) and (max-width:($large-width - 1)) {
+      @content;
+    }
+  }
+
+  @if $media-query == medium-up {
+    @media only screen and (min-width:$small-width) {
+      @content;
+    }
+  }
+
+  @if $media-query == medium-down {
+    @media only screen and (max-width:($large-width - 1)) {
+      @content;
+    }
+  }
+
+  @if $media-query == large {
+    @media only screen and (min-width:$large-width) {
+      @content;
+    }
+  }
+
+  @if $media-query == large-only {
+    @media only screen and (min-width:$large-width) and (max-width:($huge-width - 1)) {
+      @content;
+    }
+  }
+
+  @if $media-query == medium-large {
+    @media only screen and (min-width:$small-width) and (max-width:($huge-width - 1)) {
+      @content;
+    }
+  }
+
+  @if $media-query == large-mega {
+    @media only screen and (min-width:$large-width) and (max-width:($mega-width - 1)) {
+      @content;
+    }
+  }
+
+  @if $media-query == huge {
+    @media only screen and (min-width:$huge-width) {
+      @content;
+    }
+  }
+
+  @if $media-query == mega {
+    @media only screen and (min-width:$mega-width) {
+      @content;
+    }
+  }
+}
