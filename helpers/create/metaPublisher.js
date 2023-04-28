@@ -75,11 +75,11 @@ export default function metaPublisher () {
       )
     },
 
-    postToUserRelays(event) {
+    publishToUserRelays(event) {
       this.status.requests = []
 
       let relay, request, relayId
-      for(i=0; i<this.store.relays.length; i++) {
+      for(let i=0; i<this.store.relays.length; i++) {
         relay = this.store.relays[i]
 
         if(relay.added) {

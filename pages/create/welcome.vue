@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useProfileStore } from '@/stores/profile'
+import profileInitializer from '@/helpers/create/profileInitializer.js'
 
 import * as secp256k1 from '@noble/secp256k1'
 import { wordlist } from '@scure/bip39/wordlists/english.js'
@@ -40,27 +41,6 @@ definePageMeta({
   }
 })
 
-// const store = useProfileStore()
-
-function createKeys(store) {
-  console.log('createKeys', store, window.NostrTools.generatePrivateKey)
-
-  const mnemonic = generateMnemonic(wordlist)
-  const privateKey = privateKeyFromSeedWords(mnemonic)
-
-  // const privateKey = window.NostrTools.generatePrivateKey()
-  const publicKey = window.NostrTools.getPublicKey(privateKey)
-
-  const npub = window.NostrTools.nip19.npubEncode(publicKey)
-
-  console.log('keys', mnemonic, publicKey, privateKey)
-
-  store.mnemonic = mnemonic
-  store.privateKey = privateKey
-  store.publicKey = publicKey
-  store.npub = npub
-}
-
 function privateKeyFromSeedWords(mnemonic, passphrase) {
   let root = HDKey.fromMasterSeed(mnemonicToSeedSync(mnemonic, passphrase))
   let privateKey = root.derive(`m/44'/1237'/0'/0/0`).privateKey
@@ -84,11 +64,7 @@ onMounted(() => {
   console.log('privateKey', store.privateKey == '')   
   console.log('publicKey', store.publicKey == '')  
 
-  // store.setPublicKey('test')
-createKeys(store)
-  if(store.privateKey == '' || store.publicKey == '') {
-    createKeys(store)
-  }
+  profileInitializer.init()
 })
 
 // Only navigate back home after confirming cancel
