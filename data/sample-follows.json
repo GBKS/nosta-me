@@ -1,6 +1,13 @@
 {
     "follows": [
         {
+            "id": "nosta",
+            "name": "Nosta",
+            "picture": "https://nosta.me/images/profile.jpg",
+            "npub": "128bc05aa6fd421d00c3c3389329f39cfc750b035db6cdad2eb0f983bff5629f",
+            "relay": "wss://relay.damus.io"
+        },
+        {
             "id": "bitcoin-design",
             "name": "Bitcoin Design",
             "picture": "https://bitcoin.design/assets/images/profile-picture.jpg",
