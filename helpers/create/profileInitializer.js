@@ -31,6 +31,9 @@ export default {
     if(!this.store.mnemonic) {
       const mnemonic = generateMnemonic(wordlist)
 
+      // A mnemonic with the same word twice, for testing.
+      // const mnemonic = 'cute whip blossom wedding arm arrange runway arrange oven jazz rival accuse'
+
       const root = HDKey.fromMasterSeed(mnemonicToSeedSync(mnemonic, null))
       const privateKeyTemp = root.derive(`m/44'/1237'/0'/0/0`).privateKey
       if (!privateKeyTemp) throw new Error('could not derive private key')

@@ -37,7 +37,10 @@ const buttonNumber = computed(() => {
 function click() {
   if(!props.info.clicked || !props.info.correct) {
     if(props.info.index == props.clickIndex) {
-      emit('select', props.info.word)
+      emit('select', {
+        index: props.info.index,
+        word: props.info.word
+      })
     } else {
       shakeIt.value = true
       setTimeout(endShake, 600)

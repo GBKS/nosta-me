@@ -28,12 +28,12 @@ function sortWords() {
   return result
 }
 
-function toggleWord(word) {
+function toggleWord(info) {
   const words = sortedWords.value
   let i, item
   for(i=0; i<words.length; i++) {
     item = words[i]
-    if(item.word == word) {
+    if(item.index == info.index) {
       item.clicked = !item.clicked
 
       if(item.clicked === true) {
@@ -50,6 +50,8 @@ function toggleWord(word) {
         item.correct = null
         clickIndex.value --
       }
+
+      break
     }
   }
 }
