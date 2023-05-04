@@ -4,20 +4,29 @@ const props = defineProps([
   'profileService'
 ])
 
+const emit = defineEmits(['back'])
+
 const badgeCount = computed(() => {
   return props.info.length
+})
+
+const title = computed(() => {
+  return badgeCount.value + ' badge' + (badgeCount.value == 1 ? '' : 's')
 })
 </script>
 
 <template>
   <Transition name="fade" appear>
     <div v-if="info" class="badge-list">
-      <h2>Badges <span v-if="badgeCount > 0">({{ badgeCount }})</span></h2>
-      <ProfileBadgeItem
-        v-for="(item, index) in info"
-        :key="item.id"
-        :info="item"
-      />
+      <ProfileSectionBack @select="$emit('back')" />
+      <ProfileSectionTitle :title="title" />
+      <div class="badges">
+        <ProfileBadgeItem
+          v-for="(item, index) in info"
+          :key="item.id"
+          :info="item"
+        />
+      </div>
     </div>
   </Transition>
 </template>
@@ -25,16 +34,39 @@ const badgeCount = computed(() => {
 <style scoped lang="scss">
 
 .badge-list {
-  display: flex;
-  flex-direction: column;
-  flex-basis: 20%;
-  flex-grow: 1;
+  .badges {
+    margin-top: 10px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
 
-  h2 {
-    margin-bottom: 10px;
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--theme-front);
+    > * {
+      flex-grow: 1;
+    }
+  }
+
+  @include media-query(small) {
+    .badges {
+      > * {
+        flex-basis: 40%;
+      }
+    }
+  }
+
+  @include media-query(medium) {
+    .badges {
+      > * {
+        flex-basis: 30%;
+      }
+    }
+  }
+
+  @include media-query(large) {
+    .badges {
+      > * {
+        flex-basis: 20%;
+      }
+    }
   }
 }
 

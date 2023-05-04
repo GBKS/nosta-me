@@ -39,7 +39,7 @@ function requestBadgeData(tag) {
 
   const request = multiRelayRequest()
   request.init(onBadgeData)
-  request.start(relayStore.getAll, filter)
+  request.start(relayStore.getAll, [filter])
 
   // const request = relayRequest()
   // request.init(onBadgeData, false)

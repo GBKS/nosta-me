@@ -28,19 +28,28 @@ const relayData = computed(() => {
 const showLoader = computed(() => {
   return Object.keys(relayData.value).length == 0
 })
+
+const title = computed(() => {
+  const count = props.info.length
+  return count + ' relay' + (count == 1 ? '' : 's')
+})
 </script>
 
 <template>
   <div class="relay-list">
+    <ProfileSectionBack @select="$emit('back')" />
+    <ProfileSectionTitle :title="title" />
     <UiLoadIndicator
       v-if="showLoader"
     />
-    <ModalRelayList
-      v-if="!showLoader"
-      :info="relayData"
-      :showStatus="false"
-      theme="theme"
-    />
+    <div class="relays">
+      <ModalRelayList
+        v-if="!showLoader"
+        :info="relayData"
+        :showStatus="false"
+        theme="theme"
+      />
+    </div>
   </div>
 </template>
 
@@ -49,7 +58,11 @@ const showLoader = computed(() => {
 .relay-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  align-items: flex-start;
+
+  .relays {
+    margin-top: 10px;
+  }
 }
 
 </style>

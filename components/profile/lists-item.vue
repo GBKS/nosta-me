@@ -1,6 +1,7 @@
 <script setup>
 const props = defineProps([
-  'info'
+  'info',
+  'layout'
 ])
 
 const type = computed(() => {
@@ -109,7 +110,7 @@ const description = computed(() => {
 })
 
 const listImage = computed(() => {
-  const image =  '/assets/images/list-'+type.value+'.jpg'
+  const image =  '/assets/images/list-'+type.value+'.png'
   return useAssets(image)
 })
 
@@ -120,11 +121,9 @@ const classObject = computed(() => {
     c.push('-empty')
   }
 
-  return c.join(' ')
-})
+  c.push(props.layout ? ('-'+props.layout) : '-list')
 
-onMounted(() => {
-  console.log('ListsItem.onMounted', props.info)
+  return c.join(' ')
 })
 </script>
 
@@ -158,6 +157,7 @@ onMounted(() => {
     height: 50px;
     border-radius: 100px;
     overflow: hidden;
+    background: linear-gradient(135deg, #22A2FF 0%, #6B10FF 100%);
     box-shadow: 
       0px 32px 32px rgba(0, 0, 0, 0.15), 
       0px 16px 16px rgba(0, 0, 0, 0.15), 
@@ -176,6 +176,7 @@ onMounted(() => {
       font-size: 17px;
       font-weight: 600;
       color: var(--theme-front);
+      word-break: break-all;
     }
 
     p {
@@ -187,7 +188,53 @@ onMounted(() => {
 
   &.-empty {
     .icon {
-      opacity: 0.25;
+      background: linear-gradient(145deg, #505050 0%, #7C7C7C 100%);
+    }
+  }
+
+  &.-list {
+    &:not(.-empty) + .lists-item.-empty {
+      margin-top: 10px;
+    }
+
+    &.-empty {
+      padding: 5px 0;
+
+      .icon {
+        flex-basis: 25px;
+        width: 25px;
+        height: 25px;
+
+        img {
+          width: 25px;
+          height: 25px;
+        }
+      }
+
+      .copy {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        h5 {
+          font-size: 15px;
+          font-weight: 400;
+        }
+      }
+    }
+  }
+
+  &.-box {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 15px;
+    border-radius: 15px;
+    background-color: rgba(var(--theme-back-rgb), 0.2);
+    border: 1px solid rgba(var(--theme-front-rgb), 0.2);
+
+    .copy {
+      flex-direction: column;
+      align-items: flex-start;
     }
   }
 }

@@ -7,6 +7,7 @@ import { useRelayStore } from '@/stores/relays'
 const props = defineProps([
   'publicKey',
   'relayIds',
+  'hideName',
   'showAvatar',
   'avatarSize',
   'avatarStyle',
@@ -37,14 +38,14 @@ function loadUserData() {
     request.init(onUserData, true)
     request.start(
       relayIds[0],
-      filter
+      [filter]
     )
   } else {
     request = multiRelayRequest()
     request.init(onUserData)
     request.start(
       relayIds, 
-      filter
+      [filter]
     )
   }
 }
@@ -111,10 +112,11 @@ const image = computed(() => {
 })
 
 const classObject = computed(() => {
-  const c = [
-    'username',
-    '-' + (props.layout || 'horizontal')
-  ]
+  const c = ['username']
+
+  if(props.layout) {
+    c.push('-'+props.layout)
+  }
 
   if(props.showAvatar) {
     c.push('-avatar')
@@ -155,7 +157,7 @@ onBeforeUnmount(() => {
       :style="avatarStyle"
       :size="avatarSize"
     />
-    {{ userName }}
+    <template v-if="!hideName">{{ userName }}</template>
   </NuxtLink>
 </template>
 

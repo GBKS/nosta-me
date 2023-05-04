@@ -16,7 +16,7 @@ export default function multiRelayRequest () {
     log: !true,
     initialized: false,
     relayIds: null,
-    filter: null,
+    filters: null,
     events: {},
     subscriptions: {},
     relaysWaitingForConnection: [],
@@ -38,9 +38,9 @@ export default function multiRelayRequest () {
       }
     },
 
-    start(relayIds, filter) {
+    start(relayIds, filters) {
       this.relayIds = relayIds
-      this.filter = filter
+      this.filters = filters
 
       if(relayIds && relayIds.length > 0) {
         for(let i=0; i<relayIds.length; i++) {
@@ -82,13 +82,11 @@ export default function multiRelayRequest () {
 
       if(relay.status == 'connected') {
         if(connection) {
-          const subscription = connection.sub([
-            this.filter
-          ])
+          const subscription = connection.sub(this.filters)
 
           this.subscriptions[relayId] = subscription
 
-          // console.log('subbing now', subscription, relayId, this.filter)
+          // console.log('subbing now', subscription, relayId, this.filters)
           subscription.on('event', this.onEvent.bind(this, relayId))
           subscription.on('eose', this.onEndOfEvents.bind(this, relayId))
         } else {

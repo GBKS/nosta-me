@@ -5,7 +5,8 @@ import ToolBox from '@/helpers/toolBox'
 import useAssets from  '@/composables/useAssets.js'
 
 const props = defineProps([
-  'info'
+  'info',
+  'direction'
 ])
 
 const invoice = ref(null)
@@ -149,7 +150,7 @@ onMounted(() => {
     </div>
     <div class="copy">
       <p class="amount">
-        To <UiUsername
+        {{ direction == 'sent' ? 'To' : 'From' }} <UiUsername
         :publicKey="targetUserPublicKey"
         :relayIds="[info.relay]" 
       /></p>
@@ -165,10 +166,10 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 10px;
-  background-color: rgba(var(--theme-front-rgb), 0.025);
+  // background-color: rgba(var(--theme-front-rgb), 0.025);
   // border: 1px solid rgba(var(--theme-front-rgb), 0.05);
-  border-radius: 10px;
-  padding: 10px;
+  // border-radius: 10px;
+  // padding: 10px;
 
   .icon {
     flex-shrink: 0;

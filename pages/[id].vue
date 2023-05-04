@@ -15,7 +15,8 @@ const relayEvent = ref(null)
 const followData = ref(null)
 const badgeData = ref(null)
 const reportsData = ref(null)
-const zapsData = ref(null)
+const sentZapsData = ref(null)
+const receivedZapsData = ref(null)
 const listsData = ref(null)
 const status = ref(null)
 let nip05Data = null
@@ -38,14 +39,17 @@ const tabInfo = ref({
   'reports': {
     name: 'Reports'
   },
-  'zaps': {
-    name: 'Zaps'
+  'zaps-sent': {
+    name: 'Zaps sent'
+  },
+  'zaps-received': {
+    name: 'Zaps received'
   },
   'lists': {
     name: 'Lists'
   }
 })
-const activeTabId = ref('following')
+const activeTabId = ref(null)
 
 function selectTab(value) {
   activeTabId.value = value
@@ -70,7 +74,7 @@ function updateFromRoute() {
     sessionStore.theme = route.query.t
   }
 
-  if(newRouteId != routeId) {
+  if(newRouteId != routeId.value) {
     routeId.value = newRouteId
 
     reset()
@@ -81,6 +85,7 @@ function updateFromRoute() {
 watch(() => route.query, () => updateFromRoute)
 
 onBeforeMount(() => {
+  console.log('onBeforeMount')
   updateFromRoute()
 })
 
@@ -163,6 +168,10 @@ function loadNprofile(nprofile) {
     loadPublicKey(data.pubkey, relayIds)
   }
 }
+
+const baseUrl = computed(() => {
+  return '/' + route.params.id
+})
 
 function getProfileUrl() {
   let result = ''
@@ -370,10 +379,12 @@ function handleLoadedRelayList(data) {
     if(tag.length == 2 || (tag.length == 3 && tag[2] == 'write')) {
       relayId = relayManager.addRelayByUrl(tag[1])
 
-      relayData.value.push(relayId)
+      if(relayData.value.indexOf(relayId) === -1) {
+        relayData.value.push(relayId)
 
-      if(profileService) {
-        profileService.addRelay(relayId)
+        if(profileService) {
+          profileService.addRelay(relayId)
+        }
       }
     }
   }
@@ -409,24 +420,32 @@ function handleLoadedReportEvent(data) {
 function handleLoadedZapEvent(data) {
   // console.log('handleLoadedZapEvent', data)
 
-  if(!zapsData.value) {
-    zapsData.value = []
+  const isSender = data.pubkey == publicKey.value
+
+  if(isSender && !sentZapsData.value) {
+    sentZapsData.value = []
   }
+
+  if(!isSender && !receivedZapsData.value) {
+    receivedZapsData.value = []
+  }
+
+  const zapArray = isSender ? sentZapsData : receivedZapsData
 
   // Ensure it's not already added.
   let alreadyAdded = false
-  for(let i=0; i<zapsData.value.length; i++) {
-    if(zapsData.value[i].id == data.id) {
+  for(let i=0; i<zapArray.value.length; i++) {
+    if(zapArray.value[i].id == data.id) {
       alreadyAdded = true
       break
     }
   }
   
   if(!alreadyAdded) {
-    zapsData.value.push(data)
+    zapArray.value.push(data)
 
-    const count = zapsData.value.length
-    tabInfo.value.zaps.name = count + ' Zap' + (count !== 1 ? 's' : '')
+    // const count = zapsData.value.length
+    // tabInfo.value.zaps.name = count + ' Zap' + (count !== 1 ? 's' : '')
   }
 }
 
@@ -480,7 +499,8 @@ function reset() {
   nip05Data = null
   publicKey.value = null
   reportsData.value = null
-  zapsData.value = null
+  sentZapsData.value = null
+  receivedZapsData.value = null
   badgeData.value = null
   listsData.value = null
   profileDataStats.value = null
@@ -551,37 +571,91 @@ onMounted(() => {
             @showDataOverlay="onShowDataOverlay"
           />
           <UiTabs
+            v-if="false"
             :activeId="activeTabId"
             :info="tabInfo"
             theme="theme"
             @selectTab="selectTab"
           />
           <div class="lists">
+            <template v-if="!activeTabId">
+              <ProfileFollowSummary
+                :info="followData"
+                :count="followData ? followData.tags.length : null"
+                @navigate="selectTab"
+              />
+              <ProfileZapSummary
+                :info="sentZapsData"
+                :count="sentZapsData ? sentZapsData.length : null"
+                :publicKey="publicKey"
+                direction="sent"
+                @navigate="selectTab"
+              />
+              <ProfileZapSummary
+                :info="receivedZapsData"
+                :count="receivedZapsData ? receivedZapsData.length : null"
+                direction="received"
+                @navigate="selectTab"
+              />
+              <ProfileBadgeSummary
+                :info="badgeData"
+                :count="badgeData ? badgeData.length : null"
+                @navigate="selectTab"
+              />
+              <ProfileListSummary
+                :info="listsData"
+                :count="listsData ? listsData.length : null"
+                @navigate="selectTab"
+              />
+              <ProfileRelaySummary
+                :info="relayData"
+                :count="relayData ? relayData.length : null"
+                @navigate="selectTab"
+              />
+              <ProfileReportSummary
+                :info="reportsData"
+                :count="reportsData ? reportsData.length : null"
+                @navigate="selectTab"
+              />
+            </template>
             <ProfileFollowList
               v-if="activeTabId == 'following' && followData" 
               :info="followData"
               :profileService="profileService"
+              @back="selectTab"
             />
             <ProfileBadgeList
               v-if="activeTabId == 'badges'" 
               :info="badgeData"
               :profileService="profileService"
+              @back="selectTab"
             />
             <ProfileRelayList 
               v-if="activeTabId == 'relays'" 
               :info="relayData" 
+              @back="selectTab"
             />
             <ProfileReportList 
               v-if="activeTabId == 'reports'" 
               :info="reportsData" 
+              @back="selectTab"
             />
             <ProfileZapList 
-              v-if="activeTabId == 'zaps'" 
-              :info="zapsData" 
+              v-if="activeTabId == 'zaps-sent'" 
+              :info="sentZapsData"
+              direction="sent" 
+              @back="selectTab"
+            />
+            <ProfileZapList 
+              v-if="activeTabId == 'zaps-received'" 
+              :info="receivedZapsData"
+              direction="received"
+              @back="selectTab"
             />
             <ProfileListsList 
               v-if="activeTabId == 'lists'" 
               :info="listsData" 
+              @back="selectTab"
             />
           </div>
         </div>
@@ -625,7 +699,12 @@ onMounted(() => {
       margin-top: 30px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 30px;
+
+      > * {
+        padding-top: 30px;
+        border-top: 1px solid rgba(var(--theme-front-rgb), 0.1);
+      }
     }
   }
 

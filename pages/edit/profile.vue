@@ -88,10 +88,10 @@ function loadData() {
 
   const relaysToCheck = relayStore.getAll
 
-  service.start(relaysToCheck, {
+  service.start(relaysToCheck, [{
       kinds: [0, 2],
       authors: [sessionStore.publicKey]
-  })
+  }])
 }
 
 function onDataLoaded(data) {

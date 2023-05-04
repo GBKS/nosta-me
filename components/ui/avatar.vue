@@ -36,7 +36,7 @@ const classObject = computed(() => {
   >
     <img
       :src="image" 
-      :alt="name"
+      :title="name"
       @load="onLoadImage" 
     />
   </span>
@@ -84,6 +84,13 @@ const classObject = computed(() => {
     img {
       width: 60px;
       height: 60px;
+    }
+  }
+  
+  &.-huge {
+    img {
+      width: 75px;
+      height: 75px;
     }
   }
 }

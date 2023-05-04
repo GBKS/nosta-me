@@ -65,24 +65,39 @@ export default {
       console.log('profileService.checkCurrentRelay', this.searchType, this.publicKey, this.relaysToCheck)
     }
 
-    this.service.start(this.relaysToCheck, {
-        kinds: [
-          0, // Profile info (meta data)
-          2, // Recommended relays
-          3, // Contacts
-          1984, // Reports
-          9735, // Zaps
-          10000, // Mute list
-          10001, // Pin list
-          10002, // Relay list meta data
-          30000, // Categorized people
-          30001, // Categorized bookmarks
-          // 30009, // Badge definition
-          // 8, // Badge award
-          30008 // Badges
-        ],
-        authors: [this.publicKey]
-    })
+    const createdContentFilter = {
+      kinds: [
+        0, // Profile info (meta data)
+        2, // Recommended relays
+        3, // Contacts
+        1984, // Reports
+        9735, // Zaps
+        10000, // Mute list
+        10001, // Pin list
+        10002, // Relay list meta data
+        30000, // Categorized people
+        30001, // Categorized bookmarks
+        // 30009, // Badge definition
+        // 8, // Badge award
+        30008, // Badges
+        30017, // Stall
+        30018, // Product
+        1063, // Files
+        9802, // Highlights
+        31337, // Zapstr tracks
+      ],
+      authors: [this.publicKey]
+    }
+
+    const receivedZapsFilter = {
+      kinds: [9735],
+      '#p': [this.publicKey]
+    }
+
+    this.service.start(this.relaysToCheck, [
+      createdContentFilter,
+      receivedZapsFilter
+    ])
   },
 
   onEvent(data) {
@@ -116,6 +131,16 @@ export default {
       // console.log('!!! Seeing an accepted badge', data)
     } else if(data.kind == 30009) {
       // console.log('!!! Seeing a badge 30009', data)
+    } else if(data.kind == 30017) {
+      console.log('!!! Seeing a stall', data)
+    } else if(data.kind == 30018) {
+      console.log('!!! Seeing a product', data)
+    } else if(data.kind == 1063) {
+      console.log('!!! Seeing a file', data)
+    } else if(data.kind == 9802) {
+      console.log('!!! Seeing a highlights', data)
+    } else if(data.kind == 31337) {
+      console.log('!!! Seeing a Zapstr tracks', data)
     } else if(data.kind == 8) {
       // console.log('!!! Seeing a badge 8', data)
     } else if(data.type == 'end') {

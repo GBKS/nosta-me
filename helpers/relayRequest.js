@@ -17,7 +17,7 @@ export default function relayService () {
     initialized: false,
     autoClose: true,
     relayId: null,
-    filter: null,
+    filters: null,
     events: {},
     subscription: null,
     relayStore: null,
@@ -42,9 +42,9 @@ export default function relayService () {
       }
     },
 
-    start(relayId, filter) {
+    start(relayId, filters) {
       this.relayId = relayId
-      this.filter = filter
+      this.filters = filters
 
       this.subscribe()
     },
@@ -68,12 +68,10 @@ export default function relayService () {
 
       if(relay.status == 'connected') {
         if(connection) {
-          this.subscription = connection.sub([
-            this.filter
-          ])
+          this.subscription = connection.sub(this.filters)
 
           if(this.log) {
-            console.log('subbing now', this.subscription, this.relayId, this.filter)
+            console.log('subbing now', this.subscription, this.relayId, this.filters)
           }
 
           this.subscription.on('event', this.onEvent.bind(this))

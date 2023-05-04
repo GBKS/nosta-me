@@ -17,6 +17,8 @@ const props = defineProps([
   'profileService'
 ])
 
+const emit = defineEmits(['back'])
+
 const name = computed(() => {
   let result = null
 
@@ -25,6 +27,10 @@ const name = computed(() => {
 
 const followCount = computed(() => {
   return combinedProfileList.value.length
+})
+
+const title = computed(() => {
+  return 'Following ' + followCount.value + ' other' + (followCount.value == 1 ? '' : 's')
 })
 
 const combinedProfileList = computed(() => {
@@ -111,16 +117,19 @@ const showLoader = computed(() => {
 <template>
   <Transition name="fade" appear>
     <div v-if="info && info.tags" class="follow-list">
+      <ProfileSectionBack @select="$emit('back')" />
+      <ProfileSectionTitle :title="title" />
       <UiLoadIndicator
         v-if="showLoader"
       />
       <template v-if="!showLoader">
-        <h2 v-if="false">Follows <span v-if="followCount > 0">({{ followCount }})</span></h2>
-        <ProfileFollowItem
-          v-for="(publicKey, index) in displayProfileList"
-          :key="publicKey"
-          :publicKey="publicKey"
-        />
+        <div class="items">
+          <ProfileFollowItem
+            v-for="(publicKey, index) in displayProfileList"
+            :key="publicKey"
+            :publicKey="publicKey"
+          />
+        </div>
         <UiPagination
           v-if="pageCount > 1"
           :activeIndex="currentPage"
@@ -137,18 +146,19 @@ const showLoader = computed(() => {
 .follow-list {
   display: flex;
   flex-direction: column;
-  flex-basis: 20%;
-  flex-grow: 1;
+  align-items: flex-start;
 
-  h2 {
-    margin-bottom: 10px;
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--theme-front);
+  .items {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
 
   .pagination {
     margin-top: 20px;
+    width: 100%;
+    justify-content: center;
   }
 }
 

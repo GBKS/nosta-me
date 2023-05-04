@@ -84,10 +84,10 @@ export default function contactsService () {
       this.request.init(this.loadCallback)
       this.request.start(
         this.relayIds,
-        {
+        [{
           kinds: [0],
           authors: keysToLoad
-        }
+        }]
       )
     },
 

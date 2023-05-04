@@ -16,13 +16,6 @@ const relayStore = useRelayStore()
 let reportType = null
 let userId = null
 let noteId = null
-const knownTypes = [
-  'nudity',
-  'profanity',
-  'illegal',
-  'spam',
-  'impersonation'
-]
 
 function parseInfo() {
   let tag, i
@@ -58,7 +51,7 @@ function loadUserData() {
 
   const request = multiRelayRequest()
   request.init(onUserData)
-  request.start(relayStore.getAll, filter)
+  request.start(relayStore.getAll, [filter])
 
   // const request = relayRequest()
   // request.init(onBadgeData, false)
@@ -115,16 +108,6 @@ const noteLink = computed(() => {
   return 'https://snort.social/e/' + noteId
 })
 
-const reportImage = computed(() => {
-  let type = reportType
-  if(type && knownTypes.indexOf(type) === -1) {
-    type = 'unknown'
-  }
-
-  const image =  '/assets/images/report-'+type+'.jpg'
-  return useAssets(image)
-})
-
 const formattedDate = computed(() => {
   return ToolBox.formatRelativeDate(props.info.created_at)
 })
@@ -152,12 +135,7 @@ onMounted(() => {
 
 <template>
   <div class="report-item">
-    <div class="icon">
-      <img
-        :src="reportImage"
-        alt=""
-      >
-    </div>
+    <ProfileReportIcon :type="reportType" />
     <div class="copy">
       <p v-if="noteId">Reported a <NuxtLink :to="noteLink" target="_blank" rel="nofollow noopener noreferrer">note</NuxtLink> by <NuxtLink :to="userLink">{{ userName }}</NuxtLink> for <b>{{ reportType }}</b> on {{ formattedDate }}.</p> 
       <p v-if="!noteId">Reported <NuxtLink :to="userLink">{{ userName }}</NuxtLink> for <b>{{ reportType }}</b> on {{ formattedDate }}.</p> 

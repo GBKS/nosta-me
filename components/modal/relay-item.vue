@@ -99,7 +99,7 @@ const status = computed(() => {
 
 // Need to store this centrally so it can be recovered on re-render
 function loadRelayData() {
-  console.log('loadRelayData', props.info)
+  // console.log('loadRelayData', props.info)
   let currentRelayUrl = props.info.url.replace('wss://', 'https://')
 
   loadStatus.value = 'loading'
@@ -110,7 +110,7 @@ function loadRelayData() {
       .then(onRelayData)
       .catch(onRelayDataError)
   } catch(error) {
-    console.log('loadRelayData error', error)
+    console.log('ModalRelayItem.loadRelayData error', error)
     onRelayDataError(error)
   }
 }
@@ -203,7 +203,10 @@ onMounted(() => {
 
   &.-theme {
     box-shadow: none;
-    background-color: rgba(var(--theme-front-rgb), 0.05);
+    padding: 15px;
+    border-radius: 15px;
+    background-color: rgba(var(--theme-back-rgb), 0.2);
+    border: 1px solid rgba(var(--theme-front-rgb), 0.2);
 
     h4 {
       color: var(--theme-front);

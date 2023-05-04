@@ -1,24 +1,33 @@
 <script setup>
 const props = defineProps([
   'info',
-  'profileService'
+  'profileService',
+  'direction'
 ])
+
+const emit = defineEmits(['back'])
 
 const zapCount = computed(() => {
   return props.info.length
+})
+
+const title = computed(() => {
+  return zapCount.value + ' zap' + (zapCount.value == 1 ? '' : 's') + ' ' + props.direction
 })
 </script>
 
 <template>
   <Transition name="fade" appear>
     <div v-if="info" class="zap-list">
-      <h2 v-if="false">Zaps <span v-if="zapCount > 0">({{ zapCount }})</span></h2>
+      <ProfileSectionBack @select="$emit('back')" />
+      <ProfileSectionTitle :title="title" />
       <p>Zaps are bitcoin payments to other Nostr users.</p>
       <div class="list">
         <ProfileZapItem
           v-for="(item, index) in info"
           :key="item.id"
           :info="item"
+          :direction="props.direction"
         />
       </div>
     </div>
@@ -28,20 +37,7 @@ const zapCount = computed(() => {
 <style scoped lang="scss">
 
 .zap-list {
-  display: flex;
-  flex-direction: column;
-  flex-basis: 20%;
-  flex-grow: 1;
-
-  h2 {
-    margin-bottom: 10px;
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--theme-front);
-  }
-
   > p {
-    text-align: center;
     color: var(--theme-front);
     opacity: 0.5;
     font-weight: 500;
@@ -62,7 +58,7 @@ const zapCount = computed(() => {
   @include media-query(medium-up) {
     .list {
       flex-wrap: wrap;
-      gap: 20px;
+      gap: 30px;
 
       .zap-item {
         flex-basis: 35%;
