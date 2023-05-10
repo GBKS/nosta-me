@@ -1,6 +1,7 @@
 <script setup>
 import bolt11Decoder from 'light-bolt11-decoder'
 import useAssets from  '@/composables/useAssets.js'
+import ToolBox from '@/helpers/toolBox'
 
 const props = defineProps([
   'info',
@@ -183,37 +184,63 @@ const rankStyle = computed(() => {
 })
 
 const recipientOne = computed(() => {
-  return prepRecipientInfo(props.info[0])
+  return prepRecipientInfo(0)
 })
 
 const recipientTwo = computed(() => {
-  return prepRecipientInfo(props.info[1])
+  return prepRecipientInfo(1)
 })
 
 const recipientThree = computed(() => {
-  return prepRecipientInfo(props.info[2])
+  return prepRecipientInfo(2)
 })
 
-function prepRecipientInfo(event) {
-  let publicKey, description
-  for(let i=0; i<event.tags.length; i++) {
-    // if(event.tags[i][0] == 'p') {
-    //   publicKey = event.tags[i][1]
-    //   break
+const uniqueRecipientEvents = computed(() => {
+  let result
+
+  let publicKeys = [], event, publicKey, descriptionTag
+  for(let i=0; i<props.info.length; i++) {
+    event = props.info[i]
+
+    publicKey = event.pubkey
+
+    // if(props.direction == 'sent') {
+    //   descriptionTag = ToolBox.findTag(event, 'description')
+    //   publicKey = JSON.parse(descriptionTag[0]).pubkey
+    // } else {
+    //   publicKey = event.pubkey
     // }
 
-    if(event.tags[i][0] == 'description') {
-      publicKey = JSON.parse(event.tags[i][1]).pubkey
-      break
+    if(publicKeys.indexOf(event.pubkey) === -1) {
+      publicKeys.push(event.pubkey)
+
+      if(!result) result = []
+      result.push(event)
     }
   }
 
-  // console.log('prep', publicKey, event.pubkey)
+  return result
+})
 
-  return {
-    publicKey: event.pubkey,
-    relayIds: [event.relay]
+const uniqueRecipientEventCount = computed(() => {
+  return uniqueRecipientEvents.value ? uniqueRecipientEvents.value.length : 0
+})
+
+function prepRecipientInfo(index) {
+  let result
+
+  if(uniqueRecipientEvents.value && uniqueRecipientEvents.value.length >= index) {
+    const event = uniqueRecipientEvents.value[index]
+
+    result = {
+      publicKey: event.pubkey,
+      relayIds: [event.relay]
+    }
   }
+
+  // console.log('prepRecipientInfo', index, result)
+   
+  return result
 }
 
 const emit = defineEmits(['navigate'])
@@ -234,27 +261,27 @@ function navigate() {
           @select="navigate"
         />
 
-        <p v-if="info.length > 0">
+        <p v-if="uniqueRecipientEventCount > 0">
           <template v-if="direction == 'sent'">To </template> 
           <template v-if="direction != 'sent'">From </template> 
           <UiUsername
             :publicKey="recipientOne.publicKey" 
             :relayIds="recipientOne.relayIds"
           />
-          <template v-if="info.length == 1"> and </template>
-          <template v-if="info.length > 1">, </template>
+          <template v-if="uniqueRecipientEventCount == 2"> and </template>
+          <template v-if="uniqueRecipientEventCount > 2">, </template>
           <UiUsername
-            v-if="info.length > 1"
+            v-if="uniqueRecipientEventCount > 1"
             :publicKey="recipientTwo.publicKey" 
             :relayIds="recipientTwo.relayIds"
           />
-          <template v-if="info.length > 2">, </template>
+          <template v-if="uniqueRecipientEventCount > 3">, </template>
           <UiUsername
-            v-if="info.length > 2"
+            v-if="uniqueRecipientEventCount > 2"
             :publicKey="recipientThree.publicKey" 
             :relayIds="recipientThree.relayIds"
           />
-          <template v-if="info.length > 3">, and others</template>.
+          <template v-if="uniqueRecipientEventCount > 4">, and others</template>.
         </p>
       </div>
     </div>

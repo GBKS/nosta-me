@@ -7,10 +7,14 @@ const props = defineProps([
   'style'
 ])
 
-const imageLoaded = ref(false)
+const imageStatus = ref('loading')
 
-function onLoadImage() {
-  imageLoaded.value = true
+function imageLoaded() {
+  imageStatus.value = 'loaded'
+}
+
+function imageLoadError() {
+  imageStatus.value = 'error'
 }
 
 const classObject = computed(() => {
@@ -18,12 +22,8 @@ const classObject = computed(() => {
     'avatar',
     '-' + (props.size || 'medium'),
     '-' + (props.style || 'default'),
-    imageLoaded.value ? '-loaded' : '-loading'
+    '-' + imageStatus.value
   ]
-
-  if(imageLoaded.value) {
-    c.push('-loaded')
-  }
 
   return c.join(' ')
 })
@@ -35,9 +35,11 @@ const classObject = computed(() => {
     :class="classObject"
   >
     <img
+      v-if="imageStatus != 'error'"
       :src="image" 
       :title="name"
-      @load="onLoadImage" 
+      @load="imageLoaded" 
+      @error="imageLoadError"
     />
   </span>
 </template>
@@ -52,7 +54,7 @@ const classObject = computed(() => {
 
   img {
     border-radius: 143px;
-    opacity: 0;
+    opacity: 0.2;
     transition: all 250ms $ease;
   }
 
@@ -67,6 +69,9 @@ const classObject = computed(() => {
   }
   
   &.-small {
+    width: 30px;
+    height: 30px;
+
     img {
       width: 30px;
       height: 30px;
@@ -74,6 +79,9 @@ const classObject = computed(() => {
   }
   
   &.-medium {
+    width: 40px;
+    height: 40px;
+
     img {
       width: 40px;
       height: 40px;
@@ -81,6 +89,9 @@ const classObject = computed(() => {
   }
   
   &.-big {
+    width: 60px;
+    height: 60px;
+
     img {
       width: 60px;
       height: 60px;
@@ -88,6 +99,9 @@ const classObject = computed(() => {
   }
   
   &.-huge {
+    width: 75px;
+    height: 75px;
+
     img {
       width: 75px;
       height: 75px;

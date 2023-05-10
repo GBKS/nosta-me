@@ -20,6 +20,8 @@ const relayStore = useRelayStore()
 
 let request = null
 let rawUserData = null
+let loadTimer = null
+const loadTimerDone = ref(false)
 const userData = ref(null)
 
 function loadUserData() {
@@ -32,6 +34,8 @@ function loadUserData() {
   const relayIds = props.relayIds || relayStore.getAll
 
   // console.log('Username.loadUserData', filter, props, relayIds[0])
+
+  loadTimer = setTimeout(onLoadTimer, 5000)
 
   if(props.relayIds && props.relayIds.length == 1) {
     request = relayRequest()
@@ -48,6 +52,10 @@ function loadUserData() {
       [filter]
     )
   }
+}
+
+function onLoadTimer() {
+  loadTimerDone.value = true
 }
 
 function onUserData(data) {
@@ -88,7 +96,7 @@ const userLink = computed(() => {
 })
 
 const userName = computed(() => {
-  let result = "_____"
+  let result = props.publicKey.substr(0, 2) + '...' + props.publicKey.substr(props.publicKey.length-2, props.publicKey.length)
 
   if(userData.value) {
     result = userData.value.content.name
@@ -111,6 +119,20 @@ const image = computed(() => {
   return result
 })
 
+const title = computed(() => {
+  let result = null
+
+  if(!userData.value) {
+    if(loadTimerDone.value) {
+      result = 'Could not load profile.'
+    } else {
+      result = 'Loading...'
+    }
+  }
+
+  return result
+})
+
 const classObject = computed(() => {
   const c = ['username']
 
@@ -126,6 +148,10 @@ const classObject = computed(() => {
     c.push('-loaded')
   }
 
+  if(loadTimerDone.value) {
+    c.push('-timer')
+  }
+
   return c.join(' ')
 })
 
@@ -139,6 +165,10 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  if(loadTimer) {
+    clearTimeout(loadTimer)
+  }
+
   if(request) {
     request.kill()
   }
@@ -149,6 +179,7 @@ onBeforeUnmount(() => {
   <NuxtLink
     :class="classObject"
     :to="userLink"
+    :title="title"
   >
     <UiAvatar
       v-if="showAvatar"
@@ -167,7 +198,7 @@ onBeforeUnmount(() => {
   color: rgba(var(--theme-front-rgb), 0.85);
   text-decoration: none;
   font-weight: 600;
-  opacity: 0;
+  opacity: 0.25;
   transition: opacity 150ms $ease;
   pointer-events: none;
 
@@ -190,6 +221,11 @@ onBeforeUnmount(() => {
   }
 
   &.-loaded {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  &.-timer {
     opacity: 1;
     pointer-events: auto;
   }

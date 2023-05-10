@@ -59,8 +59,6 @@ function prepFollowerInfo(index) {
     // TODO: No relays provided, how do we fill this in?
   }
 
-  // console.log('prepFollowerInfo', index, props.info, publicKey, relayIds)
-
   return  {
     publicKey,
     relayIds
@@ -129,6 +127,7 @@ function navigate() {
         <p v-if="count > 0">
           Including 
           <UiUsername
+            :key="followerOne.publicKey"
             :publicKey="followerOne.publicKey" 
             :relayIds="followerOne.relayIds"
           />
@@ -136,12 +135,14 @@ function navigate() {
           <template v-if="count > 2">, </template>
           <UiUsername
             v-if="count > 1"
+            :key="followerTwo.publicKey"
             :publicKey="followerTwo.publicKey" 
             :relayIds="followerTwo.relayIds"
           />
           <template v-if="count > 2">, and </template>
           <UiUsername
             v-if="count > 2"
+            :key="followerThree.publicKey"
             :publicKey="followerThree.publicKey" 
             :relayIds="followerThree.relayIds"
           />.

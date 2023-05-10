@@ -42,5 +42,55 @@ export default {
         return d.toLocaleDateString(undefined, options)
       }
     }
+  },
+
+  findTag: function(event, name, fallback) {
+    let result = fallback ? fallback : null
+
+    if(event.tags) {
+      let i=0, tags=event.tags
+      for(; i<tags.length; i++) {
+        if(tags[i][0] == name) {
+          result = tags[i].slice(1)
+          break
+        }
+      }
+    }
+
+    return result
+  },
+
+  findTags: function(event, include) {
+    const includeArray = Array.isArray(include) ? include : [include]
+    let result
+
+    if(event.tags) {
+      let i=0, tags=event.tags
+      for(; i<tags.length; i++) {
+        if(includeArray.indexOf(tags[i][0]) !== -1) {
+          if(!result) result = []
+          result.push(tags[i].slice(1))
+        }
+      }
+    }
+
+    return result
+  },
+
+  findTagsExcluding: function(event, exclude) {
+    const excludeArray = Array.isArray(exclude) ? exclude : [exclude]
+    let result
+
+    if(event.tags) {
+      let i=0, tags=event.tags
+      for(; i<tags.length; i++) {
+        if(excludeArray.indexOf(tags[i][0]) === -1) {
+          if(!result) result = []
+          result.push(tags[i].slice(1))
+        }
+      }
+    }
+
+    return result
   }
 }

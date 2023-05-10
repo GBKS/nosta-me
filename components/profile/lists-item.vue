@@ -1,8 +1,12 @@
 <script setup>
+import ToolBox from '@/helpers/toolBox'
+
 const props = defineProps([
   'info',
   'layout'
 ])
+
+const emit = defineEmits(['select'])
 
 const type = computed(() => {
   let result = 'unknown'
@@ -35,66 +39,59 @@ const type = computed(() => {
 })
 
 const entryCount = computed(() => {
-  let result = 0
-
-  for(let i=0; i<props.info.tags.length; i++) {
-    if(props.info.tags[i][0] != 'd') {
-      result ++
-    }
-  }
-
-  return result
-})
-
-const descriptionTag = computed(() => {
-  let result = null
-
-  for(let i=0; i<props.info.tags.length; i++) {
-    if(props.info.tags[i][0] == 'd') {
-      result = props.info.tags[i][1]
-      break
-    }
-  }
-
-  return result
+  const tags = ToolBox.findTagsExcluding(props.info, ['d'])
+  return tags ? tags.length : 0
 })
 
 const title = computed(() => {
-  let result = 'unknown ('+type.value+')'
+  const descriptionTag = ToolBox.findTag(props.info, 'd')
+  let result = descriptionTag ? descriptionTag[0] : null
+  // let result = 'unknown ('+type.value+')'
 
-  switch(type.value) {
-    case 'mute':
-      result = entryCount.value + ' muted profile' + (entryCount.value == 1 ? '' : 's')
-      break
-    case 'pin':
-      result = entryCount.value + ' pinned note' + (entryCount.value == 1 ? '' : 's')
-      break
-    case 'people':
-      if(descriptionTag.value) {
-        result = descriptionTag.value
-
-        if(descriptionTag.value.length > 20) {
-          const bits = descriptionTag.value.split('/')
-          if(bits.length == 3) {
-            result = bits[0] + '/' + bits[1].substr(0, 5) + '...' + bits[1].substr(-5) + '/' + bits[2]
-          }
-        }
-      } else {
-        result = entryCount.value + ' profile' + (entryCount.value == 1 ? '' : 's')
-      }
-      break
-    case 'bookmarks':
-      result = entryCount.value + ' pinned note' + (entryCount.value == 1 ? '' : 's')
-      break
+  if(result && result.length > 25) {
+    result = result.substr(0, 10) + '...' + result.substr(result.length-10, result.length)
   }
+
+  if(!result) {
+    switch(type.value) {
+      case 'mute':
+        result = entryCount.value + ' muted profile' + (entryCount.value == 1 ? '' : 's')
+        break
+      case 'pin':
+        result = entryCount.value + ' pinned note' + (entryCount.value == 1 ? '' : 's')
+        break
+      case 'people':
+        if(result) {
+          // result = descriptionTag[0]
+
+          if(result.length > 20) {
+            const bits = result.split('/')
+            if(bits.length == 3) {
+              result = bits[0] + '/' + bits[1].substr(0, 5) + '...' + bits[1].substr(-5) + '/' + bits[2]
+            }
+          }
+        } else {
+          result = entryCount.value + ' profile' + (entryCount.value == 1 ? '' : 's')
+        }
+        break
+      case 'bookmarks':
+        result = entryCount.value + ' pinned note' + (entryCount.value == 1 ? '' : 's')
+        break
+    }
+  }
+
+  result = result.charAt(0).toUpperCase() + result.substr(1)
 
   return result
 })
 
 const description = computed(() => {
-  let result = null
+  let result
 
   switch(type.value) {
+    case 'mute':
+      result = entryCount.value + ' muted profile' + (entryCount.value == 1 ? '' : 's')
+      break
     case 'pin':
       result = entryCount.value + ' pinned note' + (entryCount.value == 1 ? '' : 's')
       break
@@ -125,10 +122,21 @@ const classObject = computed(() => {
 
   return c.join(' ')
 })
+
+function click() {
+  emit('select', props.info)
+}
+
+onMounted(() => {
+  console.log('ListsItem.onMounted', props.info)
+})
 </script>
 
 <template>
-  <div :class="classObject">
+  <button
+    :class="classObject"
+    @click="click"
+  >
     <div class="icon">
       <img
         :src="listImage"
@@ -137,9 +145,9 @@ const classObject = computed(() => {
     </div>
     <div class="copy">
       <h5>{{ title }}</h5>
-      <p v-if="description">{{ description }}</p>
+      <p v-if="description && description != title">{{ description }}</p>
     </div>
-  </div>
+  </button>
 </template>
 
 <style scoped lang="scss">
@@ -149,6 +157,11 @@ const classObject = computed(() => {
   align-items: center;
   gap: 15px;
   padding: 10px 0;
+  appearance: none;
+  background-color: transparent;
+  border-width: 0;
+  cursor: pointer;
+  text-align: left;
 
   .icon {
     flex-basis: 50px;
@@ -231,10 +244,16 @@ const classObject = computed(() => {
     border-radius: 15px;
     background-color: rgba(var(--theme-back-rgb), 0.2);
     border: 1px solid rgba(var(--theme-front-rgb), 0.2);
+    transition: all 250ms $ease;
 
     .copy {
       flex-direction: column;
       align-items: flex-start;
+    }
+
+    &:hover {
+      background-color: rgba(var(--theme-back-rgb), 0.3);
+      border: 1px solid rgba(var(--theme-front-rgb), 0.3);
     }
   }
 }

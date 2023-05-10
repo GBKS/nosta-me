@@ -3,46 +3,41 @@ import Icons from '@/helpers/icons'
 
 const props = defineProps([
   'info',
-  'count',
-  'baseUrl'
+  'count'
 ])
 
 const emit = defineEmits(['navigate'])
 
-const visibleBadges =  computed(() => {
-  return props.count > 0 ? props.info.slice(0, 5) : null
-})
-
-const detailUrl = computed(() => {
-  return props.baseUrl + '/badges'
+const visibleFiles =  computed(() => {
+  return props.count > 0 ? props.info.slice(0, 4) : null
 })
 
 const titleCopy = computed(() => {
-  let result = 'No badges yet'
+  let result = 'No files yet'
 
   if(props.count > 0) {
-    result = 'Received ' + props.count + ' badge' + (props.count == 1 ? '' : 's')
+    result = 'Shared ' + props.count + ' file' + (props.count == 1 ? '' : 's')
   }
 
   return result
 })
 
 function navigate() {
-  emit('navigate', 'badges')
+  emit('navigate', 'files')
 }
 </script>
 
 <template>
   <Transition name="fade" appear>
-    <div v-if="count > 0" class="badge-summary">
+    <div v-if="count > 0" class="file-summary">
       <ProfileSectionTitle
         :title="titleCopy"
         :clickable="true"
         @select="navigate"
       />
-      <div class="badges">
-        <ProfileBadgeItem
-          v-for="(item, index) in visibleBadges"
+      <div class="files">
+        <ProfileFileItem
+          v-for="(item, index) in visibleFiles"
           :key="item.id"
           :info="item"
         />
@@ -53,11 +48,16 @@ function navigate() {
 
 <style scoped lang="scss">
 
-.badge-summary {
-  .badges {
+.file-summary {
+  .files {
     margin-top: 25px;
     display: flex;
     @include r('gap', 10, 25);
+
+    > * {
+      flex-basis: 10%;
+      flex-grow: 1;
+    }
   }
 }
 

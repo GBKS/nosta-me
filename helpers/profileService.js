@@ -136,11 +136,11 @@ export default {
     } else if(data.kind == 30018) {
       console.log('!!! Seeing a product', data)
     } else if(data.kind == 1063) {
-      console.log('!!! Seeing a file', data)
+      // console.log('!!! Seeing a file', data)
     } else if(data.kind == 9802) {
-      console.log('!!! Seeing a highlights', data)
+      console.log('!!! Seeing a highlight', data)
     } else if(data.kind == 31337) {
-      console.log('!!! Seeing a Zapstr tracks', data)
+      console.log('!!! Seeing a Zapstr track', data)
     } else if(data.kind == 8) {
       // console.log('!!! Seeing a badge 8', data)
     } else if(data.type == 'end') {

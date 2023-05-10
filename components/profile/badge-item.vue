@@ -9,6 +9,7 @@ const props = defineProps([
 
 let rawBadgeData = null
 const badgeData = ref(null)
+const imageStatus = ref(null)
 const relayStore = useRelayStore()
 let badgeTag = null
 
@@ -50,7 +51,7 @@ function requestBadgeData(tag) {
 }
 
 function onBadgeData(data) {
-  // console.log('onBadgeData', data)
+  console.log('onBadgeData', data)
 
   rawBadgeData = data
   const refinedData = {
@@ -128,7 +129,26 @@ const link = computed(() => {
   return result
 })
 
+const classObject = computed(() => {
+  const c = ['badge-item']
+
+  if(imageStatus.value) {
+    c.push('-'+imageStatus.value)
+  }
+
+  return c.join(' ')
+})
+
+function imageLoaded() {
+  imageStatus.value = 'loaded'
+}
+
+function imageLoadError() {
+  imageStatus.value = 'error'
+}
+
 onMounted(() => {
+  console.log('BadgeItem.onMounted', props.info)
   loadBadgeData()
 })
 </script>
@@ -137,20 +157,32 @@ onMounted(() => {
   <Transition name="fade" appear>
     <a
       v-if="badgeData"
-      class="badge-item"
+      :class="classObject"
       :href="link"
       target="_blank"
       rel="nofollow noopener noreferrer"
     >
       <img
-        v-if="thumb"
+        v-if="thumb && imageStatus != 'error'"
         :src="thumb.image"
         :alt="badgeData.name"
         :width="thumb.width"
         :height="thumb.height"
+        @load="imageLoaded"
+        @error="imageLoadError"
       />
+      <div
+        v-if="!thumb || imageStatus == 'error'"
+        class="error"
+      >
+        <p>Could not load image.</p>
+      </div>
       <h5>{{ badgeData.name }}</h5>
       <p>{{ badgeData.name }}</p>
+      <UiUsername
+        :publicKey="rawBadgeData.pubkey"
+        :relayIds="[rawBadgeData.relay]"
+      />
     </a>
   </Transition>
 </template>
@@ -167,6 +199,19 @@ onMounted(() => {
     width: 125px;
     height: 125px;
     object-fit: contain;
+  }
+
+  .error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 125px;
+    padding: 5px;
+    box-sizing: border-box;
+    border-radius: 15px;
+    background-color: rgba(var(--theme-back-rgb), 0.2);
+    border: 1px solid rgba(var(--theme-front-rgb), 0.2);
   }
 
   h5 {

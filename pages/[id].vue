@@ -17,6 +17,7 @@ const badgeData = ref(null)
 const reportsData = ref(null)
 const sentZapsData = ref(null)
 const receivedZapsData = ref(null)
+const fileData = ref(null)
 const listsData = ref(null)
 const status = ref(null)
 let nip05Data = null
@@ -45,14 +46,25 @@ const tabInfo = ref({
   'zaps-received': {
     name: 'Zaps received'
   },
+  'files': {
+    name: 'Files'
+  },
   'lists': {
     name: 'Lists'
+  },
+  'list': {
+    name: 'List',
+    info: null
   }
 })
 const activeTabId = ref(null)
 
-function selectTab(value) {
+function selectTab(value, info) {
+  console.log('selectTab', value, info)
   activeTabId.value = value
+  if(tabInfo.value[value] && info) {
+    tabInfo.value[value].info = info
+  }
 }
 
 function updateFromRoute() {
@@ -288,6 +300,9 @@ function onLoadProfileEvent(data) {
   } else if(data.kind == 1984) {
     // A report
     handleLoadedReportEvent(data)
+  } else if(data.kind == 1063) {
+    // A file
+    handleLoadedFileEvent(data)
   } else if(data.kind == 9735) {
     // A zap
     handleLoadedZapEvent(data)
@@ -414,6 +429,30 @@ function handleLoadedReportEvent(data) {
 
     const count = reportsData.value.length
     tabInfo.value.reports.name = count + ' Report' + (count !== 1 ? 's' : '')
+  }
+}
+
+function handleLoadedFileEvent(data) {
+  // console.log('handleLoadedFileEvent', data)
+
+  if(!fileData.value) {
+    fileData.value = []
+  }
+
+  // Ensure it's not already added.
+  let alreadyAdded = false
+  for(let i=0; i<fileData.value.length; i++) {
+    if(fileData.value[i].id == data.id) {
+      alreadyAdded = true
+      break
+    }
+  }
+
+  if(!alreadyAdded) {
+    fileData.value.push(data)
+
+    const count = fileData.value.length
+    tabInfo.value.reports.name = count + ' File' + (count !== 1 ? 's' : '')
   }
 }
 
@@ -602,7 +641,7 @@ onMounted(() => {
                 :count="badgeData ? badgeData.length : null"
                 @navigate="selectTab"
               />
-              <ProfileListSummary
+              <ProfileListsSummary
                 :info="listsData"
                 :count="listsData ? listsData.length : null"
                 @navigate="selectTab"
@@ -615,6 +654,11 @@ onMounted(() => {
               <ProfileReportSummary
                 :info="reportsData"
                 :count="reportsData ? reportsData.length : null"
+                @navigate="selectTab"
+              />
+              <ProfileFileSummary
+                :info="fileData"
+                :count="fileData ? fileData.length : null"
                 @navigate="selectTab"
               />
             </template>
@@ -652,9 +696,22 @@ onMounted(() => {
               direction="received"
               @back="selectTab"
             />
+            <ProfileFileList 
+              v-if="activeTabId == 'files'" 
+              :info="fileData" 
+              @navigate="selectTab"
+              @back="selectTab"
+            />
             <ProfileListsList 
               v-if="activeTabId == 'lists'" 
               :info="listsData" 
+              @navigate="selectTab"
+              @back="selectTab"
+            />
+            <ProfileListList 
+              v-if="activeTabId == 'list'" 
+              :info="tabInfo.list.info" 
+              @navigate="selectTab"
               @back="selectTab"
             />
           </div>

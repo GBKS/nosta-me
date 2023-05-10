@@ -7,6 +7,11 @@ onMounted(() => {
   const damusId = relayManager.addRelayByUrl('wss://relay.damus.io')
   
   users.value = [
+    // {
+    //   publicKey: '128bc05aa6fd421d00c3c3389329f39cfc750b035db6cdad2eb0f983bff5629f', // Nosta
+    //   relayIds: [damusId],
+    //   theme: 'space'
+    // },
     {
       publicKey: '8c29b321d0f3c61343882ea49623e84771690cd0566e40b90f08e5d34336aaa0', // Bitcoin design
       relayIds: [damusId],

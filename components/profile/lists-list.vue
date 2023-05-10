@@ -3,7 +3,7 @@ const props = defineProps([
   'info'
 ])
 
-const emit = defineEmits(['back'])
+const emit = defineEmits(['navigate', 'back'])
 
 const sortedLists = computed(() => {
   return props.info.sort(function(a, b) {
@@ -21,6 +21,11 @@ const title = computed(() => {
   return count + ' list' + (count == 1 ? '' : 's')
 })
 
+function navigate(info) {
+  console.log('nav', info)
+  emit('navigate', 'list', info)
+}
+
 </script>
 
 <template>
@@ -32,6 +37,7 @@ const title = computed(() => {
         v-for="(item, index) in sortedLists"
         :key="item.id"
         :info="item"
+        @select="navigate"
       />
     </div>
   </div>
