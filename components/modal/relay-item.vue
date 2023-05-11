@@ -199,6 +199,7 @@ onMounted(() => {
   h4 {
     font-weight: 600;
     @include r('font-size', 17, 19);
+    word-break: break-word;
   }
 
   &.-theme {
