@@ -110,8 +110,6 @@ watch(() => props.info, () => setupUnloadedProfiles)
 const showLoader = computed(() => {
   return displayProfileList.length > 0
 })
-
-// console.log('follow-list', props.info)
 </script>
 
 <template>

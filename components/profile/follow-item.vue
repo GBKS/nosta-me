@@ -1,6 +1,7 @@
 <script setup>
 import { useUserStore } from "@/stores/users.js"
 import { useRelayStore } from '@/stores/relays'
+import userService from '@/helpers/userService.js'
 
 const userStore = useUserStore()
 const relayStore = useRelayStore()
@@ -10,7 +11,9 @@ const profileData = ref(null)
 const profileContent = ref(null)
 
 const props = defineProps([
-  'publicKey'
+  'publicKey',
+  'selfLoad',
+  'relayId'
 ])
 
 const imageLoaded = ref(false)
@@ -105,6 +108,11 @@ onMounted(() => {
   // console.log('profileContent', profileContent)
   if(!profile.value) {
     window.emitter.on('profile-'+props.publicKey, loadCallback)
+
+    // console.log('onMounted', props.selfLoad)
+    if(props.selfLoad) {
+      userService.getProfile(props.publicKey, [props.relayId])
+    }
   }
 })
 

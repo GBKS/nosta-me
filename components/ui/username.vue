@@ -1,7 +1,8 @@
 <script setup>
-import { useUserStore } from "@/stores/users.js"
+import userService from '@/helpers/userService.js'
 import relayRequest from '@/helpers/relayRequest.js'
 import multiRelayRequest from '@/helpers/multiRelayRequest.js'
+import { useUserStore } from "@/stores/users.js"
 import { useRelayStore } from '@/stores/relays'
 
 const props = defineProps([
@@ -21,6 +22,7 @@ const relayStore = useRelayStore()
 let request = null
 let rawUserData = null
 let loadTimer = null
+const loadCallback = relayRequest.bind(this)
 const loadTimerDone = ref(false)
 const userData = ref(null)
 
@@ -38,12 +40,16 @@ function loadUserData() {
   loadTimer = setTimeout(onLoadTimer, 5000)
 
   if(props.relayIds && props.relayIds.length == 1) {
-    request = relayRequest()
-    request.init(onUserData, true)
-    request.start(
-      relayIds[0],
-      [filter]
-    )
+    window.emitter.on('profile-'+props.publicKey, loadCallback)
+
+    userService.getProfile(props.publicKey, relayIds)
+
+    // request = relayRequest()
+    // request.init(onUserData, true)
+    // request.start(
+    //   relayIds[0],
+    //   [filter]
+    // )
   } else {
     request = multiRelayRequest()
     request.init(onUserData)
@@ -168,6 +174,8 @@ onBeforeUnmount(() => {
   if(loadTimer) {
     clearTimeout(loadTimer)
   }
+
+  window.emitter.off('profile-'+props.publicKey, loadCallback)
 
   if(request) {
     request.kill()

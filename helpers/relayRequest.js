@@ -11,7 +11,7 @@ Checks a single relay for data.
 
  */
 
-export default function relayService () { 
+export default function relayRequest () { 
   return {
     log: !true,
     initialized: false,

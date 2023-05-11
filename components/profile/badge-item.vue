@@ -51,7 +51,7 @@ function requestBadgeData(tag) {
 }
 
 function onBadgeData(data) {
-  console.log('onBadgeData', data)
+  // console.log('onBadgeData', data)
 
   rawBadgeData = data
   const refinedData = {

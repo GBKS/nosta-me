@@ -6,6 +6,16 @@ const props = defineProps([
 ])
 
 const emit = defineEmits(['navigate', 'back'])
+const currentPage = ref(0)
+const perPage = 10
+
+function selectPage(page) {
+  currentPage.value = page
+}
+
+const pageCount = computed(() => {
+  return Math.ceil(count.value / perPage)
+})
 
 const followPublicKeys = computed(() => {
   return ToolBox.findTags(props.info, ['p'])
@@ -18,6 +28,13 @@ const notePublicKeys = computed(() => {
 const count = computed(() => {
   const tags = ToolBox.findTags(props.info, ['e', 'p'])
   return tags ? tags.length : 0
+})
+
+const visibleTags = computed(() => {
+  return props.info.tags.slice(
+    currentPage.value*perPage, 
+    (currentPage.value+1)*perPage
+  )
 })
 
 const listName = computed(() => {
@@ -66,11 +83,13 @@ onMounted(() => {
     <ProfileSectionBack @select="back" />
     <ProfileSectionTitle :title="title" />
     <div class="items">
-      <template v-for="tag in info.tags">
+      <template v-for="tag in visibleTags">
         <ProfileFollowItem
           v-if="tag[0] == 'p'"
           :key="tag[1]"
           :publicKey="tag[1]"
+          :selfLoad="true"
+          :relayId="info.relay"
         />
         <ProfileListNote
           v-if="tag[0] == 'e'"
@@ -80,6 +99,12 @@ onMounted(() => {
         />
       </template>
     </div>
+    <UiPagination
+      v-if="pageCount > 1"
+      :activeIndex="currentPage"
+      :max="pageCount"
+      @selectPage="selectPage"
+    />
   </div>
 </template>
 
