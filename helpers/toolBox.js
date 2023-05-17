@@ -13,18 +13,18 @@ export default {
 
     const delta = now - d
 
-    const units= {
+    const units = {
       minute: 1000*60,
       hour: 1000*60*60,
       day: 1000*60*60*24
     }
 
     if(delta < units.minute) {
-      return Math.round(delta/1000*60*60) + 's'
+      return Math.round(delta/1000) + 's'
     } else if(delta < units.hour) {
-      return Math.round(delta/1000*60*60) + 'm'
+      return Math.round(delta/1000/60) + 'm'
     } else if(delta < units.day) {
-      return Math.round(delta/1000*60*60) + 'd'
+      return Math.round(delta/1000/60/60) + 'h'
     } else {
       // Check if it's the same year
       if(d.getFullYear() == now.getFullYear()) {

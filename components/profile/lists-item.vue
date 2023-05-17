@@ -126,10 +126,6 @@ const classObject = computed(() => {
 function click() {
   emit('select', props.info)
 }
-
-onMounted(() => {
-  console.log('ListsItem.onMounted', props.info)
-})
 </script>
 
 <template>

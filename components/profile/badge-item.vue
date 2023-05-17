@@ -148,7 +148,7 @@ function imageLoadError() {
 }
 
 onMounted(() => {
-  console.log('BadgeItem.onMounted', props.info)
+  // console.log('BadgeItem.onMounted', props.info)
   loadBadgeData()
 })
 </script>

@@ -13,7 +13,7 @@ Checks a single relay for data.
 
 export default function relayRequest () { 
   return {
-    log: !true,
+    log: false,
     initialized: false,
     autoClose: true,
     relayId: null,

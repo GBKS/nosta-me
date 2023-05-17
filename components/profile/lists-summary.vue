@@ -77,7 +77,7 @@ const emptyListText = computed(() => {
 
   if(emptyListCount.value > 0) {
     if(filledListCount.value == 0) {
-      result = 'Only ' + emptyListCount.value + ' empty list' + (emptyListCount.value == 1 ? '' : 's') + '.'
+      result = 'Has ' + emptyListCount.value + ' empty list' + (emptyListCount.value == 1 ? '' : 's') + '.'
     } else {
       result = 'And has ' + emptyListCount.value + ' empty list' + (emptyListCount.value == 1 ? '' : 's') + '.'
     }
@@ -87,7 +87,7 @@ const emptyListText = computed(() => {
 })
 
 const titleCopy = computed(() => {
-  let result = 'No lists yet'
+  let result = 'Not using lists'
 
   if(filledLists.value) {
     result = 'Created ' + filledListCount.value + ' list' + (filledListCount.value == 1 ? '' : 's')

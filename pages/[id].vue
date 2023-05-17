@@ -17,6 +17,8 @@ const badgeData = ref(null)
 const reportsData = ref(null)
 const sentZapsData = ref(null)
 const receivedZapsData = ref(null)
+const stallData = ref(null)
+const productData = ref(null)
 const fileData = ref(null)
 const listsData = ref(null)
 const status = ref(null)
@@ -55,12 +57,20 @@ const tabInfo = ref({
   'list': {
     name: 'List',
     info: null
+  },
+  'stalls': {
+    name: 'Stalls',
+    info: null
+  },
+  'stall': {
+    name: 'Stall',
+    info: null
   }
 })
 const activeTabId = ref(null)
 
 function selectTab(value, info) {
-  console.log('selectTab', value, info)
+  // console.log('selectTab', value, info)
   activeTabId.value = value
   if(tabInfo.value[value] && info) {
     tabInfo.value[value].info = info
@@ -97,7 +107,6 @@ function updateFromRoute() {
 watch(() => route.query, () => updateFromRoute)
 
 onBeforeMount(() => {
-  console.log('onBeforeMount')
   updateFromRoute()
 })
 
@@ -297,6 +306,12 @@ function onLoadProfileEvent(data) {
   } else if(data.kind == 30008) {
     // A badge
     handleLoadedBadgeEvent(data)
+  } else if(data.kind == 30017) {
+    // A stall
+    handleLoadedStallEvent(data)
+  } else if(data.kind == 30018) {
+    // A product
+    handleLoadedProductEvent(data)
   } else if(data.kind == 1984) {
     // A report
     handleLoadedReportEvent(data)
@@ -488,6 +503,72 @@ function handleLoadedZapEvent(data) {
   }
 }
 
+function handleLoadedStallEvent(data) {
+  // console.log('handleLoadedStallEvent', data)
+
+  if(typeof data.content == 'string' && data.content.length > 0) {
+    data.content = JSON.parse(data.content)
+  }
+
+  if(!stallData.value) {
+    stallData.value = []
+  }
+
+  // Ensure it's not already added.
+  let alreadyAdded = false
+  let addedIndex = 0
+  let addedIsOlder = false
+  for(let i=0; i<stallData.value.length; i++) {
+    if(stallData.value[i].content.id == data.content.id) {
+      alreadyAdded = true
+      addedIndex = i
+      addedIsOlder = stallData.value[i].created_at < data.created_at
+      break
+    }
+  }
+
+  // Already added, but we have newer data, so remove the old one
+  if(alreadyAdded && addedIsOlder) {
+    stallData.value.splice(addedIndex, 1)
+    alreadyAdded = false
+  }
+
+  if(!alreadyAdded) {
+    stallData.value.push(data)
+
+    const count = stallData.value.length
+    tabInfo.value.stalls.name = count + ' Stall' + (count !== 1 ? 's' : '')
+  }
+}
+
+function handleLoadedProductEvent(data) {
+  // console.log('handleLoadedProductEvent', data)
+
+  if(!productData.value) {
+    productData.value = []
+  }
+
+  // Ensure it's not already added.
+  let alreadyAdded = false
+  for(let i=0; i<productData.value.length; i++) {
+    if(productData.value[i].id == data.id) {
+      alreadyAdded = true
+      break
+    }
+  }
+
+  if(!alreadyAdded) {
+    if(typeof data.content == 'string' && data.content.length > 0) {
+      data.content = JSON.parse(data.content)
+    }
+
+    productData.value.push(data)
+
+    const count = productData.value.length
+    tabInfo.value.products.name = count + ' Product' + (count !== 1 ? 's' : '')
+  }
+}
+
 function saveProfileInfo(eventData) {
   let data = eventData.content
   if(typeof data == 'string') {
@@ -623,6 +704,12 @@ onMounted(() => {
                 :count="followData ? followData.tags.length : null"
                 @navigate="selectTab"
               />
+              <ProfileStallSummary
+                :info="stallData"
+                :products="productData"
+                :count="stallData ? stallData.length : null"
+                @navigate="selectTab"
+              />
               <ProfileZapSummary
                 :info="sentZapsData"
                 :count="sentZapsData ? sentZapsData.length : null"
@@ -711,6 +798,13 @@ onMounted(() => {
             <ProfileListList 
               v-if="activeTabId == 'list'" 
               :info="tabInfo.list.info" 
+              @navigate="selectTab"
+              @back="selectTab"
+            />
+            <ProfileStallList 
+              v-if="activeTabId == 'stall'"
+              :info="tabInfo.stall.info"
+              :products="productData" 
               @navigate="selectTab"
               @back="selectTab"
             />

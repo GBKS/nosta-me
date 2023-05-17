@@ -22,7 +22,7 @@ const relayStore = useRelayStore()
 let request = null
 let rawUserData = null
 let loadTimer = null
-const loadCallback = relayRequest.bind(this)
+const loadCallback = onUserData.bind(this)
 const loadTimerDone = ref(false)
 const userData = ref(null)
 
@@ -35,29 +35,11 @@ function loadUserData() {
 
   const relayIds = props.relayIds || relayStore.getAll
 
-  // console.log('Username.loadUserData', filter, props, relayIds[0])
-
   loadTimer = setTimeout(onLoadTimer, 5000)
 
-  if(props.relayIds && props.relayIds.length == 1) {
-    window.emitter.on('profile-'+props.publicKey, loadCallback)
+  window.emitter.on('profile-'+props.publicKey, loadCallback)
 
-    userService.getProfile(props.publicKey, relayIds)
-
-    // request = relayRequest()
-    // request.init(onUserData, true)
-    // request.start(
-    //   relayIds[0],
-    //   [filter]
-    // )
-  } else {
-    request = multiRelayRequest()
-    request.init(onUserData)
-    request.start(
-      relayIds, 
-      [filter]
-    )
-  }
+  userService.getProfile(props.publicKey, relayIds)
 }
 
 function onLoadTimer() {
@@ -69,7 +51,7 @@ function onUserData(data) {
 
   if(data && data.type !== 'end') {
     let content = data.content
-    if(typeof content == 'string') {
+    if(typeof content == 'string' && content.length > 0) {
       content = JSON.parse(data.content)
     }
 
@@ -84,7 +66,6 @@ const userLink = computed(() => {
   let result = null
 
   if(userData.value) {
-    // console.log('userLink', userData.value)
     const relay = relayStore.getRelay(userData.value.relay)
     const nprofile = window.NostrTools.nip19.nprofileEncode({
       pubkey: userData.value.pubkey,
@@ -101,13 +82,17 @@ const userLink = computed(() => {
   return result
 })
 
+const type = computed(() => {
+  return userLink.value ? 'NuxtLink' : 'div'
+})
+
 const userName = computed(() => {
   let result = props.publicKey.substr(0, 2) + '...' + props.publicKey.substr(props.publicKey.length-2, props.publicKey.length)
 
   if(userData.value) {
     result = userData.value.content.name
 
-    if(result.length > 50) {
+    if(result && result.length > 50) {
       result = result.substr(0, 20)+'...'+result.substr(result.length-20)
     }
   }

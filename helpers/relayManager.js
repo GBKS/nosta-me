@@ -63,6 +63,10 @@ export default {
 
         let relayId = idBit.replaceAll('.', '-')
 
+        // if(relayId.endsWith('/')) {
+        //   relayId = relayId.substr(0, relayId.length-1)
+        // }
+
         const data = {
           id: relayId,
           name: relayId,

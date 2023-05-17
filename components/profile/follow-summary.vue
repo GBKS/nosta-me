@@ -65,6 +65,13 @@ function prepFollowerInfo(index) {
   }
 }
 
+const classObject = computed(() => {
+  return [
+    'avatars',
+    props.count > 4 ? '_5' : ('_' + props.count)
+  ].join(' ')
+})
+
 const emit = defineEmits(['navigate'])
 
 function navigate() {
@@ -75,9 +82,10 @@ function navigate() {
 <template>
   <Transition name="fade" appear>
     <div v-if="count > 0" class="follow-summary">
-      <div class="avatars">
+      <div :class="classObject">
         <UiUsername
           v-if="followerOne"
+          :key="followerOne.publicKey"
           :publicKey="followerOne.publicKey" 
           :relayIds="followerOne.relayIds"
           hideName="true"
@@ -86,6 +94,7 @@ function navigate() {
         />
         <UiUsername
           v-if="count > 1 && followerTwo"
+          :key="followerTwo.publicKey" 
           :publicKey="followerTwo.publicKey" 
           :relayIds="followerTwo.relayIds"
           hideName="true"
@@ -94,6 +103,7 @@ function navigate() {
         />
         <UiUsername
           v-if="count > 2 && followerThree"
+          :key="followerThree.publicKey"
           :publicKey="followerThree.publicKey" 
           :relayIds="followerThree.relayIds"
           hideName="true"
@@ -102,6 +112,7 @@ function navigate() {
         />
         <UiUsername
           v-if="count > 3 && followerFour"
+          :key="followerFour.publicKey" 
           :publicKey="followerFour.publicKey" 
           :relayIds="followerFour.relayIds"
           hideName="true"
@@ -110,6 +121,7 @@ function navigate() {
         />
         <UiUsername
           v-if="count > 4 && followerFive"
+          :key="followerFive.publicKey" 
           :publicKey="followerFive.publicKey" 
           :relayIds="followerFive.relayIds"
           hideName="true"
@@ -156,11 +168,11 @@ function navigate() {
 
 .follow-summary {
   display: flex;
-  gap: 20px;
+  gap: 30px;
 
   .avatars {
     display: flex;
-    width: 295px;
+    width: 275px;
     height: 75px;
     position: relative;
 
@@ -173,10 +185,11 @@ function navigate() {
     > a:nth-child(3) { left: 100px; }
     > a:nth-child(4) { left: 150px; }
     > a:nth-child(5) { left: 200px; }
-    
-    > a:not(:first-child) {
-      // margin-left: -20px;
-    }
+
+    &._1 { width: 75px; }
+    &._2 { width: 125px; }
+    &._3 { width: 175px; }
+    &._4 { width: 225px; }
   }
 
   .copy {

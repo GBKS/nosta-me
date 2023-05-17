@@ -19,6 +19,7 @@ This is a for-fun side project by [Christoph](https://nosta.me/gbks@nosta.me). Y
 - NIP-06: Basic key derivation from mnemonic seed phrase
 - NIP-07: window.nostr capability for web browsers
 - NIP-11: Relay Information Document
+- NIP-15: Marketplace
 - NIP-19: bech32-encoded entities
 - NIP-21: nostr: URL scheme
 - NIP-51: Lists
@@ -26,10 +27,10 @@ This is a for-fun side project by [Christoph](https://nosta.me/gbks@nosta.me). Y
 - NIP-57: Lightning Zaps
 - NIP-58: Badges
 - NIP-65: Relay List Metadata
+- NIP-94: File Metadata
 
 ## NIPs to be supported
 
-- NIP-15: Marketplace
 - NIP-36: Sensitive Content
 - NIP-39: External Identities in Profiles
 - NIP-46: Nostr Connect

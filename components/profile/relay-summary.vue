@@ -68,6 +68,12 @@ function navigate() {
     display: flex;
     @include r('gap', 10, 25);
   }
+
+  @include media-query(small) {
+    .relays {
+      flex-direction: column;
+    }
+  }
 }
 
 </style>

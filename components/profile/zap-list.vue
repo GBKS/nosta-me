@@ -7,6 +7,39 @@ const props = defineProps([
 
 const emit = defineEmits(['back'])
 
+const currentPage = ref(0)
+const perPage = 20
+
+function selectPage(page) {
+  currentPage.value = page
+}
+
+const pageCount = computed(() => {
+  return Math.ceil(count.value / perPage)
+})
+
+const sortedZaps = computed(() => {
+  return props.info.sort(function(a, b) {
+    if(a.created_at > b.created_at) return -1
+    if(a.created_at < b.created_at) return 1
+    return 0
+  })
+})
+
+const count = computed(() => {
+  return sortedZaps.value ? sortedZaps.value.length : 0
+})
+
+const visibleZaps = computed(() => {
+  let result = null
+
+  if(count.value > 0) {
+    result = sortedZaps.value.slice(currentPage.value*perPage, (currentPage.value+1)*perPage)
+  }
+
+  return result
+})
+
 const zapCount = computed(() => {
   return props.info.length
 })
@@ -24,12 +57,18 @@ const title = computed(() => {
       <p>Zaps are bitcoin payments to other Nostr users.</p>
       <div class="list">
         <ProfileZapItem
-          v-for="(item, index) in info"
+          v-for="(item, index) in visibleZaps"
           :key="item.id"
           :info="item"
           :direction="props.direction"
         />
       </div>
+      <UiPagination
+        v-if="pageCount > 1"
+        :activeIndex="currentPage"
+        :max="pageCount"
+        @selectPage="selectPage"
+      />
     </div>
   </Transition>
 </template>

@@ -132,9 +132,9 @@ export default {
     } else if(data.kind == 30009) {
       // console.log('!!! Seeing a badge 30009', data)
     } else if(data.kind == 30017) {
-      console.log('!!! Seeing a stall', data)
+      // console.log('!!! Seeing a stall', data)
     } else if(data.kind == 30018) {
-      console.log('!!! Seeing a product', data)
+      // console.log('!!! Seeing a product', data)
     } else if(data.kind == 1063) {
       // console.log('!!! Seeing a file', data)
     } else if(data.kind == 9802) {
