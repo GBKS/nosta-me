@@ -20,7 +20,7 @@ export default defineEventHandler((event) => {
 
   const allData = {
     names: {
-      "_": "",
+      "_": "128bc05aa6fd421d00c3c3389329f39cfc750b035db6cdad2eb0f983bff5629f",
       gbks: "b731e7fbde5c192d793ff520a6ec91f6965f5d8fa1b64e12171089a65e540525"
     },
     relays: {
