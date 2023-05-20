@@ -20,12 +20,30 @@ const isImage = computed(() => {
   )
 })
 
+const isVideo = computed(() => {
+  return (
+    type.value.indexOf('video/mp4') !== -1
+  )
+})
+
+const isAudio = computed(() => {
+  return (
+    type.value.indexOf('audio/aac') !== -1
+  )
+})
+
 const fileUrl = computed(() => {
   return ToolBox.findTag(props.info, 'url')[0]
 })
 
 const title = computed(() => {
-  return props.info.content.length > 0 ? props.info.content : null
+  let result = props.info.content.length > 0 ? props.info.content : null
+
+  if(result && result.length > 50) {
+    result = result.substr(0, 48) + '...'
+  }
+
+  return result
 })
 
 const formattedDate = computed(() => {
@@ -55,7 +73,7 @@ function imageLoadError() {
 }
 
 onMounted(() => {
-  
+  // console.log('FileItem.onMounted', props.info)
 })
 </script>
 
@@ -66,18 +84,26 @@ onMounted(() => {
     target="_blank"
     rel="nofollow noopener noreferrer"
   >
-    <img
-      v-if="isImage && imageStatus != 'error'"
-      :src="fileUrl"
-      @load="imageLoaded"
-      @error="imageLoadError"
-    />
-    <div class="error"  v-if="isImage && imageStatus == 'error'">
-      <p>Could not load the image</p>
-    </div>
+    <template v-if="isImage">
+      <img
+        v-if="imageStatus != 'error'"
+        :src="fileUrl"
+        @load="imageLoaded"
+        @error="imageLoadError"
+      />
+      <div class="error"  v-if="imageStatus == 'error'">
+        <p>Could not load the image</p>
+      </div>
+    </template>
+    <video v-if="isVideo" controls>
+      <source :src="fileUrl" :type="type">
+    </video>
+    <audio v-if="isAudio" controls="controls">
+      <source :src="fileUrl" :type="type">
+    </audio>
     <div 
-      v-if="!isImage"
-      class="unregognized" 
+      v-if="!isImage && !isVideo && !isAudio"
+      class="unrecognized" 
     >
       <p>{{ type }}</p>
     </div>
@@ -94,7 +120,9 @@ onMounted(() => {
   align-items: center;
   text-decoration: none;
 
-  img {
+  img,
+  video,
+  audio {
     width: 100%;
     height: 120px;
     object-fit: cover;
@@ -107,7 +135,7 @@ onMounted(() => {
     }
   }
 
-  .unregognized,
+  .unrecognized,
   .error {
     display: flex;
     align-items: center;
@@ -122,6 +150,9 @@ onMounted(() => {
 
     p {
       text-align: center;
+      color: var(--theme-front);
+      font-size: 13px;
+      opacity: 0.5;
     }
 
     & + h5,
