@@ -29,7 +29,7 @@ const text = computed(() => {
     :to="'/'+info.profile.nip05"
     title="Copy handle"
     @click="copy"
-  ><span v-html="Icons.verified" />{{ text }}</button>
+  ><span v-html="Icons.contactCircle" />{{ text }}</button>
 </template>
 
 <style scoped lang="scss">
