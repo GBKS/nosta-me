@@ -126,7 +126,7 @@ function showDataOverlay() {
           @showDataOverlay="showDataOverlay"
         />
       </div>
-      <ProfileFollowButton v-if="isLoggedIn && !isOwner" />
+      <ProfileFollowButton v-if="false && isLoggedIn && !isOwner" />
       <ProfileEditButton v-if="isOwner" />
     </div>
   </div>
