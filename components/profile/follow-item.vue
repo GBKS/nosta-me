@@ -2,6 +2,7 @@
 import { useUserStore } from "@/stores/users.js"
 import { useRelayStore } from '@/stores/relays'
 import userService from '@/helpers/userService.js'
+import ToolBox from '@/helpers/toolBox'
 
 const userStore = useUserStore()
 const relayStore = useRelayStore()
@@ -47,6 +48,10 @@ const description = computed(() => {
 
 const image = computed(() => {
   return profileContent.value ? profileContent.value.picture : null
+})
+
+const formattedPublicKey = computed(() => {
+  return ToolBox.trim(props.publicKey, 10)
 })
 
 const profileLink = computed(() => {
@@ -145,7 +150,7 @@ onBeforeUnmount(() => {
             <p 
               class="-key"
               :title="publicKey"
-            >{{ publicKey.substr(0, 5) + '...' + publicKey.substr(-5) }}</p>
+            >{{ formattedPublicKey }}</p>
           </div>
         </template>
       </NuxtLink>

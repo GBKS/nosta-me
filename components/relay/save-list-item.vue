@@ -1,5 +1,6 @@
 <script setup>
 import { useRelayStore } from '@/stores/relays'
+import ToolBox from '@/helpers/toolBox'
 
 const relayStore = useRelayStore()
 
@@ -21,7 +22,8 @@ const relayData = computed(() => {
 })
 
 const title = computed(() => {
-  return relayInfo.value ? relayInfo.value.name : props.relayId
+  const result = relayInfo.value ? relayInfo.value.name : props.relayId
+  return ToolBox.trim(result, 30)
 })
 
 function onRelayStatusChange(data) {

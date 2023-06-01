@@ -1,15 +1,34 @@
 <script setup>
+/*
+
+This page is for editing your profile
+
+Two scenarios:
+- You don't have a profile yet (maybe using brand new keys)
+- You have profile data
+
+ */
+
 import { useSessionStore } from '@/stores/session'
 import { useProfileStore } from '@/stores/profile'
 import { useRelayStore } from '@/stores/relays'
 import multiRelayRequest from '@/helpers/multiRelayRequest.js'
+import metaPublisher from '@/helpers/create/metaPublisher.js'
 
 const profileStore = useProfileStore()
 const sessionStore = useSessionStore()
 const relayStore = useRelayStore()
 const router = useRouter()
 
+const log = false
 let service = null
+let publisher = null
+let publishStatus = ref(null)
+
+// If nothing was loaded after a while, show a message.
+let timer = null
+const timeOutDelay = 10000
+const timedOut = ref(false)
 
 const name = ref('')
 const about = ref('')
@@ -18,11 +37,26 @@ const bitcoin = ref('')
 const handle = ref('')
 const picture = ref('')
 const banner = ref('')
+let editContent = {}
 
 const isSaving = ref(false)
 const relayIds = ref([])
 const loadedProfileEvents = ref([])
 const loadedRelayEvents = ref([])
+
+function startTimer() {
+  stopTimer()
+  setTimeout(onTimer, timeOutDelay)
+}
+
+function stopTimer() {
+  clearTimeout(timer)
+  timer = null
+}
+
+function onTimer() {
+  timedOut.value = true
+}
 
 const picturePreviewClass = computed(() => {
   const c = ['picture-preview']
@@ -64,22 +98,69 @@ const bannerPreviewStyle = computed(() => {
   return result
 })
 
-function validate() {
+const enableForm = computed(() => {
+  return loadedProfileEvents.value.length > 0
+})
 
-}
+const hasFormChanged = computed(() => {
+  return (editContent && (
+    (name.value != editContent.name) || 
+    (about.value != editContent.about) || 
+    (website.value != editContent.website) || 
+    (picture.value != editContent.picture) || 
+    (name.banner != editContent.banner) || 
+    (handle.value != editContent.nip05) || 
+    (bitcoin.value != editContent.lud16)
+  ))
+})
 
 function cancelChanges() {
-  if(confirm('Get ouf of here?')) {
+  if(!hasFormChanged.value || confirm('Get ouf of here?')) {
     router.push('/'+sessionStore.publicKey)
   }
 }
 
-function saveChanges() {
+function publishResult(status) {
+  if(log) {
+    console.log('EditProfile.metaResult', status)
+  }
 
+  publishStatus.value = status
+}
+
+// Send to the Blastr relay
+function saveChanges() {
+  if(publisher) {
+    publisher.kill()
+    publisher = null
+  }
+
+  // Get content from profile we're editing to preserve other properties.
+  const content = editContent
+  content.name = name.value
+  content.about = about.value
+  content.website = website.value
+  content.picture = picture.value
+  content.banner = banner.value
+  content.nip05 = handle.value
+  content.lud16 = bitcoin.value
+
+  if(log) {
+    console.log('EditProfile.saveChanges', editContent)
+  }
+
+  // Publish it
+  publisher = metaPublisher()
+  publisher.init()
+  publisher.publish(publishResult, content)
+
+  // Update what we have stored in cache
 }
 
 function loadData() {
-  console.log('loadData')
+  if(log) {
+    console.log('EditProfile.loadData')
+  }
 
   if(!service) {
     service = multiRelayRequest()
@@ -95,7 +176,9 @@ function loadData() {
 }
 
 function onDataLoaded(data) {
-  console.log('onDataLoaded', data)
+  if(log) {
+    console.log('EditProfile.onDataLoaded', data)
+  }
 
   if(data.kind == 0) {
     loadedProfileEvents.value.push(data)
@@ -106,33 +189,74 @@ function onDataLoaded(data) {
   updateInfoFromFoundProfiles()
 }
 
+const profileVersions = computed(() => {
+  const dates = []
+  const relays = []
+  const versions = {}
+  let i=0, version
+  for(; i<loadedProfileEvents.value.length; i++) {
+    version = loadedProfileEvents.value[i]
+
+    if(dates.indexOf(version.created_at) === -1) {
+      dates.push(version.created_at)
+    }
+
+    if(relays.indexOf(version.relay) === -1) {
+      relays.push(version.relay)
+    }
+
+    if(!versions[version.created_at]) {
+      versions[version.created_at] = []
+    }
+    versions[version.created_at].push(version)
+  }
+
+  if(log) {
+    console.log('EditProfile.profileVersions', dates, relays, versions)
+  }
+
+  return { dates, relays, versions }
+})
+
 function updateInfoFromFoundProfiles() {
   let content, event
 
+  // Sort by newest
   const sortedEvents = loadedProfileEvents.value.sort((a, b) => {
-    if(a.created_at < b.created_at) return -1
-    if(a.created_at > b.created_at) return 1
+    if(a.created_at > b.created_at) return -1
+    if(a.created_at < b.created_at) return 1
     return 0
   })
 
+  // Create refs for values we're editing
+  event = sortedEvents[0]
+  content = event.content
+  if(typeof content == 'string') {
+    content = JSON.parse(content)
+  }
+  // Store for updating and publishing later.
+  editContent = content
+
+  if(content.name) { name.value = content.name }
+  if(content.about) { about.value = content.about }
+  if(content.website) { website.value = content.website }
+  if(content.picture) { picture.value = content.picture }
+  if(content.banner) { banner.value = content.banner }
+  if(content.lud16) { bitcoin.value = content.lud16 }
+  if(content.nip05) { handle.value = content.nip05 }
+
+  // Store relays we found profiles on.
   for(let i=0; i<sortedEvents.length; i++) {
     event = sortedEvents[i]
-    content = JSON.parse(event.content)
-
-    if(content.name) { name.value = content.name }
-    if(content.about) { about.value = content.about }
-    if(content.website) { website.value = content.website }
-    if(content.picture) { picture.value = content.picture }
-    if(content.banner) { banner.value = content.banner }
-    if(content.lud16) { bitcoin.value = content.lud16 }
-    if(content.nip05) { handle.value = content.nip05 }
 
     if(relayIds.value.indexOf(event.relay) === -1) {
       relayIds.value.push(event.relay)
     }
   }
 
-  console.log('updateInfoFromFoundProfiles', relayIds.value)
+  if(log) {
+    console.log('EditProfile.updateInfoFromFoundProfiles', relayIds.value)
+  }
 }
 
 const foundRelayIds = computed(() => {
@@ -160,9 +284,10 @@ onMounted(() => {
     <div class="modal">
       <div class="content">
         <div class="copy">
-          <p class="-disabled">🪩 This page does not work yet. But it will be awesome once it does.</p>
           <h1>Update your profile</h1>
-          <p>This is just for your basic information. You can edit who you follow and which relays to post to on your profile page.</p>
+          <p>Edit your basic information.</p>
+
+          <p v-if="profileVersions.dates.length > 1">{{ profileVersions.dates.length }} versions of your profile were found across {{ profileVersions.relays.length }} relays. Saving via this page will make them consistent.</p>
         </div>
         <div class="fields">
           <div class="field-set">
@@ -178,6 +303,7 @@ onMounted(() => {
             <UiInput
               placeholder="Enter your about..."
               size="small"
+              multiline="true"
               v-model="about"
             />
           </div>
@@ -198,7 +324,14 @@ onMounted(() => {
             />
           </div>
           <div class="field-set">
-            <label>Bitcoin lightning address</label>
+            <div class="top">
+              <label>Bitcoin lightning address</label>
+              <UiTip
+                v-if="false"
+                text="Looks like an email, but for receiving bitcoin."
+                link="https://lightningaddress.com"
+              />
+            </div>
             <UiInput
               placeholder="Enter your bitcoin..."
               size="small"
@@ -209,7 +342,7 @@ onMounted(() => {
             <div class="field-set">
               <label>Profile picture</label>
               <UiInput
-                placeholder="Enter your picture..."
+                placeholder="Enter your picture URL..."
                 size="small"
                 v-model="picture"
               />
@@ -223,7 +356,7 @@ onMounted(() => {
             <div class="field-set">
               <label>Profile banner</label>
               <UiInput
-                placeholder="Enter your banner..."
+                placeholder="Enter your banner URL..."
                 size="small"
                 v-model="banner"
               />
@@ -236,7 +369,9 @@ onMounted(() => {
         </div>
         <div class="relays">
           <h2>Relays</h2>
-          <p>Your profile was found on these relays. Saving changes will update them.</p>
+          <p v-if="relayIds.length == 0 && !timedOut">Looking for your profile data...</p>
+          <p v-if="relayIds.length == 0 && timedOut">Could not find any profile data for you. Saving changes will blast it out to many relays, so others can find you easily.</p>
+          <p v-if="relayIds.length > 0">Your profile was found on these relays. Saving changes will update them, and many more relays, so others can find you easily.</p>
           <RelaySaveList
             :active="isSaving"
             :relayIds="relayIds"
@@ -249,7 +384,7 @@ onMounted(() => {
           >Cancel</UiButton>
           <UiButton 
             size="small"
-            :disabled="true"
+            :disabled="!hasFormChanged"
             @click="saveChanges" 
           >Save changes</UiButton>
         </div>
@@ -321,6 +456,12 @@ onMounted(() => {
 
           label {
             font-weight: 500;
+          }
+
+          .top {
+            display: flex;
+            align-items: center;
+            gap: 7px;
           }
         }
 

@@ -1,5 +1,6 @@
 <script setup>
 import Icons from '@/helpers/icons'
+import ToolBox from '@/helpers/toolBox'
 
 const props = defineProps([
   'publicKey'
@@ -12,7 +13,7 @@ const npub = computed(() => {
 })
 
 const formattedKey = computed(() => {
-  return npub.value.substr(0, 5)+'...'+npub.value.substr(-5)
+  return ToolBox.trim(npub.value, 10)
 })
 
 function copy() {

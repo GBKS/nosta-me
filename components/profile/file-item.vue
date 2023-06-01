@@ -37,13 +37,8 @@ const fileUrl = computed(() => {
 })
 
 const title = computed(() => {
-  let result = props.info.content.length > 0 ? props.info.content : null
-
-  if(result && result.length > 50) {
-    result = result.substr(0, 48) + '...'
-  }
-
-  return result
+  const result = props.info.content.length > 0 ? props.info.content : null
+  return ToolBox.trim(result, 50, 'end')
 })
 
 const formattedDate = computed(() => {

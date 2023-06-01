@@ -28,7 +28,7 @@ const relayData = computed(() => {
 </script>
 
 <template>
-  <div class="relay-save-list">
+  <div class="relay-save-list" v-if="relayIds.length > 0">
     <RelaySaveListItem
       v-for="(relayId, index) in relayIds"
       :key="relayId"

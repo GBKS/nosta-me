@@ -12,8 +12,8 @@ const emit = defineEmits(['select'])
 const title = computed(() => {
   let result = props.info.content.name ? props.info.content.name : null
 
-  if(props.layout == 'box' && result.length > 50) {
-    result = result.substr(0, 48) + '...'
+  if(props.layout == 'box') {
+    result = ToolBox.trim(result, 50, 'end')
   }
 
   return result
@@ -22,8 +22,8 @@ const title = computed(() => {
 const description = computed(() => {
   let result = props.info.content.description ? props.info.content.description : null
 
-  if(props.layout == 'box' && result.length > 50) {
-    result = result.substr(0, 48) + '...'
+  if(props.layout == 'box') {
+    result = ToolBox.trim(result, 50, 'end')
   }
 
   return result

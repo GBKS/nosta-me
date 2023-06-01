@@ -62,15 +62,16 @@ input,
 textarea {
   @include r('font-size', 18, 22);
   appearance: none;
-  padding: 20px;
+  padding: 15px 20px;
   background-color: transparent;
   border: 1px solid rgba(var(--frontRGB), 0.25);
   border-radius: 15px;
   box-sizing: border-box;
-  transition: all 150ms $ease;
+  transition: color 150ms $ease, border-color 150ms $ease;
+  line-height: 1.6;
 
   &.-small {
-    padding: 10px;
+    padding: 7px 10px;
     @include r('font-size', 15, 17);
     border-radius: 7px;
   }

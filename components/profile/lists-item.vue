@@ -48,9 +48,7 @@ const title = computed(() => {
   let result = descriptionTag ? descriptionTag[0] : null
   // let result = 'unknown ('+type.value+')'
 
-  if(result && result.length > 25) {
-    result = result.substr(0, 10) + '...' + result.substr(result.length-10, result.length)
-  }
+  result = ToolBox.trim(result, 25)
 
   if(!result) {
     switch(type.value) {
@@ -67,7 +65,7 @@ const title = computed(() => {
           if(result.length > 20) {
             const bits = result.split('/')
             if(bits.length == 3) {
-              result = bits[0] + '/' + bits[1].substr(0, 5) + '...' + bits[1].substr(-5) + '/' + bits[2]
+              result = bits[0] + '/' + ToolBox.trim(bits[1], 10) + '/' + bits[2]
             }
           }
         } else {
