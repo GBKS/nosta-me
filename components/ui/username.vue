@@ -4,6 +4,7 @@ import relayRequest from '@/helpers/relayRequest.js'
 import multiRelayRequest from '@/helpers/multiRelayRequest.js'
 import { useUserStore } from "@/stores/users.js"
 import { useRelayStore } from '@/stores/relays'
+import ToolBox from '@/helpers/toolBox'
 
 const props = defineProps([
   'publicKey',
@@ -87,13 +88,13 @@ const type = computed(() => {
 })
 
 const userName = computed(() => {
-  let result = props.publicKey.substr(0, 2) + '...' + props.publicKey.substr(props.publicKey.length-2, props.publicKey.length)
+  let result = ToolBox.trim(props.publicKey, 8)
 
   if(userData.value) {
     result = userData.value.content.name
 
-    if(result && result.length > 50) {
-      result = result.substr(0, 20)+'...'+result.substr(result.length-20)
+    if(result) {
+      result = ToolBox.trim(result, 50)
     }
   }
 

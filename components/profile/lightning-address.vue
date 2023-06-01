@@ -1,18 +1,13 @@
 <script setup>
 import Icons from '@/helpers/icons'
+import ToolBox from '@/helpers/toolBox'
 
 const props = defineProps([
   'info'
 ])
 
 const formattedAddress = computed(() => {
-  let result = props.info.profile.lud16
-
-  if(result.length > 30) {
-    result = result.substr(0, 10) + '...' + result.substr(result.length - 10)
-  }
-
-  return result
+  return ToolBox.trim(props.info.profile.lud16, 30)
 })
 </script>
 

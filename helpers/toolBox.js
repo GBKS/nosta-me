@@ -1,4 +1,3 @@
-
 /*
 
 Some random utility functions.
@@ -91,6 +90,21 @@ export default {
       }
     }
 
+    return result
+  },
+
+  trim(text, maxLength, position) {
+    let result = text
+
+    if(result && result.length > maxLength) {
+      if(position == 'end') {
+        result = result.substr(0, maxLength-2) + '...'
+      } else {
+        const cutOff = Math.ceil(maxLength/2-2)
+        result = result.substr(0, cutOff) + '...' + result.substr(result.length - cutOff)
+      }
+    }
+    
     return result
   }
 }

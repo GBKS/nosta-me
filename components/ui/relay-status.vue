@@ -1,4 +1,6 @@
 <script setup>
+import ToolBox from '@/helpers/toolBox'
+
 const props = defineProps([
   'info',
   'size'
@@ -105,7 +107,8 @@ const statusText = computed(() => {
 })
 
 const displayText = computed(() => {
-  return props.size === 'compact' ? '' : statusText.value
+  const result = props.size === 'compact' ? '' : statusText.value 
+  return ToolBox.trim(result, 30)
 })
 
 function click() {

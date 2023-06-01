@@ -1,12 +1,17 @@
 import relayPublishRequest from '@/helpers/relayPublishRequest.js'
 import { useProfileStore } from '@/stores/profile'
 import relayManager from '@/helpers/relayManager.js'
+import { useSessionStore } from '@/stores/session'
+import { useUserStore } from "@/stores/users.js"
 
 export default function metaPublisher () { 
   return {
     store: null,
+    sessionStore: null,
+    userStore: null,
     callback: null,
     relayId: null,
+    unsignedEvent: null,
     status: {
       status: 'default',
       request: null,
@@ -16,6 +21,7 @@ export default function metaPublisher () {
     init() {
       if(!this.store) {
         this.store = useProfileStore()
+        this.sessionStore = useSessionStore()
       }
 
       if(!this.relayId) {
@@ -26,14 +32,14 @@ export default function metaPublisher () {
 
     // Save NIP-01 (kind 0) profile info
     // Blast everywhere so people can discover the profile
-    publish(callback) {
+    publish(callback, rawContent) {
       this.callback = callback
 
       this.init()
 
       const event = this.getBlankEvent()
 
-      const content = {
+      const content = rawContent ? rawContent : {
         name: this.store.name,
         about: this.store.about,
         website: this.store.website,
@@ -48,13 +54,8 @@ export default function metaPublisher () {
       event.tags = []
       event.content = JSON.stringify(content)
 
-      const signedEvent = this.signEvent(event)
-
-      // Blast it out
-      this.publishToBlastr(signedEvent)
-
-      // Also directly post to the relays the user added
-      this.publishToUserRelays(signedEvent)
+      console.log('event', event, this.store.publicKey)
+      this.signEvent(event)
 
       return this.status
     },
@@ -98,7 +99,15 @@ export default function metaPublisher () {
     },
 
     onResult(data) {
-      console.log('metaDataResult', data, this.callback)
+      console.log('metaPublisher.metaDataResult', data, this.callback)
+
+      // Store updated user for later use
+      if(data.status == 'success') {
+        if(!this.userStore) {
+          this.userStore = useUserStore()
+        }
+        this.userStore.addUser(data.event.pubkey, data.event)
+      }
 
       this.status.status = data.status
       this.status.result = data
@@ -119,17 +128,77 @@ export default function metaPublisher () {
     },
 
     getBlankEvent() {
-      return {
-        pubkey: this.store.publicKey,
-        created_at: Math.floor(Date.now() / 1000)
+      return { 
+        pubkey: this.sessionStore.isLoggedIn ? this.sessionStore.publicKey : this.store.publicKey,
+        created_at: Math.floor(Date.now() / 1000) 
       }
     },
 
     signEvent(event) {
-      event.id = window.NostrTools.getEventHash(event)
-      event.sig = window.NostrTools.signEvent(event, this.store.privateKey)
+      let privateKey
 
-      return event
+      console.log('metaPublisher.isLoggedIn', event, this.sessionStore.isLoggedIn)
+
+      if(this.sessionStore.isLoggedIn) {
+        console.log('metaPublisher.loginType', this.sessionStore.loginType)
+        if(this.sessionStore.loginType == 'browser') {
+          // Request from browser.
+          console.log('window.nostr', window.nostr)
+          if(!window.nostr.enabled && window.nostr.enable) {
+            this.unsignedEvent = event
+            this.enableBrowser()
+          } else if(window.nostr.enabled === true || window.nostr.signEvent) {
+            this.onSignEvent(event)
+          }
+        } else if(this.sessionStore.loginType == 'privatekey') {
+          privateKey = this.sessionStore.privateKey
+        } else {
+          console.log('metaPublisher.signEvent unknown login type')
+        }
+      } else {
+        // Assuming we're in the edit flow - this needs to get cleaner.
+        privateKey = this.store.privateKey
+      }
+
+      console.log('metaPublisher.signEvent', privateKey)
+      if(privateKey) {
+        event.id = window.NostrTools.getEventHash(event)
+        event.sig = window.NostrTools.signEvent(event, privateKey)
+
+        this.onSignEvent(event)
+      }
+    },
+
+    enableBrowser() {
+      console.log('metaPublisher.enableBrowser')
+      window.nostr.enable()
+        .then(this.onEnableBrowser.bind(this))
+        .catch(this.onEnableBrowserFailed.bind(this))
+    },
+
+    onEnableBrowser() {
+      console.log('metaPublisher.onEnableBrowser', this.unsignedEvent)
+      window.nostr.signEvent(this.unsignedEvent)
+        .then(this.onSignEvent.bind(this))
+        .catch(this.onSignEventFailed.bind(this))
+    },
+
+    onEnableBrowserFailed() {
+      console.log('metaPublisher.onEnableBrowserFailed', arguments)
+    },
+
+    onSignEvent(signedEvent) {
+      console.log('metaPublisher.onSignEvent', signedEvent)
+
+      // Blast it out
+      this.publishToBlastr(signedEvent)
+
+      // Also directly post to the relays the user added
+      this.publishToUserRelays(signedEvent)
+    },
+
+    onSignEventFailed() {
+      console.log('metaPublisher.onSignEventFailed', arguments)
     },
 
     // Tests
@@ -175,6 +244,10 @@ export default function metaPublisher () {
       )
 
       return this.status
+    },
+
+    kill() {
+      console.log('metaPublisher.kill need to implement this')
     }
   }
 }
