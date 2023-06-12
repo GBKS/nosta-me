@@ -6,11 +6,13 @@ import { useUserStore } from "@/stores/users.js"
 
 export default function metaPublisher () { 
   return {
+    log: !false,
     store: null,
     sessionStore: null,
     userStore: null,
     callback: null,
     relayId: null,
+    relayIds: null,
     unsignedEvent: null,
     status: {
       status: 'default',
@@ -32,8 +34,9 @@ export default function metaPublisher () {
 
     // Save NIP-01 (kind 0) profile info
     // Blast everywhere so people can discover the profile
-    publish(callback, rawContent) {
+    publish(callback, rawContent, relayIds) {
       this.callback = callback
+      this.relayIds = relayIds
 
       this.init()
 
@@ -66,7 +69,9 @@ export default function metaPublisher () {
       this.status.status = 'saving'
       this.status.request = request
 
-      console.log('publishMetaData', event, this.status)
+      if(this.log) {
+        console.log('publishMetaData', event, this.status)
+      }
 
       // Blast it out
       request.publish(
@@ -79,14 +84,20 @@ export default function metaPublisher () {
     publishToUserRelays(event) {
       this.status.requests = []
 
+      if(this.log) {
+        console.log('metaPublisher.publishToUserRelays', this.store.relays, this.relayIds)
+      }
+
       let relay, request, relayId
-      for(let i=0; i<this.store.relays.length; i++) {
-        relay = this.store.relays[i]
+      if(this.relayIds) {
+        for(let i=0; i<this.relayIds.length; i++) {
+          relayId = this.relayIds[i]
 
-        if(relay.added) {
+          if(this.log) {
+            console.log('relayId', relayId)
+          }
+
           request = relayPublishRequest()
-          relayId = relayManager.addRelayByUrl(relay.url)
-
           this.status.requests.push(request)
 
           request.publish(
@@ -95,11 +106,35 @@ export default function metaPublisher () {
             this.onResult.bind(this)
           )
         }
+      } else {
+        for(let i=0; i<this.store.relays.length; i++) {
+          relay = this.store.relays [i]
+
+          if(relay.added) {
+            relayId = relayManager.addRelayByUrl(relay.url)
+
+            if(this.log) {
+              console.log('relayId', relayId)
+            }
+
+            request = relayPublishRequest()
+            this.status.requests.push(request)
+
+            request.publish(
+              relayId,
+              event,
+              this.onResult.bind(this)
+            )
+          }
+        }
       }
+
     },
 
     onResult(data) {
-      console.log('metaPublisher.metaDataResult', data, this.callback)
+      if(this.log) {
+        console.log('metaPublisher.metaDataResult', data, this.callback)
+      }
 
       // Store updated user for later use
       if(data.status == 'success') {
@@ -137,18 +172,27 @@ export default function metaPublisher () {
     signEvent(event) {
       let privateKey
 
-      console.log('metaPublisher.isLoggedIn', event, this.sessionStore.isLoggedIn)
+      if(this.log) {
+        console.log('metaPublisher.isLoggedIn', event, this.sessionStore.isLoggedIn)
+      }
 
       if(this.sessionStore.isLoggedIn) {
-        console.log('metaPublisher.loginType', this.sessionStore.loginType)
+        if(this.log) {
+          console.log('metaPublisher.loginType', this.sessionStore.loginType)
+        }
+
         if(this.sessionStore.loginType == 'browser') {
           // Request from browser.
-          console.log('window.nostr', window.nostr)
+          if(this.log) {
+            console.log('window.nostr', window.nostr, window.nostr.enabled, window.nostr.enable)
+          }
+
           if(!window.nostr.enabled && window.nostr.enable) {
             this.unsignedEvent = event
             this.enableBrowser()
           } else if(window.nostr.enabled === true || window.nostr.signEvent) {
-            this.onSignEvent(event)
+            this.unsignedEvent = event
+            this.onEnableBrowser()
           }
         } else if(this.sessionStore.loginType == 'privatekey') {
           privateKey = this.sessionStore.privateKey
@@ -160,7 +204,10 @@ export default function metaPublisher () {
         privateKey = this.store.privateKey
       }
 
-      console.log('metaPublisher.signEvent', privateKey)
+      if(this.log) {
+        console.log('metaPublisher.signEvent', privateKey)
+      }
+
       if(privateKey) {
         event.id = window.NostrTools.getEventHash(event)
         event.sig = window.NostrTools.signEvent(event, privateKey)
@@ -170,14 +217,20 @@ export default function metaPublisher () {
     },
 
     enableBrowser() {
-      console.log('metaPublisher.enableBrowser')
+      if(this.log) {
+        console.log('metaPublisher.enableBrowser')
+      }
+
       window.nostr.enable()
         .then(this.onEnableBrowser.bind(this))
         .catch(this.onEnableBrowserFailed.bind(this))
     },
 
     onEnableBrowser() {
-      console.log('metaPublisher.onEnableBrowser', this.unsignedEvent)
+      if(this.log) {
+        console.log('metaPublisher.onEnableBrowser', this.unsignedEvent)
+      }
+
       window.nostr.signEvent(this.unsignedEvent)
         .then(this.onSignEvent.bind(this))
         .catch(this.onSignEventFailed.bind(this))
@@ -188,7 +241,9 @@ export default function metaPublisher () {
     },
 
     onSignEvent(signedEvent) {
-      console.log('metaPublisher.onSignEvent', signedEvent)
+      if(this.log) {
+        console.log('metaPublisher.onSignEvent', signedEvent)
+      }
 
       // Blast it out
       this.publishToBlastr(signedEvent)

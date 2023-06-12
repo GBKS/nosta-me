@@ -28,15 +28,17 @@ function logOut() {
       <p>Create and view Nostr profiles. So easy, a 2-day old baby can do it asleep in 7 seconds*.</p>
       <p class="-small">*Using time-travel telekinesis probably.</p>
       <nav>
-        <template v-if="isLoggedIn">
-          <UiButton :to="userProfileLink">View my profile</UiButton>
-          <UiButton @click="logOut" size="small">Log out</UiButton>
-        </template>
+        <client-only>        
+          <template v-if="isLoggedIn">
+            <UiButton :to="userProfileLink">View my profile</UiButton>
+            <UiButton @click="logOut" size="small">Log out</UiButton>
+          </template>
 
-        <template v-if="!isLoggedIn">
-          <UiButton to="/create/welcome">Create a new profile</UiButton>
-          <UiButton to="/login/options">Log in</UiButton>
-        </template>
+          <template v-if="!isLoggedIn">
+            <UiButton to="/create/welcome">Create a new profile</UiButton>
+            <UiButton to="/login/options">Log in</UiButton>
+          </template>
+        </client-only>
 
         <NuxtLink to="/about">What the...?</NuxtLink>
       </nav>

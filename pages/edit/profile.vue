@@ -7,6 +7,10 @@ Two scenarios:
 - You don't have a profile yet (maybe using brand new keys)
 - You have profile data
 
+Other features:
+- Highlight when multiple versions of a profile were found
+  and let the user know that saving will update them
+
  */
 
 import { useSessionStore } from '@/stores/session'
@@ -152,7 +156,7 @@ function saveChanges() {
   // Publish it
   publisher = metaPublisher()
   publisher.init()
-  publisher.publish(publishResult, content)
+  publisher.publish(publishResult, content, relayIds.value)
 
   // Update what we have stored in cache
 }
