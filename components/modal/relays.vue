@@ -11,12 +11,12 @@ onMounted(() => {
   store = useRelayStore()
 })
 
-function onShowModal(id) {
-  active.value = id === 'relays'
+function onShowModal(data) {
+  active.value = data.id === 'relays'
 }
 
-function onHideModal(id) {
-  if(id === 'relays') {
+function onHideModal(data) {
+  if(data.id === 'relays') {
     active.value = false
   }
 }
@@ -29,10 +29,6 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.emitter.off('show-modal', onShowModal)
   window.emitter.off('hide-modal', onHideModal)
-})
-
-const buttonTitle = computed(() => {
-  return active.value ? 'Hide relays' : 'Show relays'
 })
 </script>
 

@@ -1,0 +1,150 @@
+{
+    "profile": {
+        "kind": 0,
+        "name": "Profiles"
+    },
+    "note": {
+        "kind": 1,
+        "name": "Notes"
+    },
+    "recommended-relay": {
+        "kind": 2,
+        "name": "Recommended relays"
+    },
+    "contact": {
+        "kind": 3,
+        "name": "Contacts"
+    },
+    "direct-message": {
+        "kind": 4,
+        "name": "Direct messages"
+    },
+    "event-deletion": {
+        "kind": 5,
+        "name": "Event deletion"
+    },
+    "repost": {
+        "kind": 6,
+        "name": "Reposts"
+    },
+    "reaction": {
+        "kind": 7,
+        "name": "Reactions"
+    },
+    "badge-award": {
+        "kind": 8,
+        "name": "Badge awards"
+    },
+    "channel-creation": {
+        "kind": 40,
+        "name": "Channel creation"
+    },
+    "channel-metadata": {
+        "kind": 41,
+        "name": "Channel info"
+    },
+    "channel-message": {
+        "kind": 42,
+        "name": "Channel messages"
+    },
+    "channel-hide-message": {
+        "kind": 43,
+        "name": "Hide channel messages"
+    },
+    "channel-mute-user": {
+        "kind": 44,
+        "name": "Mute channel users"
+    },
+    "file": {
+        "kind": 1063,
+        "name": "Files"
+    },
+    "report": {
+        "kind": 1984,
+        "name": "Reports"
+    },
+    "zap-request": {
+        "kind": 9734,
+        "name": "Zap requests"
+    },
+    "zap": {
+        "kind": 9735,
+        "name": "Zaps"
+    },
+    "mute-list": {
+        "kind": 10000,
+        "name": "Mute lists"
+    },
+    "pin-list": {
+        "kind": 10001,
+        "name": "Pin lists"
+    },
+    "relay-list": {
+        "kind": 10002,
+        "name": "Relay lists"
+    },
+    "wallet-info": {
+        "kind": 13194,
+        "name": "Wallet info"
+    },
+    "client-authentication": {
+        "kind": 22242,
+        "name": "Client authentication"
+    },
+    "wallet-request": {
+        "kind": 23194,
+        "name": "Wallet requests"
+    },
+    "wallet-response": {
+        "kind": 23195,
+        "name": "Wallet response"
+    },
+    "nostr-connect": {
+        "kind": 24133,
+        "name": "Nostr connect"
+    },
+    "people-list": {
+        "kind": 30000,
+        "name": "People list"
+    },
+    "bookmark-list": {
+        "kind": 30001,
+        "name": "Bookmark list"
+    },
+    "badge": {
+        "kind": 30008,
+        "name": "Badges"
+    },
+    "badge-definition": {
+        "kind": 30009 ,
+        "name": "Badge definitions"
+    },
+    "stall": {
+        "kind": 30017,
+        "name": "Stalls"
+    },
+    "product": {
+        "kind": 30018,
+        "name": "Products"
+    },
+    "app-data": {
+        "kind": 30078,
+        "name": "App data"
+    },
+    "long-form-content": {
+        "kind": 30023,
+        "name": "Long-form content"
+    },
+    "31337": {
+        "kind": 31337,
+        "name": "?"
+    },
+    "handler-recommendation": {
+        "kind": 31989,
+        "name": "App recommendations"
+    },
+    "handler-information": {
+        "kind": 31990,
+        "name": "App information"
+    }
+}

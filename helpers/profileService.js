@@ -85,6 +85,8 @@ export default {
         1063, // Files
         9802, // Highlights
         31337, // Zapstr tracks
+        31989, // Handler recommendation
+        31990, // Handler information
       ],
       authors: [this.publicKey]
     }
@@ -141,6 +143,10 @@ export default {
       console.log('!!! Seeing a highlight', data)
     } else if(data.kind == 31337) {
       console.log('!!! Seeing a Zapstr track', data)
+    } else if(data.kind == 31989) {
+      // console.log('!!! Seeing a handler recommendation', data)
+    } else if(data.kind == 31990) {
+      // console.log('!!! Seeing a handler information', data)
     } else if(data.kind == 8) {
       // console.log('!!! Seeing a badge 8', data)
     } else if(data.type == 'end') {

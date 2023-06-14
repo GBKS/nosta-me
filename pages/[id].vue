@@ -13,6 +13,7 @@ const profileData = ref(null)
 const relayData = ref(null)
 const relayEvent = ref(null)
 const followData = ref(null)
+const handlerData = ref(null)
 const badgeData = ref(null)
 const reportsData = ref(null)
 const sentZapsData = ref(null)
@@ -64,6 +65,13 @@ const tabInfo = ref({
   },
   'stall': {
     name: 'Stall',
+    info: null
+  },
+  'handlers': {
+    name: 'Handlers'
+  },
+  'handler': {
+    name: 'Handler',
     info: null
   }
 })
@@ -318,6 +326,9 @@ function onLoadProfileEvent(data) {
   } else if(data.kind == 1063) {
     // A file
     handleLoadedFileEvent(data)
+  } else if(data.kind == 31989) {
+    // A handler
+    handleLoadedHandlerEvent(data)
   } else if(data.kind == 9735) {
     // A zap
     handleLoadedZapEvent(data)
@@ -352,47 +363,11 @@ function handleLoadedRecommendedRelay(data) {
 }
 
 function handleListsEvent(data) {
-  if(!listsData.value) {
-    listsData.value = []
-  }
-
-  // Ensure it's not already added.
-  let alreadyAdded = false
-  for(let i=0; i<listsData.value.length; i++) {
-    if(listsData.value[i].id == data.id) {
-      alreadyAdded = true
-      break
-    }
-  }
-
-  if(!alreadyAdded) {
-    listsData.value.push(data)
-
-    const count = listsData.value.length
-    tabInfo.value.lists.name = count + ' List' + (count !== 1 ? 's' : '')
-  }
+  storeEvent(listsData, data)
 }
 
 function handleLoadedBadgeEvent(data) {
-  if(!badgeData.value) {
-    badgeData.value = []
-  }
-
-  // Ensure it's not already added.
-  let alreadyAdded = false
-  for(let i=0; i<badgeData.value.length; i++) {
-    if(badgeData.value[i].id == data.id) {
-      alreadyAdded = true
-      break
-    }
-  }
-
-  if(!alreadyAdded) {
-    badgeData.value.push(data)
-
-    const count = badgeData.value.length
-    tabInfo.value.badges.name = count + ' Badge' + (count !== 1 ? 's' : '')
-  }
+  storeEvent(badgeData, data)
 }
 
 function handleLoadedRelayList(data) {
@@ -424,50 +399,33 @@ function handleLoadedRelayList(data) {
 }
 
 function handleLoadedReportEvent(data) {
-  // console.log('handleLoadedReportEvent', data)
-
-  if(!reportsData.value) {
-    reportsData.value = []
-  }
-
-  // Ensure it's not already added.
-  let alreadyAdded = false
-  for(let i=0; i<reportsData.value.length; i++) {
-    if(reportsData.value[i].id == data.id) {
-      alreadyAdded = true
-      break
-    }
-  }
-
-  if(!alreadyAdded) {
-    reportsData.value.push(data)
-
-    const count = reportsData.value.length
-    tabInfo.value.reports.name = count + ' Report' + (count !== 1 ? 's' : '')
-  }
+  storeEvent(reportsData, data)
 }
 
 function handleLoadedFileEvent(data) {
-  // console.log('handleLoadedFileEvent', data)
+  storeEvent(fileData, data)
+}
 
-  if(!fileData.value) {
-    fileData.value = []
+function handleLoadedHandlerEvent(data) {
+  storeEvent(handlerData, data)
+}
+
+function storeEvent(location, data) {
+  if(!location.value) {
+    location.value = []
   }
 
   // Ensure it's not already added.
   let alreadyAdded = false
-  for(let i=0; i<fileData.value.length; i++) {
-    if(fileData.value[i].id == data.id) {
+  for(let i=0; i<location.value.length; i++) {
+    if(location.value[i].id == data.id) {
       alreadyAdded = true
       break
     }
   }
 
   if(!alreadyAdded) {
-    fileData.value.push(data)
-
-    const count = fileData.value.length
-    tabInfo.value.reports.name = count + ' File' + (count !== 1 ? 's' : '')
+    location.value.push(data)
   }
 }
 
@@ -733,6 +691,16 @@ onMounted(() => {
                 :count="listsData ? listsData.length : null"
                 @navigate="selectTab"
               />
+              <ProfileFileSummary
+                :info="fileData"
+                :count="fileData ? fileData.length : null"
+                @navigate="selectTab"
+              />
+              <ProfileHandlerSummary
+                :info="handlerData"
+                :count="handlerData ? handlerData.length : null"
+                @navigate="selectTab"
+              />
               <ProfileRelaySummary
                 :info="relayData"
                 :count="relayData ? relayData.length : null"
@@ -741,11 +709,6 @@ onMounted(() => {
               <ProfileReportSummary
                 :info="reportsData"
                 :count="reportsData ? reportsData.length : null"
-                @navigate="selectTab"
-              />
-              <ProfileFileSummary
-                :info="fileData"
-                :count="fileData ? fileData.length : null"
                 @navigate="selectTab"
               />
             </template>
@@ -806,6 +769,11 @@ onMounted(() => {
               :info="tabInfo.stall.info"
               :products="productData" 
               @navigate="selectTab"
+              @back="selectTab"
+            />
+            <ProfileHandlerTab 
+              v-if="activeTabId == 'handlers'"
+              :info="handlerData"
               @back="selectTab"
             />
           </div>

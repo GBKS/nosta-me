@@ -106,5 +106,32 @@ export default {
     }
     
     return result
+  },
+
+  dig(object, path, fallback) {
+    let result = null
+
+    if(object) {
+      result = object
+
+      const bits = path.split('.')
+      let i=0, key
+      for(; i<bits.length; i++) {
+        key = bits[i]
+
+        if(result[key]) {
+          result = result[key]
+        } else {
+          result = null
+          break
+        }
+      }
+    }
+
+    if(result == null && fallback) {
+      result = fallback
+    }
+
+    return result
   }
 }

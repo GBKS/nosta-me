@@ -6,12 +6,12 @@ const sessionStore = useSessionStore()
 const activeThemeId = ref('space')
 const active = ref(false)
 
-function onShowModal(id) {
-  active.value = id === 'themes'
+function onShowModal(data) {
+  active.value = data.id === 'themes'
 }
 
-function onHideModal(id) {
-  if(id === 'themes') {
+function onHideModal(data) {
+  if(data.id === 'themes') {
     active.value = false
   }
 }
@@ -27,7 +27,7 @@ onBeforeUnmount(() => {
 })
 
 function close() {
-  window.emitter.emit('hide-modal', 'themes')
+  window.emitter.emit('hide-modal', {id: 'themes'})
 }
 
 function selectTheme(value) {

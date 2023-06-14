@@ -56,6 +56,7 @@ const classObject = computed(() => {
     border-radius: 143px;
     opacity: 0.2;
     transition: all 250ms $ease;
+    object-fit: cover;
   }
 
   &.-shadow {
