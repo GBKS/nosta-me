@@ -78,6 +78,7 @@ updateFromRoute()
       <ModalSearch />
       <ModalRelays />
       <ModalThemes />
+      <ModalHandler />
     </client-only>
     <Header />
     <div class="site-content">

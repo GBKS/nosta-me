@@ -153,6 +153,7 @@ function showDataOverlay() {
       border-radius: 100px;
       opacity: 0;
       transition: opacity 250ms $ease;
+      object-fit: cover;
     }
 
     &.-loaded {

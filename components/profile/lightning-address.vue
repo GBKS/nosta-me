@@ -3,16 +3,28 @@ import Icons from '@/helpers/icons'
 import ToolBox from '@/helpers/toolBox'
 
 const props = defineProps([
-  'info'
+  'info',
+  'theme',
+  'size'
 ])
 
 const formattedAddress = computed(() => {
   return ToolBox.trim(props.info.profile.lud16, 30)
 })
+
+const classObject = computed(() => {
+  return [
+    '-'+(props.theme || 'theme'),
+    '-'+(props.size || 'default')
+  ].join(' ')
+})
 </script>
 
 <template>
-  <p v-if="info.profile.lud16"><span v-html="Icons.bitcoin" />{{ formattedAddress }}</p>
+  <p 
+    v-if="info.profile.lud16" 
+    :class="classObject"
+  ><span v-html="Icons.bitcoin" />{{ formattedAddress }}</p>
 </template>
 
 <style scoped lang="scss">
@@ -20,12 +32,7 @@ const formattedAddress = computed(() => {
 p {
   vertical-align: middle;
   text-decoration: none;
-  font-size: 17px;
-  padding: 5px 10px 8px 10px;
-  color: var(--theme-text-medium);
   transition: all 150ms $ease;
-  border-radius: 5px;
-  margin-left: -10px;
 
   span {
     display: inline-block;
@@ -36,6 +43,28 @@ p {
       height: 18px;
       vertical-align: middle;
     }
+  }
+
+  &.-default {
+    font-size: 17px;
+    padding: 5px 10px 8px 10px;
+    margin-left: -10px;
+    border-radius: 5px;
+  }
+
+  &.-small {
+    font-size: 13px;
+    padding: 4px 6px 4px 6px;
+    margin-left: -6px;
+    border-radius: 3px;
+  }
+
+  &.-theme {
+    color: var(--theme-text-medium);
+  }
+
+  &.-light {
+    color: rgba(black, 0.75);
   }
 
   // &:hover {

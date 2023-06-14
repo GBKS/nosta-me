@@ -2,7 +2,9 @@
 import Icons from '@/helpers/icons'
 
 const props = defineProps([
-  'info'
+  'info',
+  'theme',
+  'size'
 ])
 
 const isCopied = ref(false)
@@ -21,11 +23,19 @@ function resetCopied() {
 const text = computed(() => {
   return isCopied.value ? 'Copied to clipboard' : props.info.profile.nip05
 })
+
+const classObject = computed(() => {
+  return [
+    '-'+(props.theme || 'theme'),
+    '-'+(props.size || 'default')
+  ].join(' ')
+})
 </script>
 
 <template>
   <button
     v-if="info.profile.nip05"
+    :class="classObject"
     :to="'/'+info.profile.nip05"
     title="Copy handle"
     @click="copy"
@@ -40,12 +50,7 @@ button {
   background-color: transparent;
   vertical-align: middle;
   text-decoration: none;
-  font-size: 17px;
-  padding: 5px 10px 8px 10px;
-  color: var(--theme-text-medium);
   transition: all 150ms $ease;
-  border-radius: 5px;
-  margin-left: -10px;
 
   span {
     display: inline-block;
@@ -58,10 +63,40 @@ button {
     }
   }
 
+  &.-default {
+    font-size: 17px;
+    padding: 5px 10px 8px 10px;
+    margin-left: -10px;
+    border-radius: 5px;
+  }
+
+  &.-small {
+    font-size: 13px;
+    padding: 4px 6px 4px 6px;
+    margin-left: -6px;
+    border-radius: 3px;
+  }
+
+  &.-theme {
+    color: var(--theme-text-medium);
+
+    &:hover {
+      background-color: rgba(var(--theme-active-rgb), 0.25);
+      color: var(--theme-active);
+    }
+  }
+
+  &.-light {
+    color: rgba(black, 0.75);
+
+    &:hover {
+      background-color: rgba(black, 0.1);
+      color: black;
+    }
+  }
+
   &:hover {
     cursor: pointer;
-    background-color: rgba(var(--theme-active-rgb), 0.25);
-    color: var(--theme-active);
   }
 }
 

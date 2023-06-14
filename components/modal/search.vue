@@ -51,17 +51,17 @@ function validateInput() {
 }
 
 function close() {
-  window.emitter.emit('hide-modal', 'search')
+  window.emitter.emit('hide-modal', {id: 'search'})
 }
 
-function onShowModal(id) {
-  active.value = id == 'search'
+function onShowModal(data) {
+  active.value = data.id == 'search'
 
   setTimeout(focusInput, 25)
 }
 
-function onHideModal(id) {
-  if(id === 'search') {
+function onHideModal(data) {
+  if(data.id === 'search') {
     active.value = false
   }
 }

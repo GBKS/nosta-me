@@ -10,20 +10,20 @@ function toggle() {
   active.value = !active.value
 
   if(active.value) {
-    window.emitter.emit('show-modal', 'relays')
+    window.emitter.emit('show-modal', {id: 'relays'})
   } else {
-    window.emitter.emit('hide-modal', 'relays')
+    window.emitter.emit('hide-modal', {id: 'relays'})
   }
 }
 
-function onShowModal(id) {
-  if(id != 'relays') {
+function onShowModal(data) {
+  if(data.id != 'relays') {
     active.value = false
   }
 }
 
-function onHideModal(id) {
-  if(id === 'relays') {
+function onHideModal(data) {
+  if(data.id === 'relays') {
     active.value = false
   }
 }

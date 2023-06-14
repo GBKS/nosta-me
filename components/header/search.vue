@@ -7,20 +7,20 @@ function toggle() {
   active.value = !active.value
 
   if(active.value === true) {
-    window.emitter.emit('show-modal', 'search')
+    window.emitter.emit('show-modal', {id: 'search'})
   } else {
-    window.emitter.emit('hide-modal', 'search')
+    window.emitter.emit('hide-modal', {id: 'search'})
   }
 }
 
-function onShowModal(id) {
-  if(id != 'search') {
+function onShowModal(data) {
+  if(data.id != 'search') {
     active.value = false
   }
 }
 
-function onHideModal(id) {
-  if(id === 'search') {
+function onHideModal(data) {
+  if(data.id === 'search') {
     active.value = false
   }
 }

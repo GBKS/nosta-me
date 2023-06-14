@@ -7,20 +7,20 @@ function toggle() {
   active.value = !active.value
 
   if(active.value === true) {
-    window.emitter.emit('show-modal', 'themes')
+    window.emitter.emit('show-modal', {id: 'themes'})
   } else {
-    window.emitter.emit('hide-modal', 'themes')
+    window.emitter.emit('hide-modal', {id: 'themes'})
   }
 }
 
-function onShowModal(id) {
-  if(id != 'themes') {
+function onShowModal(data) {
+  if(data.id != 'themes') {
     active.value = false
   }
 }
 
-function onHideModal(id) {
-  if(id === 'themes') {
+function onHideModal(data) {
+  if(data.id === 'themes') {
     active.value = false
   }
 }
