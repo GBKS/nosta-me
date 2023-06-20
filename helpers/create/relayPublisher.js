@@ -2,7 +2,7 @@ import relayPublishRequest from '@/helpers/relayPublishRequest.js'
 import { useProfileStore } from '@/stores/profile'
 import relayManager from '@/helpers/relayManager.js'
 
-export default function metaPublisher () { 
+export default function relayPublisher () { 
   return {
     store: null,
     callback: null,

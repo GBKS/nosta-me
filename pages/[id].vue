@@ -10,6 +10,7 @@ const sessionStore = useSessionStore()
 const routeId = ref('')
 const queryRelayIds = ref(null)
 const profileData = ref(null)
+const profileDataEvents = ref(null)
 const relayData = ref(null)
 const relayEvent = ref(null)
 const followData = ref(null)
@@ -168,33 +169,53 @@ function loadFromRouteId() {
 }
 
 function loadNpub(npub, queryRelayIds) {
-  status.value = 'Loading npub: '+npub
-  let {type, data} = window.NostrTools.nip19.decode(npub)
+  try {
+    let {type, data} = window.NostrTools.nip19.decode(npub)
 
-  if(data) {
-    loadPublicKey(data, queryRelayIds)
+    status.value = {state: 'loading', npub: npub}
+
+    if(data) {
+      loadPublicKey(data, queryRelayIds)
+    } else {
+      console.log('loadNpub no data', npub, type, data)
+      status.value = {state: 'no-data', npub: npub}
+    }
+  } catch(error) {
+    console.log('loadNpub error', npub, error)
+
+    status.value = {state: 'error', npub: npub}
   }
 }
 
 function loadNprofile(nprofile) {
-  status.value = 'Loading nprofile: '+nprofile
-  let {type, data} = window.NostrTools.nip19.decode(nprofile)
+  try {
+    let {type, data} = window.NostrTools.nip19.decode(nprofile)
 
-  console.log('loadNprofile', nprofile, type, data)
+    status.value = {state: 'loading', nprofile: nprofile}
 
-  if(data) {
-    let relayIds = null
+    console.log('loadNprofile', nprofile, type, data)
 
-    if(data.relays && data.relays.length > 0) {
-      relayIds = []
-      let relayId
-      for(let i=0; i<data.relays.length; i++) {
-        relayId = relayManager.addRelayByUrl(data.relays[i])
-        relayIds.push(relayId)
+    if(data) {
+      let relayIds = null
+
+      if(data.relays && data.relays.length > 0) {
+        relayIds = []
+        let relayId
+        for(let i=0; i<data.relays.length; i++) {
+          relayId = relayManager.addRelayByUrl(data.relays[i])
+          relayIds.push(relayId)
+        }
       }
-    }
 
-    loadPublicKey(data.pubkey, relayIds)
+      loadPublicKey(data.pubkey, relayIds)
+    } else {
+      console.log('loadNprofile no data', nprofile, type, data)
+      status.value = {state: 'no-data', nprofile: nprofile}
+    }
+  } catch(error) {
+    console.log('loadNprofile error', nprofile, error)
+
+    status.value = {state: 'error', nprofile: nprofile}
   }
 }
 
@@ -227,7 +248,7 @@ function getProfileUrl() {
 }
 
 async function loadNip05(profileId, queryRelayIds) {
-  status.value = 'Loading NIP-05: '+profileId
+  status.value = {state: 'loading', nip05: profileId}
 
   // const trimmedProfileId = profileId.split('@').join('')
 
@@ -266,7 +287,7 @@ async function loadNip05(profileId, queryRelayIds) {
 }
 
 function loadPublicKey(newPublicKey, relayIds) {
-  status.value = 'Loading public key: '+newPublicKey
+  status.value = {state: 'loading', publicKey: newPublicKey}
 
   publicKey.value = newPublicKey
 
@@ -276,11 +297,11 @@ function loadPublicKey(newPublicKey, relayIds) {
 }
 
 function onLoadProfileEvent(data) {
-  status.value = 'Loaded a profile event'
-
   // console.log('onLoadProfile', data.kind, data)
 
   if(data.kind === 0) {
+    status.value = {state: 'loaded', event: data}
+
     // Profile info
     saveProfileInfo(data)
 
@@ -290,12 +311,7 @@ function onLoadProfileEvent(data) {
     handleLoadedRecommendedRelay(data)
   } else if(data.kind == 3) {
     // Contact list
-    if(!(followData.value && data.tags.length == 0)) {
-      followData.value = data
-
-      const count = data.tags.length
-      tabInfo.value.following.name = count + ' Following'
-    }
+    handleLoadedContactList(data)
   } else if(data.kind == 10000) {
     // A list of muted people
     handleListsEvent(data)
@@ -347,6 +363,17 @@ function onLoadProfileEvent(data) {
     profileDataStats.value.relays[data.relay] = 0 
   } else {
     profileDataStats.value.relays[data.relay]++
+  }
+}
+
+function handleLoadedContactList(data) {
+  // console.log('handleLoadedContactList', data)
+  if(data.tags && data.tags.length > 0) {
+    let saveIt = true
+
+    if(!followData.value || eventData.created_at > followData.value.created_at) {
+      followData.value = data
+    }
   }
 }
 
@@ -541,14 +568,16 @@ function saveProfileInfo(eventData) {
     }
   }
 
-  // console.log('saveProfileInfo', eventData)
-
   if(profileData.value) {
     // Only store if newer than existing data.
     if(eventData.created_at < profileData.value.event.created_at) {
       saveIt = false
     }
   }
+
+  storeEvent(profileDataEvents, data)
+
+  console.log('saveProfileInfo', eventData, profileDataEvents)
 
   if(saveIt) {
     profileData.value = {
@@ -636,6 +665,11 @@ onMounted(() => {
   <div :class="classObject">
     <div class="content -theme-content-frame" :key="publicKey">
       <p v-if="false && !profileData && status">{{ status }}</p>
+
+      <ProfileLoader
+        :status="status"
+        :events="profileDataEvents"
+      />
 
       <template v-if="profileData">
         <ProfileBanner :info="profileData" />
@@ -783,6 +817,7 @@ onMounted(() => {
     <ProfileDataOverlay
       v-if="showDataOverlay"
       :info="profileData"
+      :infoEvents="profileDataEvents"
       :publicKey="publicKey"
       :relayData="relayEvent"
       :followData="followData"
