@@ -4,6 +4,7 @@ import { useRelayStore } from '@/stores/relays'
 
 const props = defineProps([
   'info',
+  'infoEvents',
   'publicKey',
   'relayData',
   'followData',
