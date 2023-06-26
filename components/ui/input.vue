@@ -64,7 +64,7 @@ textarea {
   appearance: none;
   padding: 15px 20px;
   background-color: transparent;
-  border: 1px solid rgba(var(--frontRGB), 0.25);
+  border: 1px solid rgba(var(--front-rgb), 0.25);
   border-radius: 15px;
   box-sizing: border-box;
   transition: color 150ms $ease, border-color 150ms $ease;
@@ -81,7 +81,7 @@ textarea {
   }
 
   &:hover {
-    border-color: rgba(var(--frontRGB), 0.5);
+    border-color: rgba(var(--front-rgb), 0.5);
   }
 
   &:focus {

@@ -13,7 +13,9 @@ const profileData = ref(null)
 const profileDataEvents = ref(null)
 const relayData = ref(null)
 const relayEvent = ref(null)
+const relayDataEvents = ref(null)
 const followData = ref(null)
+const followDataEvents = ref(null)
 const handlerData = ref(null)
 const badgeData = ref(null)
 const reportsData = ref(null)
@@ -371,6 +373,8 @@ function handleLoadedContactList(data) {
   if(data.tags && data.tags.length > 0) {
     let saveIt = true
 
+    storeEvent(followDataEvents, data)
+
     if(!followData.value || eventData.created_at > followData.value.created_at) {
       followData.value = data
     }
@@ -378,6 +382,8 @@ function handleLoadedContactList(data) {
 }
 
 function handleLoadedRecommendedRelay(data) {
+  console.log('handleLoadedRecommendedRelay', data)
+
   if(!relayData.value) {
     relayData.value = []
   }
@@ -400,6 +406,8 @@ function handleLoadedBadgeEvent(data) {
 function handleLoadedRelayList(data) {
   // console.log('handleLoadedRelayList', data)
 
+  storeEvent(relayDataEvents, data)
+
   if(!relayData.value) {
     relayData.value = []
   }
@@ -420,9 +428,6 @@ function handleLoadedRelayList(data) {
       }
     }
   }
-
-  const count = data.tags.length
-  tabInfo.value.relays.name = count + ' Relay' + (count !== 1 ? 's' : '')
 }
 
 function handleLoadedReportEvent(data) {
@@ -575,9 +580,9 @@ function saveProfileInfo(eventData) {
     }
   }
 
-  storeEvent(profileDataEvents, data)
+  storeEvent(profileDataEvents, eventData)
 
-  console.log('saveProfileInfo', eventData, profileDataEvents)
+  // console.log('saveProfileInfo', eventData, profileDataEvents)
 
   if(saveIt) {
     profileData.value = {
@@ -814,13 +819,23 @@ onMounted(() => {
         </div>
       </template>
     </div>
-    <ProfileDataOverlay
+    <ProfileDataOverlayModal
       v-if="showDataOverlay"
       :info="profileData"
       :infoEvents="profileDataEvents"
       :publicKey="publicKey"
-      :relayData="relayEvent"
+      :relayData="relayDataEvents"
       :followData="followData"
+      :followDataEvents="followDataEvents"
+      :badgeData="badgeData"
+      :handlerData="handlerData"
+      :listsData="listsData"
+      :stallData="stallData"
+      :productData="productData"
+      :sentZapsData="sentZapsData"
+      :receivedZapsData="receivedZapsData"
+      :reportsData="reportsData"
+      :fileData="fileData"
       :stats="profileDataStats"
       @close="closeDataOverlay"
     />

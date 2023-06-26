@@ -55,7 +55,7 @@ function toggleAdd() {
   gap: 15px;
   flex-grow: 1;
   padding: 14px 0;
-  border-bottom: 1px solid rgba(var(--frontRGB), 0.2);
+  border-bottom: 1px solid rgba(var(--front-rgb), 0.2);
 
   > div {
     display: flex;
@@ -64,7 +64,7 @@ function toggleAdd() {
     width: 20px;
     height: 20px;
     border-radius: 100px;
-    border: 1px solid rgba(var(--frontRGB), 1);
+    border: 1px solid rgba(var(--front-rgb), 1);
 
     :deep(svg) {
       width: 12px;
@@ -86,14 +86,14 @@ function toggleAdd() {
       gap: 10px;
       position: relative;
       font-size: 17px;
-      color: rgba(var(--frontRGB), 0.5);
+      color: rgba(var(--front-rgb), 0.5);
 
       &:after {
         display: block;
         content: '';
         width: 6px;
         height: 6px;
-        background-color: rgba(var(--frontRGB), 0.2);
+        background-color: rgba(var(--front-rgb), 0.2);
         border-radius: 10px;
       }
     }

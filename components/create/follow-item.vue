@@ -49,7 +49,7 @@ const look = computed(() => {
   align-items: center;
   gap: 10px;
   padding: 10px 0;
-  border-bottom: 1px solid rgba(var(--frontRGB), 0.2);
+  border-bottom: 1px solid rgba(var(--front-rgb), 0.2);
 
   a {
     display: flex;
