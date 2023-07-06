@@ -83,10 +83,11 @@ export default {
         30017, // Stall
         30018, // Product
         1063, // Files
-        9802, // Highlights
+        // 9802, // Highlights
         31337, // Zapstr tracks
         31989, // Handler recommendation
         31990, // Handler information
+        30311 // Live activities
       ],
       authors: [this.publicKey]
     }
@@ -143,6 +144,8 @@ export default {
       console.log('!!! Seeing a highlight', data)
     } else if(data.kind == 31337) {
       console.log('!!! Seeing a Zapstr track', data)
+    } else if(data.kind == 30311) {
+      // console.log('!!! Seeing a live activity', data)
     } else if(data.kind == 31989) {
       // console.log('!!! Seeing a handler recommendation', data)
     } else if(data.kind == 31990) {

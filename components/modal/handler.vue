@@ -7,8 +7,6 @@ const handlerData = ref(null)
 const dialog = ref(null)
 
 function onShowModal(data) {
-  console.log('HandlerModal.onShowModal', data)
-
   const isActive = data.id === 'handler'
 
   if(isActive) {

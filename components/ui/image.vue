@@ -29,6 +29,10 @@ const classObject = computed(() => {
     c.push('-' + props.style)
   }
 
+  if(!props.src) {
+    c.push('-placeholder')
+  }
+
   return c.join(' ')
 })
 
@@ -36,6 +40,7 @@ const styleObject = computed(() => {
   const s = {}
 
   if(props.radius) s.borderRadius = props.radius + 'px'
+  if(!props.src && props.height) s.height = props.height + 'px'
 
   return s
 })
@@ -48,26 +53,35 @@ const imageStyleObject = computed(() => {
 
   return s
 })
+
+const message = computed(() => {
+  let result = 'No image'
+
+  if(status.value == 'error') {
+    result = 'Could not load image'
+  }
+
+  return result
+})
 </script>
 
 <template>
   <div 
-    v-if="src"
     :class="classObject"
     :style="styleObject"
   >
     <img
-      v-if="status != 'error'"
+      v-if="src && status != 'error'"
       :src="src" 
       :alt="alt"
       :style="imageStyleObject"
       @load="imageLoaded" 
       @error="imageLoadError"
     />
-      <p
-        v-if="status == 'error'"
-        class="error"
-      >Could not load image.</p>
+    <p
+      v-if="!src || status == 'error'"
+      class="error"
+    >{{ message }}</p>
   </div>
 </template>
 
@@ -80,6 +94,8 @@ const imageStyleObject = computed(() => {
   overflow: hidden;
 
   img {
+    width: 100%;
+    height: auto;
     opacity: 0;
     transition: all 250ms $ease;
     object-fit: cover;
@@ -105,7 +121,8 @@ const imageStyleObject = computed(() => {
     }
   }
 
-  &.-error {
+  &.-error,
+  &.-placeholder {
     display: flex;
     align-items: center;
     justify-content: center;
