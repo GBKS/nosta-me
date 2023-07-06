@@ -21,6 +21,7 @@ const badgeData = ref(null)
 const reportsData = ref(null)
 const sentZapsData = ref(null)
 const receivedZapsData = ref(null)
+const liveData = ref(null)
 const stallData = ref(null)
 const productData = ref(null)
 const fileData = ref(null)
@@ -76,6 +77,9 @@ const tabInfo = ref({
   'handler': {
     name: 'Handler',
     info: null
+  },
+  'live': {
+    name: 'Live events'
   }
 })
 const activeTabId = ref(null)
@@ -350,6 +354,8 @@ function onLoadProfileEvent(data) {
   } else if(data.kind == 9735) {
     // A zap
     handleLoadedZapEvent(data)
+  } else if(data.kind == 30311) {
+    storeEvent(liveData, data)
   }
 
   // Track event
@@ -605,9 +611,13 @@ function reset() {
   }
 
   profileData.value = null
+  profileDataEvents.value = null
   relayData.value = null
   relayEvent.value = null
+  relayDataEvents.value = null
   followData.value = null
+  followDataEvents.value = null
+  handlerData.value = null
   nip05Data = null
   publicKey.value = null
   reportsData.value = null
@@ -616,6 +626,10 @@ function reset() {
   badgeData.value = null
   listsData.value = null
   profileDataStats.value = null
+  liveData.value = null
+  stallData.value = null
+  productData.value = null
+  fileData.value = null
 }
 
 function updateHistory() {
@@ -735,6 +749,11 @@ onMounted(() => {
                 :count="fileData ? fileData.length : null"
                 @navigate="selectTab"
               />
+              <ProfileLiveSummary
+                :info="liveData"
+                :count="liveData ? liveData.length : null"
+                @navigate="selectTab"
+              />
               <ProfileHandlerSummary
                 :info="handlerData"
                 :count="handlerData ? handlerData.length : null"
@@ -815,6 +834,11 @@ onMounted(() => {
               :info="handlerData"
               @back="selectTab"
             />
+            <ProfileLiveTab 
+              v-if="activeTabId == 'live'"
+              :info="liveData"
+              @back="selectTab"
+            />
           </div>
         </div>
       </template>
@@ -836,6 +860,7 @@ onMounted(() => {
       :receivedZapsData="receivedZapsData"
       :reportsData="reportsData"
       :fileData="fileData"
+      :liveData="liveData"
       :stats="profileDataStats"
       @close="closeDataOverlay"
     />

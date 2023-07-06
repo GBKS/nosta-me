@@ -18,6 +18,7 @@ const props = defineProps([
   'receivedZapsData',
   'reportsData',
   'fileData',
+  'liveData',
   'stats'
 ])
 
@@ -86,6 +87,11 @@ const navOptions = computed(() => {
       id: 'files',
       name: 'Files',
       count: props.fileData ? props.fileData.length : 0 
+    },
+    {
+      id: 'live',
+      name: 'Live',
+      count: props.liveData ? props.liveData.length : 0 
     }
   ]
 })
@@ -188,6 +194,11 @@ function close() {
           <ProfileDataOverlayFiles
             v-if="activeNavOptionId == 'files'"
             :info="fileData"
+          />
+
+          <ProfileDataOverlayLive
+            v-if="activeNavOptionId == 'live'"
+            :info="liveData"
           />
         </div>
       </div>

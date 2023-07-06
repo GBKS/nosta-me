@@ -30,7 +30,7 @@ export default defineNuxtConfig({
 				{ rel: 'manifest', href: '/manifest.json' }
 			],
 			script: [
-				{ src: '/lib/nostr-tools-1-7-5.js' } // npm i the lib did not work, so loading it in this way
+				{ src: '/lib/nostr-tools-1-12-1.js' } // npm i the lib did not work, so loading it in this way
 			]
 		}
 	},
