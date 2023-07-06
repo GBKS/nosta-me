@@ -739,6 +739,11 @@ onMounted(() => {
                 :count="badgeData ? badgeData.length : null"
                 @navigate="selectTab"
               />
+              <ProfileLiveSummary
+                :info="liveData"
+                :count="liveData ? liveData.length : null"
+                @navigate="selectTab"
+              />
               <ProfileListsSummary
                 :info="listsData"
                 :count="listsData ? listsData.length : null"
@@ -747,11 +752,6 @@ onMounted(() => {
               <ProfileFileSummary
                 :info="fileData"
                 :count="fileData ? fileData.length : null"
-                @navigate="selectTab"
-              />
-              <ProfileLiveSummary
-                :info="liveData"
-                :count="liveData ? liveData.length : null"
                 @navigate="selectTab"
               />
               <ProfileHandlerSummary
