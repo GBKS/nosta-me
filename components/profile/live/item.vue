@@ -59,8 +59,6 @@ const link = computed(() => {
     relays: [relay.url]
   }
 
-  console.log('LiveItem.link', data)
-
   return 'https://zap.stream/' + window.NostrTools.nip19.naddrEncode(data)
 })
 
@@ -70,10 +68,6 @@ const classObject = computed(() => {
   if(status.value) c.push('-'+status.value)
 
   return c.join(' ')
-})
-
-onMounted(() => {
-  console.log('LiveItem.onMounted', props.info)
 })
 </script>
 
@@ -151,6 +145,7 @@ onMounted(() => {
     font-size: 15px;
     color: var(--theme-front);
     opacity: 0.75;
+    text-align: center;
   }
 }
 

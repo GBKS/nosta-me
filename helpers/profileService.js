@@ -145,7 +145,7 @@ export default {
     } else if(data.kind == 31337) {
       console.log('!!! Seeing a Zapstr track', data)
     } else if(data.kind == 30311) {
-      console.log('!!! Seeing a live activity', data)
+      // console.log('!!! Seeing a live activity', data)
     } else if(data.kind == 31989) {
       // console.log('!!! Seeing a handler recommendation', data)
     } else if(data.kind == 31990) {
