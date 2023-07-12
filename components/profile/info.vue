@@ -117,6 +117,7 @@ function showDataOverlay() {
           :active="optionsVisible"
           @click="toggleOptions"
         />
+        <ProfileZapButton :info="info" />
         <ProfileShareOptions
           :active="optionsVisible"
           :info="info"
@@ -207,6 +208,8 @@ function showDataOverlay() {
 
     .options-wrap {
       position: relative;
+      display: flex;
+      gap: 10px;
 
       .options-button {
 

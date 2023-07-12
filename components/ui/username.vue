@@ -13,7 +13,7 @@ const props = defineProps([
   'showAvatar',
   'avatarSize',
   'avatarStyle',
-  'theme',
+  'theme', // horizontal, vertical
   'layout'
 ])
 

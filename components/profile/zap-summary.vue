@@ -10,29 +10,6 @@ const props = defineProps([
   'direction'
 ])
 
-const ranks = [
-  {
-    amount: 1,
-    rank: 'bronze'
-  },
-  {
-    amount: 100,
-    rank: 'silver'
-  },
-  {
-    amount: 1000,
-    rank: 'gold'
-  },
-  {
-    amount: 10000,
-    rank: 'emerald'
-  },
-  {
-    amount: 100000,
-    rank: 'neon'
-  }
-]
-
 const zapsParsed = []
 const summaries = ref(null)
 const zappedAmountValue = ref(0)
@@ -160,27 +137,6 @@ const formattedAmount = computed(() => {
 
 const formattedUnit = computed(() => {
   return 'sat' + (zappedAmount.value == 1 ? '' : 's')
-})
-
-const rank = computed(() => {
-  let rank = 'bronze'
-  for(let i=0; i<ranks.length; i++) {
-    if(zappedAmount.value >= ranks[i].amount) {
-      rank = ranks[i].rank
-    }
-  }
-  return rank
-})
-
-const rankImage = computed(() => {
-  const image =  '/assets/images/zap-'+rank.value+'.jpg'
-  return useAssets(image)
-})
-
-const rankStyle = computed(() => {
-  return {
-    backgroundImage: 'url("'+rankImage.value+'")'
-  }
 })
 
 const recipientOne = computed(() => {
