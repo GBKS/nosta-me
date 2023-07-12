@@ -8,19 +8,19 @@ const props = defineProps([
 
 const ranks = [
   {
-    amount: 100,
+    amount: 1000,
     rank: 'silver'
   },
   {
-    amount: 1000,
+    amount: 10000,
     rank: 'gold'
   },
   {
-    amount: 10000,
+    amount: 100000,
     rank: 'emerald'
   },
   {
-    amount: 100000,
+    amount: 1000000,
     rank: 'neon'
   }
 ]
@@ -28,7 +28,7 @@ const ranks = [
 const rank = computed(() => {
   let rank = 'bronze'
   for(let i=0; i<ranks.length; i++) {
-    if(props.amount.value >= ranks[i].amount) {
+    if(props.amount >= ranks[i].amount) {
       rank = ranks[i].rank
     }
   }

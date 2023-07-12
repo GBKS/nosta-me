@@ -79,6 +79,7 @@ updateFromRoute()
       <ModalRelays />
       <ModalThemes />
       <ModalHandler />
+      <ModalZapMain />
     </client-only>
     <Header />
     <div class="site-content">

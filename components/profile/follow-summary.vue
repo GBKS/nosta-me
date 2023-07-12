@@ -175,6 +175,7 @@ function navigate() {
     width: 275px;
     height: 75px;
     position: relative;
+    flex-shrink: 0;
 
     :deep(a) {
       position: absolute;

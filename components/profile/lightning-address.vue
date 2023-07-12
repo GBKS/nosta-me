@@ -12,24 +12,51 @@ const formattedAddress = computed(() => {
   return ToolBox.trim(props.info.profile.lud16, 30)
 })
 
+const type = computed(() => {
+  return (window.nostr && window.webln) ? 'button' : 'p'
+})
+
+const title = computed(() => {
+  return type.value == 'button' ? 'Click to zap' : null
+})
+
 const classObject = computed(() => {
-  return [
+  let c = [
+    'lightning-address',
     '-'+(props.theme || 'theme'),
     '-'+(props.size || 'default')
-  ].join(' ')
+  ]
+
+  if(window.nostr) {
+    c.push('-zap')
+  }
+
+  return c.join(' ')
 })
+
+function select() {
+  if(window.nostr && window.webln) {
+    window.emitter.emit('show-modal', {
+      id: 'zap', 
+      event: props.info.event
+    })
+  }
+}
 </script>
 
 <template>
-  <p 
+  <component 
     v-if="info.profile.lud16" 
+    :is="type"
     :class="classObject"
-  ><span v-html="Icons.bitcoin" />{{ formattedAddress }}</p>
+    :title="title"
+    @click="select"
+  ><span v-html="Icons.bitcoin" />{{ formattedAddress }}</component>
 </template>
 
 <style scoped lang="scss">
 
-p {
+.lightning-address {
   vertical-align: middle;
   text-decoration: none;
   transition: all 150ms $ease;
@@ -43,6 +70,13 @@ p {
       height: 18px;
       vertical-align: middle;
     }
+  }
+
+  &.-zap {
+    cursor: pointer;
+    appearance: none;
+    border-width: 0;
+    background-color: transparent;
   }
 
   &.-default {
@@ -61,10 +95,20 @@ p {
 
   &.-theme {
     color: var(--theme-text-medium);
+
+    &.-zap:hover {
+      background-color: rgba(var(--theme-active-rgb), 0.25);
+      color: var(--theme-active);
+    }
   }
 
   &.-light {
     color: rgba(black, 0.75);
+
+    &.-zap:hover {
+      background-color: rgba(black, 0.1);
+      color: black;
+    }
   }
 
   // &:hover {

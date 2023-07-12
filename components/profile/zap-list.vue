@@ -87,6 +87,10 @@ const title = computed(() => {
     display: flex;
   }
 
+  .pagination {
+    margin-top: 20px;
+  }
+
   @include media-query(small) {
     .list {
       flex-direction: column;
