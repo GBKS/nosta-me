@@ -13,7 +13,7 @@ const npub = computed(() => {
 })
 
 const formattedKey = computed(() => {
-  return ToolBox.trim(npub.value, 10)
+  return ToolBox.trim(npub.value, 15)
 })
 
 function copy() {
@@ -38,7 +38,7 @@ const text = computed(() => {
     :to="'/'+publicKey"
     title="Copy public key"
     @click="copy"
-  ><span v-html="Icons.key" />{{ text }}</button>
+  ><span v-html="Icons.keyCircle" />{{ text }}</button>
 </template>
 
 <style scoped lang="scss">

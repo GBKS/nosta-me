@@ -79,6 +79,10 @@ const classObject = computed(() => {
   ].join(' ')
 })
 
+const externalIdentities = computed(() => {
+  return props.info.event.tags.filter(tag => tag[0] == 'i')
+})
+
 function toggleOptions() {
   optionsVisible.value = !optionsVisible.value
 }
@@ -105,10 +109,19 @@ function showDataOverlay() {
         v-html="description"
       />
       <div class="links">
-        <ProfileNostrAddress :info="info" />
-        <ProfileLightningAddress :info="info" />
-        <ProfileWebsite :info="info" />
-        <ProfilePublicKey :publicKey="publicKey" />
+        <div class="internal">
+          <ProfileNostrAddress :info="info" />
+          <ProfileLightningAddress :info="info" />
+          <ProfileWebsite :info="info" />
+          <ProfilePublicKey :publicKey="publicKey" />
+        </div>
+        <div class="external" v-if="externalIdentities">
+          <ProfileExternalIdentity
+            v-for="info in externalIdentities"
+            :key="info[2]"
+            :info="info"
+          />
+        </div>
       </div>
     </div>
     <div class="options">
@@ -192,9 +205,13 @@ function showDataOverlay() {
 
     .links {
       margin-top: 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
+
+      .internal,
+      .external {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   }
 
@@ -252,7 +269,12 @@ function showDataOverlay() {
   }
 
   @include media-query(medium-up) {
-
+    .text {
+      .links {
+        display: flex;
+        gap: 25px;
+      }
+    }
   }
 
   @include media-query(large) {
