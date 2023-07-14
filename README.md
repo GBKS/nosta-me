@@ -21,18 +21,20 @@ This is a for-fun side project by [Christoph](https://nosta.me/gbks@nosta.me). Y
 - NIP-11: Relay Information Document
 - NIP-15: Marketplace
 - NIP-19: bech32-encoded entities
-- NIP-21: nostr: URL scheme
+- NIP-21: nostr: URI scheme
+- NIP-39: External Identities in Profiles
 - NIP-51: Lists
+- NIP-53: Live event
 - NIP-56: Reporting
 - NIP-57: Lightning Zaps
 - NIP-58: Badges
 - NIP-65: Relay List Metadata
+- NIP-89: Recommended Application Handlers
 - NIP-94: File Metadata
 
 ## NIPs to be supported
 
 - NIP-36: Sensitive Content
-- NIP-39: External Identities in Profiles
 - NIP-46: Nostr Connect
 - NIP-78: Application-specific data 
 
