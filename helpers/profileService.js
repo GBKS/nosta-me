@@ -84,10 +84,12 @@ export default {
         30018, // Product
         1063, // Files
         // 9802, // Highlights
+        30311, // Live activities
+        30402, // Classified
         31337, // Zapstr tracks
+        31922, // Calendar events
         31989, // Handler recommendation
         31990, // Handler information
-        30311 // Live activities
       ],
       authors: [this.publicKey]
     }
@@ -142,10 +144,14 @@ export default {
       // console.log('!!! Seeing a file', data)
     } else if(data.kind == 9802) {
       console.log('!!! Seeing a highlight', data)
-    } else if(data.kind == 31337) {
-      console.log('!!! Seeing a Zapstr track', data)
     } else if(data.kind == 30311) {
       // console.log('!!! Seeing a live activity', data)
+    } else if(data.kind == 30402) {
+      console.log('!!! Seeing a classified', data)
+    } else if(data.kind == 31337) {
+      console.log('!!! Seeing a Zapstr track', data)
+    } else if(data.kind == 31922) {
+      console.log('!!! Seeing a calendar event', data)
     } else if(data.kind == 31989) {
       // console.log('!!! Seeing a handler recommendation', data)
     } else if(data.kind == 31990) {

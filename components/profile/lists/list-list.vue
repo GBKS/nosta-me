@@ -91,7 +91,7 @@ onMounted(() => {
           :selfLoad="true"
           :relayId="info.relay"
         />
-        <ProfileListNote
+        <ProfileListsListNote
           v-if="tag[0] == 'e'"
           :key="tag[1]"
           :publicKey="tag[1]"
