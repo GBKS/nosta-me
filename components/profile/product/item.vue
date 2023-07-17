@@ -97,7 +97,6 @@ const price = computed(() => {
 })
 
 const formattedPrice = computed(() => {
-  console.log('dd', Intl.NumberFormat)
   const format = new Intl.NumberFormat(undefined, { style: 'currency', currency: currency.value })
   const result = format.format(price.value)
   return result
@@ -122,10 +121,6 @@ const tags = computed(() => {
 const hasTags = computed(() => {
   return tags.value && tags.value.length > 0
 })
-
-onMounted(() => {
-  console.log('ProductItem.onMounted', props.info)
-})
 </script>
 
 <template>
@@ -142,14 +137,7 @@ onMounted(() => {
         </h5>
         <p>{{ description }}</p>
         <p>{{ meta }}</p>
-        <div v-if="hasTags" class="tags">
-          <p
-            v-for="(item, index) in tags"
-            :key="index"
-          >
-            {{ item[0] }}
-          </p>
-        </div>
+        <ProfileBitsTags :info="info" align="left" />
       </div>
     </div>
   </Transition>
@@ -212,18 +200,6 @@ onMounted(() => {
 
     .tags {
       margin-top: 10px;
-      display: flex;
-      gap: 5px;
-
-      p {
-        padding: 3px 7px;
-        border-radius: 5px;
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--theme-front);
-        background-color: rgba(var(--theme-back-rgb), 0.2);
-        opacity: 0.75;
-      }
     }
   }
 

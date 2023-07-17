@@ -50,10 +50,6 @@ const count = computed(() => {
 function back() {
   emit('navigate')
 }
-
-onMounted(() => {
-  console.log('StallList.onMounted', props.info)
-})
 </script>
 
 <template>

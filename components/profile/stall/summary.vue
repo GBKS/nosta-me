@@ -25,6 +25,10 @@ const titleCopy = computed(() => {
 })
 
 function navigate(info) {
+  emit('navigate', 'stalls')
+}
+
+function navigateToStall(info) {
   emit('navigate', 'stall', info)
 }
 </script>
@@ -44,7 +48,7 @@ function navigate(info) {
           :info="item"
           :products="products"
           layout="box"
-          @select="navigate"
+          @select="navigateToStall"
         />
       </div>
     </div>

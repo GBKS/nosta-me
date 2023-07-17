@@ -22,6 +22,8 @@ const reportsData = ref(null)
 const sentZapsData = ref(null)
 const receivedZapsData = ref(null)
 const liveData = ref(null)
+const eventsData = ref(null)
+const classifiedsData = ref(null)
 const stallData = ref(null)
 const productData = ref(null)
 const fileData = ref(null)
@@ -64,8 +66,7 @@ const tabInfo = ref({
     info: null
   },
   'stalls': {
-    name: 'Stalls',
-    info: null
+    name: 'Stalls'
   },
   'stall': {
     name: 'Stall',
@@ -80,6 +81,13 @@ const tabInfo = ref({
   },
   'live': {
     name: 'Live events'
+  },
+  'classifieds': {
+    name: 'Classifieds'
+  },
+  'classified': {
+    name: 'Classified',
+    info: null
   }
 })
 const activeTabId = ref(null)
@@ -356,6 +364,10 @@ function onLoadProfileEvent(data) {
     handleLoadedZapEvent(data)
   } else if(data.kind == 30311) {
     storeEvent(liveData, data)
+  } else if(data.kind == 31922) {
+    storeEvent(eventsData, data)
+  } else if(data.kind == 30402) {
+    storeEvent(classifiedsData, data)
   }
 
   // Track event
@@ -744,6 +756,11 @@ onMounted(() => {
                 :count="liveData ? liveData.length : null"
                 @navigate="selectTab"
               />
+              <ProfileClassifiedsSummary
+                :info="classifiedsData"
+                :count="classifiedsData ? classifiedsData.length : null"
+                @navigate="selectTab"
+              />
               <ProfileListsSummary
                 :info="listsData"
                 :count="listsData ? listsData.length : null"
@@ -816,9 +833,16 @@ onMounted(() => {
               @navigate="selectTab"
               @back="selectTab"
             />
-            <ProfileListList 
+            <ProfileListsListList 
               v-if="activeTabId == 'list'" 
               :info="tabInfo.list.info" 
+              @navigate="selectTab"
+              @back="selectTab"
+            />
+            <ProfileStallTab 
+              v-if="activeTabId == 'stalls'"
+              :info="stallData"
+              :products="productData"
               @navigate="selectTab"
               @back="selectTab"
             />
@@ -837,6 +861,11 @@ onMounted(() => {
             <ProfileLiveTab 
               v-if="activeTabId == 'live'"
               :info="liveData"
+              @back="selectTab"
+            />
+            <ProfileClassifiedsTab 
+              v-if="activeTabId == 'classifieds'"
+              :info="classifiedsData"
               @back="selectTab"
             />
           </div>
@@ -861,6 +890,8 @@ onMounted(() => {
       :reportsData="reportsData"
       :fileData="fileData"
       :liveData="liveData"
+      :eventsData="eventsData"
+      :classifiedsData="classifiedsData"
       :stats="profileDataStats"
       @close="closeDataOverlay"
     />
