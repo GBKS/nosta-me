@@ -8,6 +8,7 @@ const props = defineProps([
   'platform',
   'url',
   'image',
+  'npub',
   'size'
 ])
 
@@ -18,6 +19,16 @@ const imageSource = computed(() => {
 
 const title = computed(() => {
   return 'View profile in '+props.name
+})
+
+const completeUrl = computed(() => {
+  let result = props.url
+
+  if(props.npub) {
+    result = result.replace('{npub}', props.npub)
+  }
+
+  return result
 })
 
 const classObject = computed(() => {
@@ -34,7 +45,7 @@ const classObject = computed(() => {
 <template>
   <NuxtLink
     :class="classObject"
-    :to="url"
+    :to="completeUrl"
     target="_blank"
     rel="nofollow noopener noreferrer"
     :title="title"

@@ -162,6 +162,7 @@ onMounted(() => {
     text-align: center;
     font-weight: 600;
     max-width: 600px;
+    text-wrap: balance;
 
     a {
       color: white;

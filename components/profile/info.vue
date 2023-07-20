@@ -190,6 +190,7 @@ function showDataOverlay() {
 
     p {
       color: var(--theme-text-medium);
+      text-wrap: balance;
 
       :deep(a) {
         color: var(--theme-text-medium);

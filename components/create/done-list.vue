@@ -3,7 +3,40 @@ import { useProfileStore } from '@/stores/profile'
 import profileInitializer from '@/helpers/create/profileInitializer.js'
 
 const store = useProfileStore()
-let options = ref(null)
+const options = [
+  {
+    id: 'damus',
+    name: 'Damus',
+    description: 'Social media',
+    platform: 'iOS',
+    url: 'https://snort.social/p/{npub}',
+    image: 'damus'
+  },
+  {
+    id: 'amethyst',
+    name: 'Amethyst',
+    description: 'Social media',
+    platform: 'Android',
+    url: 'https://play.google.com/store/apps/details?id=com.vitorpamplona.amethyst',
+    image: 'amethyst'
+  },
+  {
+    id: 'primal',
+    name: 'Primal',
+    description: 'Social media',
+    platform: 'Web',
+    url: 'https://primal.net/p/{npub}',
+    image: 'primal'
+  },
+  {
+    id: 'blogstack',
+    name: 'Blogstack',
+    description: 'Blogging',
+    platform: 'Web',
+    url: 'https://hamstr.to/profile/{npub}',
+    image: 'blogstack'
+  }
+]
 
 function toggleItem(id) {
   let item
@@ -17,54 +50,20 @@ function toggleItem(id) {
 
 onMounted(() => {
   profileInitializer.init()
-
-  options.value = [
-    {
-      id: 'damus',
-      name: 'Damus',
-      description: 'Social media',
-      platform: 'iOS',
-      url: 'https://snort.social/p/' + store.npub,
-      image: 'damus'
-    },
-    {
-      id: 'amethyst',
-      name: 'Amethyst',
-      description: 'Social media',
-      platform: 'Android',
-      url: 'https://play.google.com/store/apps/details?id=com.vitorpamplona.amethyst',
-      image: 'amethyst'
-    },
-    {
-      id: 'snort',
-      name: 'Snort',
-      description: 'Social media',
-      platform: 'Web',
-      url: 'https://snort.social/p/' + store.npub,
-      image: 'snort'
-    },
-    {
-      id: 'blogstack',
-      name: 'Blogstack',
-      description: 'Blogging',
-      platform: 'Web',
-      url: 'https://hamstr.to/profile/' + store.npub,
-      image: 'blogstack'
-    }
-  ]
 })
 </script>
 
 <template>
   <div class="done-list" v-if="options">
     <ProfileShareAppOption
-      v-for="(item, index) in options"
-      :key="index"
+      v-for="item in options"
+      :key="item.id"
       :name="item.name"
       :description="item.description"
       :platform="item.platform"
       :url="item.url"
       :image="item.image"
+      :npub="store.npub"
       size="big"
     />
   </div>

@@ -63,6 +63,7 @@ function onShowModal(data) {
 function onHideModal(data) {
   if(data.id === 'search') {
     active.value = false
+    inputModel.value = ''
   }
 }
 

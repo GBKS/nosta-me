@@ -7,38 +7,38 @@ onMounted(() => {
   const damusId = relayManager.addRelayByUrl('wss://relay.damus.io')
   
   users.value = [
-    // {
-    //   publicKey: '128bc05aa6fd421d00c3c3389329f39cfc750b035db6cdad2eb0f983bff5629f', // Nosta
-    //   relayIds: [damusId],
-    //   theme: 'space'
-    // },
-    {
-      publicKey: '8c29b321d0f3c61343882ea49623e84771690cd0566e40b90f08e5d34336aaa0', // Bitcoin design
+    { // Nosta
+      publicKey: '128bc05aa6fd421d00c3c3389329f39cfc750b035db6cdad2eb0f983bff5629f', 
       relayIds: [damusId],
       theme: 'space'
     },
-    {
-      publicKey: '4f260791d78a93d13e09f1965f4ba1e1f96d1fcb812123a26d95737c9d54802b', // Bolt fun
+    { // Bitcoin design
+      publicKey: '8c29b321d0f3c61343882ea49623e84771690cd0566e40b90f08e5d34336aaa0',
+      relayIds: [damusId],
+      theme: 'space'
+    }, 
+    { // Bolt fun
+      publicKey: '4f260791d78a93d13e09f1965f4ba1e1f96d1fcb812123a26d95737c9d54802b', 
       relayIds: [damusId],
       theme: 'bubbles'
     },
-    {
-      publicKey: 'b731e7fbde5c192d793ff520a6ec91f6965f5d8fa1b64e12171089a65e540525', // GBKS
+    { // GBKS
+      publicKey: 'b731e7fbde5c192d793ff520a6ec91f6965f5d8fa1b64e12171089a65e540525',
       relayIds: [damusId],
       theme: 'winter'
     },
-    {
-      publicKey: '1bc70a0148b3f316da33fe3c89f23e3e71ac4ff998027ec712b905cd24f6a411', // Karnage
+    { // Karnage
+      publicKey: '1bc70a0148b3f316da33fe3c89f23e3e71ac4ff998027ec712b905cd24f6a411',
       relayIds: [damusId],
       theme: 'black'
     },
-    {
-      publicKey: '8fb140b4e8ddef97ce4b821d247278a1a4353362623f64021484b372f948000c', // fishcake
+    { // fishcake
+      publicKey: '8fb140b4e8ddef97ce4b821d247278a1a4353362623f64021484b372f948000c',
       relayIds: [damusId],
       theme: 'city'
     },
-    {
-      publicKey: '175f568d77fb0cb7400f0ddd8aed1738cd797532b314ef053a1669d4dba7433a', // Pavlenex
+    { // Pavlenex
+      publicKey: '175f568d77fb0cb7400f0ddd8aed1738cd797532b314ef053a1669d4dba7433a',
       relayIds: [damusId],
       theme: 'flowers'
     }

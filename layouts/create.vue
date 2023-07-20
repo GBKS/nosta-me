@@ -55,12 +55,14 @@
             font-family: 'Moonrocks';
             line-height: 0.9;
             @include r('font-size', 48, 64);
+            text-wrap: balance;
           }
 
           p.-description {
             margin-top: 30px;
             font-weight: 500;
             @include r('font-size', 20, 22);
+            text-wrap: balance;
 
             a {
               color: black;
