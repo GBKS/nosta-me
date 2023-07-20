@@ -2,10 +2,12 @@
 import relayManager from '@/helpers/relayManager.js'
 import profileService from '@/helpers/profileService.js'
 import themes from '@/data/themes.json'
+import { useUserStore } from '@/stores/users'
 import { useSessionStore } from '@/stores/session'
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
 const sessionStore = useSessionStore()
 const routeId = ref('')
 const queryRelayIds = ref(null)
@@ -113,7 +115,7 @@ function updateFromRoute() {
     queryRelayIds.value = null
   }
 
-  // console.log('updateFromRoute', queryRelayIds, route.query.r)
+  console.log('updateFromRoute', queryRelayIds, route.query.r)
 
   if(route.query.t && themes[sessionStore.theme]) {
     sessionStore.theme = route.query.t
@@ -308,6 +310,12 @@ function loadPublicKey(newPublicKey, relayIds) {
   console.log('loadPublicKey', newPublicKey, relayIds)
 
   profileService.findProfile(newPublicKey, relayIds, onLoadProfileEvent)
+
+  // Check if we already have a cached version. If so, use it.
+  const profileEvent = userStore.getUser(newPublicKey)
+  if(profileEvent) {
+    onLoadProfileEvent(profileEvent)
+  }
 }
 
 function onLoadProfileEvent(data) {
@@ -365,6 +373,8 @@ function onLoadProfileEvent(data) {
   } else if(data.kind == 30311) {
     storeEvent(liveData, data)
   } else if(data.kind == 31922) {
+    storeEvent(eventsData, data)
+  } else if(data.kind == 31923) {
     storeEvent(eventsData, data)
   } else if(data.kind == 30402) {
     storeEvent(classifiedsData, data)

@@ -107,7 +107,9 @@ const kindTags = computed(() => {
     
       for(kindId in kinds) {
         if(kinds[kindId].kind == kind) {
-          result.push(kinds[kindId].name)
+          result.push({
+            name: kinds[kindId].name
+          })
           continue
         }
       }
@@ -134,7 +136,9 @@ const platformTags = computed(() => {
           tag = tags[k]
 
           if(tag.length > 2) {
-            result.push(tag[2])
+            result.push({
+              name: tag[2]
+            })
           }
         }
       }
@@ -256,21 +260,17 @@ onMounted(() => {
         </div>
         <div class="tags">
           <h3>Recommended for</h3>
-          <ul>
-            <li
-              v-for="(item, index) in kindTags"
-              :key="index"
-            >{{ item }}</li>
-          </ul>
+          <UiTags
+            :info="kindTags"
+            theme="light"
+          />
         </div>
         <div class="platforms">
           <h3>Platforms</h3>
-          <ul>
-            <li
-              v-for="(item, index) in platformTags"
-              :key="index"
-            >{{ item }}</li>
-          </ul>
+          <UiTags
+            :info="platformTags"
+            theme="light"
+          />
         </div>
       </template>
     </div>
@@ -336,30 +336,17 @@ onMounted(() => {
       margin-top: 20px;
     }
 
-    .tags,
-    .platforms {
+    > .tags,
+    > .platforms {
       margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
 
       h3 {
         font-size: 15px;
         font-weight: 500;
         color: black;
-      }
-
-      ul {
-        list-style-type: none;
-        padding: 0;
-        margin: 10px 0 0 0;
-        display: flex;
-        gap: 5px;
-        flex-wrap: wrap;
-
-        li {
-          font-size: 12px;
-          padding: 3px 7px 4px 7px;
-          border-radius: 3px;
-          background-color: rgba(black, 0.1);
-        }
       }
     }
   }

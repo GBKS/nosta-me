@@ -102,17 +102,18 @@ const classObject = computed(() => {
 </script>
 
 <template>
-  <a
-    :class="classObject"
-    :href="link"
-    target="_blank"
-    rel="nofollow noopener noreferrer"
-  >
-    <h5 v-if="title">{{ title }}</h5>
+  <div :class="classObject">
+    <h5 v-if="title">
+      <a
+        :href="link"
+        target="_blank"
+        rel="nofollow noopener noreferrer"
+      >{{ title }}</a>
+    </h5>
     <p v-if="summary">{{ summary }}</p>
     <p v-if="meta">{{ meta }}</p>
-    <ProfileBitsTags :info="info" align="center" />
-  </a>
+    <ProfileBitsTags :info="info" align="center" max="5" />
+  </div>
 </template>
 
 <style scoped lang="scss">
@@ -121,14 +122,17 @@ const classObject = computed(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-decoration: none;
 
   h5 {
     font-size: 17px;
     font-weight: 600;
-    color: var(--theme-front);
     text-align: center;
     word-break: break-all;
+
+    a {
+      text-decoration: none;
+      color: var(--theme-front);
+    }
   }
 
   > p {

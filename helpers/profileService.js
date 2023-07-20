@@ -88,6 +88,7 @@ export default {
         30402, // Classified
         31337, // Zapstr tracks
         31922, // Calendar events
+        31923, // Calendar events
         31989, // Handler recommendation
         31990, // Handler information
       ],
@@ -151,6 +152,8 @@ export default {
     } else if(data.kind == 31337) {
       console.log('!!! Seeing a Zapstr track', data)
     } else if(data.kind == 31922) {
+      console.log('!!! Seeing a calendar event', data)
+    } else if(data.kind == 31923) {
       console.log('!!! Seeing a calendar event', data)
     } else if(data.kind == 31989) {
       // console.log('!!! Seeing a handler recommendation', data)

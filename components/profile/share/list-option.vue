@@ -45,14 +45,28 @@ function click() {
 <style scoped lang="scss">
 
 .share-list-option {
-  border-top: 1px solid #DEDEDE;
   display: flex;
   justify-content: center;
-  padding: 10px 0;
+  padding: 7px 0;
   opacity: 0.75;
   transition: all 150ms $ease;
   text-decoration: none;
   color: black;
+  position: relative;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: -5px;
+    right: -5px;
+    pointer-events: none;
+    background-color: rgba(var(--front-rgb), 0.1);
+    opacity: 0;
+    transition: opacity 150ms $ease;
+    border-radius: 5px;
+  }
 
   span {
     text-align: left;
@@ -62,26 +76,33 @@ function click() {
     }
 
     :deep(svg) {
-      width: 18px;
-      height: 18px;
+      width: 16px;
+      height: 16px;
+      opacity: 0.75;
+      transition: all 150ms $ease;
+      vertical-align: middle;
     }
   }
 
-  // &:first-of-type {
-  //   border-top-width: 0;
-  // }
-
   &:hover {
     opacity: 1;
+   
+    &:before {
+      opacity: 1;
+    } 
+
+    span {
+      :deep(svg) {
+        opacity: 1;
+      }
+    }
   }
 }
 
 button.share-list-option {
   appearance: none;
   background-color: transparent;
-  border-left-width: 0;
-  border-right-width: 0;
-  border-bottom-width: 0;
+  border-width: 0;
   cursor: pointer;
 }
 

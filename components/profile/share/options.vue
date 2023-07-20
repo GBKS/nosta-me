@@ -104,6 +104,27 @@ onMounted(() => {
   })
 })
 
+const appOptions = [
+  {
+    id: 'primal',
+    name: 'Primal',
+    url: 'https://primal.net/p/{npub}',
+    image: 'primal'
+  },
+  {
+    id: 'iris',
+    name: 'Iris',
+    url: 'https://iris.to/{npub}',
+    image: 'iris'
+  },
+  {
+    id: 'snort',
+    name: 'Snort',
+    url: 'https://snort.social/p/{npub}',
+    image: 'snort'
+  }
+]
+
 </script>
 
 <template>
@@ -111,21 +132,14 @@ onMounted(() => {
     <div class="share-options" v-if="active">
       <div class="apps">
         <ProfileShareAppOption
-          name="Snort"
-          image="snort"
-          :url="snortUrl"
-          @click="close"
-        />
-        <ProfileShareAppOption
-          name="Hamstr"
-          image="hamstr"
-          :url="hamstrUrl"
-          @click="close"
-        />
-        <ProfileShareAppOption
-          name="Astral"
-          image="astral"
-          :url="astralUrl"
+          v-for="item in appOptions"
+          :key="item.id"
+          :name="item.name"
+          :description="item.description"
+          :platform="item.platform"
+          :url="item.url"
+          :image="item.image"
+          :npub="npub"
           @click="close"
         />
       </div>
@@ -167,7 +181,7 @@ onMounted(() => {
   z-index: 5;
   background-color: white;
   padding: 10px 10px 5px 10px;
-  border-radius: 15px;
+  border-radius: 22px 22px 8px 8px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -175,7 +189,7 @@ onMounted(() => {
   box-shadow: 0 15px 30px -8px rgba(black, 0.25);
 
   .apps {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     display: flex;
     gap: 10px;
   }
