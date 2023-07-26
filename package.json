@@ -23,6 +23,7 @@
     "mitt": "^3.0.0",
     "node-fetch": "^3.3.0",
     "pinia": "^2.0.28",
+    "qr-code-styling": "^1.6.0-rc.1",
     "qrcode": "^1.5.1",
     "sass": "^1.57.1",
     "sass-loader": "^13.2.0"

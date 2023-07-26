@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onBeforeMount } from 'vue'
 import relayManager from '@/helpers/relayManager.js'
 import { useSessionStore } from '@/stores/session'
 import themes from '@/data/themes.json'
+import * as linkify from "linkifyjs"
 
 import mitt from 'mitt'
 
@@ -62,6 +63,8 @@ onBeforeMount(() => {
 })
 
 onMounted(() => {
+  linkify.registerCustomProtocol('nostr', true)
+
   isMounted.value = true
 })
 
@@ -80,6 +83,7 @@ updateFromRoute()
       <ModalThemes />
       <ModalHandler />
       <ModalZapMain />
+      <ModalQr />
     </client-only>
     <Header />
     <div class="site-content">

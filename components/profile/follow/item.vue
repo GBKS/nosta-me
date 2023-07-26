@@ -3,6 +3,7 @@ import { useUserStore } from "@/stores/users.js"
 import { useRelayStore } from '@/stores/relays'
 import userService from '@/helpers/userService.js'
 import ToolBox from '@/helpers/toolBox'
+import relayManager from '@/helpers/relayManager.js'
 
 const userStore = useUserStore()
 const relayStore = useRelayStore()
@@ -14,7 +15,8 @@ const profileContent = ref(null)
 const props = defineProps([
   'publicKey',
   'selfLoad',
-  'relayId'
+  'relayId',
+  'tag'
 ])
 
 const imageLoaded = ref(false)
@@ -29,7 +31,6 @@ const imageClass = computed(() => {
 const profile = computed(() => {
   let result = profileData.value
 
-  // console.log('follow-item.profile', result)
   if(!result) {
     result = userStore.getUser(props.publicKey)
   }
@@ -38,8 +39,14 @@ const profile = computed(() => {
 })
 
 const name = computed(() => {
-  // console.log('follow-item.name', profileContent.value)
-  return profileContent.value ? profileContent.value.name : null
+  let result = profileContent.value ? profileContent.value.name : null
+
+  // Use the petname if given.
+  if(props.tag && props.tag.length > 3 && props.tag[3].length > 0) {
+    result = props.tag[3]
+  }
+
+  return result
 })
 
 const description = computed(() => {
@@ -59,7 +66,6 @@ const profileLink = computed(() => {
 
   // Create an nprofile
   // let {type, data} = window.NostrTools.nip19.decode(nprofile)
-
   if(profileData.value && profileData.value.relay) {
     const relay = relayStore.getRelay(profileData.value.relay)
     // result += '?r=' + encodeURIComponent(relay.url)
@@ -87,14 +93,12 @@ function onLoadProfile(data) {
 
   profileContent.value = content
 
-  // console.log('follow-item.onLoadProfile', data, profileContent.value.relay)
-
   window.emitter.off('profile-'+props.publicKey, loadCallback)
 }
 
 function refreshProfileContent() {
   const data = userStore.getUser(props.publicKey)
-  // console.log('refreshProfileContent', data, props.publicKey)
+  
   if(data) {
     let content = data.content
     if(typeof content == 'string') {
@@ -108,15 +112,21 @@ function refreshProfileContent() {
 refreshProfileContent()
 
 onMounted(() => {
-  // console.log('follow-item.onMounted', props.publicKey)
-  // console.log('profile', profile)
-  // console.log('profileContent', profileContent)
   if(!profile.value) {
     window.emitter.on('profile-'+props.publicKey, loadCallback)
 
-    // console.log('onMounted', props.selfLoad)
     if(props.selfLoad) {
-      userService.getProfile(props.publicKey, [props.relayId])
+      let relayId = props.relayId
+
+      // See if the tag has a relay included.
+      if(props.tag && props.tag.length > 2 && props.tag[2] !== '') {
+        const tagRelayId = relayManager.addRelayByUrl(props.tag[2])
+        if(tagRelayId) {
+          relayId = tagRelayId
+        }
+      }
+
+      userService.getProfile(props.publicKey, [relayId])
     }
   }
 })

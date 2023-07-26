@@ -1,7 +1,11 @@
 <script setup>
+import * as linkify from "linkifyjs"
 import linkifyStr from "linkify-string"
 import Icons from '@/helpers/icons'
 import { useSessionStore } from '@/stores/session'
+import UiUsername from '@/components/ui/username'
+import ToolBox from '@/helpers/toolBox'
+import relayManager from '@/helpers/relayManager.js'
 
 const props = defineProps([
   'info',
@@ -40,19 +44,57 @@ const hasName = computed(() => {
 })
 
 const description = computed(() => {
-  let result = null
+  return ToolBox.dig(props, 'info.profile.about', null)
+})
 
-  // console.log('description', props.info)
+// Split description by URLs and nostr: links and build a virtual DOM
+// with the proper components
+const DescriptionNode = () => {
+  const text = description.value
 
-  if(props.info && props.info.profile && props.info.profile.about) {
-    result = linkifyStr(props.info.profile.about, {
-      rel: 'nofollow noopener noreferrer',
-      target: '_blank'
-    })
+  let children = []
+  const tokens = linkify.tokenize(text)
+
+  let i=0, token
+  for(; i<tokens.length; i++) {
+    token = tokens[i]
+
+    if(token.t == 'url') {
+      if(token.v.indexOf('nostr:npub') === 0) {
+        const publicKey = window.NostrTools.nip19.decode(token.v.split(':')[1]).data;
+        children.push(h(UiUsername, { publicKey }))
+      } else if(token.v.indexOf('nostr:nprofile') === 0) {
+        children.push(turnNProfileToNode(token.v))
+      } else {
+        children.push(h('a', {
+          href: token.v,
+          innerHTML: token.v,
+          rel: 'nofollow noopener noreferrer',
+          target: '_blank'
+        }))
+      }
+    } else {
+      children.push(token.v)
+    }
   }
 
-  return result
-})
+  return h('p', null, children)
+}
+
+function turnNProfileToNode(text) {
+  const { pubkey, relays } = window.NostrTools.nip19.decode(text.split(':')[1]).data;
+  const relayIds = []
+  if(relays) {
+    let i=0, relayId
+    for(; i<relays.length; i++) {
+      relayId = relayManager.addRelayByUrl(relays[i])
+      if(relayId) {
+        relayIds.push(relayId)
+      }
+    }
+  }
+  return h(UiUsername, { publicKey: pubkey, relayIds })
+}
 
 const image = computed(() => {
   let result = null
@@ -104,10 +146,7 @@ function showDataOverlay() {
     </div>
     <div class="text">
       <h1>{{ name }}</h1>
-      <p 
-        v-if="description" 
-        v-html="description"
-      />
+      <DescriptionNode v-if="description" />
       <div class="links">
         <div class="internal">
           <ProfileNostrAddress :info="info" />
@@ -130,6 +169,7 @@ function showDataOverlay() {
           :active="optionsVisible"
           @click="toggleOptions"
         />
+        <ProfileQrButton :info="info" />
         <ProfileZapButton :info="info" />
         <ProfileShareOptions
           :active="optionsVisible"
