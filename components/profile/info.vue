@@ -3,7 +3,7 @@ import * as linkify from "linkifyjs"
 import linkifyStr from "linkify-string"
 import Icons from '@/helpers/icons'
 import { useSessionStore } from '@/stores/session'
-import UiUsername from '@/components/ui/Username'
+import UiUsername from '@/components/ui/username'
 import ToolBox from '@/helpers/toolBox'
 import relayManager from '@/helpers/relayManager.js'
 
