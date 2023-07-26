@@ -6,6 +6,7 @@ import eventTracker from '@/helpers/eventTracker.js'
 const userStore = useUserStore()
 const unloadedProfiles = ref([])
 const loadedProfiles = ref([])
+const profileTags = {}
 const loadProfileCallback = onLoadProfile.bind(this)
 const loadEventTracker = eventTracker()
 const currentPage = ref(0)
@@ -53,9 +54,12 @@ const pageCount = computed(() => {
 
 function setupUnloadedProfiles() {
   // console.log('setupUnloadedProfiles', props.info)
-  let publicKey, userData
-  for(let i=0; i<props.info.tags.length; i++) {
-    publicKey = props.info.tags[i][1]
+  let publicKey, userData, i=0, tag
+  for(; i<props.info.tags.length; i++) {
+    tag = props.info.tags[i]
+    publicKey = tag[1]
+
+    profileTags[publicKey] = tag
 
     // Is it already in the list?
     if(unloadedProfiles.value.indexOf(publicKey) === -1) {
@@ -126,6 +130,7 @@ const showLoader = computed(() => {
             v-for="(publicKey, index) in displayProfileList"
             :key="publicKey"
             :publicKey="publicKey"
+            :tag="profileTags[publicKey]"
           />
         </div>
         <UiPagination

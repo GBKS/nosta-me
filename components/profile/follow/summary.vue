@@ -39,18 +39,26 @@ const followerFive = computed(() => {
 
 function prepFollowerInfo(index) {
   let result
+  let relayId
   let relayIds
   let publicKey
+  let tag
 
   if(props.info.tags.length > index) {
-    publicKey = props.info.tags[index][1]
+    tag = props.info.tags[index]
+    publicKey = tag[1]
   }
 
   // Try to get relays
-  if(props.info.content.length > 0) {
+  if(tag.length > 2) {
+    // From the follow entry. Should be precise.
+    relayId = relayManager.addRelayByUrl(tag[2])
+    relayIds = [relayId]
+  } else if(props.info.content.length > 0) {
+    // From the event content.
     const relayData = JSON.parse(props.info.content)
     relayIds = []
-    let relayUrl, relayId
+    let relayUrl
     for(relayUrl in relayData) {
       relayId = relayManager.addRelayByUrl(relayUrl)
       relayIds.push(relayId)
