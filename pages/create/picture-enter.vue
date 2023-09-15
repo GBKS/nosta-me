@@ -10,7 +10,6 @@ We want the user to only move forward with valid input
 
 Image is valid if it's been successfully loaded
 
-
  */
 
 import { useProfileStore } from '@/stores/profile'
@@ -178,7 +177,7 @@ onMounted(() => {
       <UiButton 
         @click="loadImage"
         size="small"
-      >Load image</UiButton>
+      >Preview image</UiButton>
     </div>
     <nav>
       <UiButton 

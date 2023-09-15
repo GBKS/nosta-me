@@ -31,6 +31,10 @@ const isValidEmail = computed(() => {
   return containsAt && containsDot && longEnough
 })
 
+watch(() => store.handle, (newValue, oldValue) => {
+  handleCheckStatus.value = null
+})
+
 const inputValid = computed(() => {
   const hasValidInput = store.handle.length > 5 ? isValidEmail.value : true
   return !hasInput.value || (hasValidInput && handleCheckStatus.value == 'valid')
@@ -86,7 +90,11 @@ async function loadNip05(handle) {
   try {
     const data = await window.NostrTools.nip05.queryProfile(cleanHandle)
 
-    handleCheckStatus.value = 'valid'
+    if(data) {
+      handleCheckStatus.value = 'valid'
+    } else {
+      handleCheckStatus.value = 'not-found'
+    }
   } catch(error) {
     handleCheckStatus.value = 'not-found'
   }

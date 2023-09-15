@@ -89,6 +89,7 @@ const store = useProfileStore()
     // justify-content: flex-start !important;
     // overflow-y: scroll;
     align-items: stretch !important;
+    min-width: 0;
   }
 }
 

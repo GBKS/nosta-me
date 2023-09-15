@@ -41,8 +41,8 @@ onMounted(() => {
     <div class="content">
       <div class="copy">
         <p class="-step">4 of 10</p>
-        <h1>Your recovery phrase</h1>
-        <p class="-description">These words let you recreate your private and public keys. Write them down in a safe place.</p>
+        <h1>Let's check</h1>
+        <p class="-description">Tap the words in the order they appear in your recovery phrase.</p>
       </div>
     </div>
     <div class="options">

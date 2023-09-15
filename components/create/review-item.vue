@@ -85,6 +85,8 @@ function formatAddedCount(list, singular, plural) {
     &:nth-child(2n) {
       flex-grow: 1;
       text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
     }
   }
 
