@@ -51,6 +51,8 @@ function select() {
   display: flex;
 
   span {
+    white-space: nowrap;
+    
     &:first-child {
       flex-grow: 1;
     }

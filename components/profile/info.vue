@@ -12,6 +12,7 @@ const props = defineProps([
   'publicKey',
   'relayData',
   'followData',
+  'userStatusData',
   'hasBanner'
 ])
 
@@ -146,6 +147,7 @@ function showDataOverlay() {
     </div>
     <div class="text">
       <h1>{{ name }}</h1>
+      <ProfileUserStatus :info="userStatusData" />
       <DescriptionNode v-if="description" />
       <div class="links">
         <div class="internal">
@@ -226,6 +228,12 @@ function showDataOverlay() {
       @include r('font-size', 40, 64);
       color: var(--theme-text-bright);
       word-break: break-word;
+    }
+
+    .user-status {
+      & + p {
+        margin-top: 10px;
+      }
     }
 
     p {
