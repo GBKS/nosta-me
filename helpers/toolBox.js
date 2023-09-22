@@ -6,7 +6,7 @@ Some random utility functions.
 
 export default {
 
-  formatRelativeDate: function(dateString) {
+  formatRelativeDate: function(dateString, includeAgo) {
     const d = new Date(parseInt(dateString)*1000)
     const now = new Date()
 
@@ -19,11 +19,11 @@ export default {
     }
 
     if(delta < units.minute) {
-      return Math.round(delta/1000) + 's'
+      return Math.round(delta/1000) + 's' + (includeAgo ? ' ago' : null)
     } else if(delta < units.hour) {
-      return Math.round(delta/1000/60) + 'm'
+      return Math.round(delta/1000/60) + 'm' + (includeAgo ? ' ago' : null)
     } else if(delta < units.day) {
-      return Math.round(delta/1000/60/60) + 'h'
+      return Math.round(delta/1000/60/60) + 'h' + (includeAgo ? ' ago' : null)
     } else {
       // Check if it's the same year
       if(d.getFullYear() == now.getFullYear()) {

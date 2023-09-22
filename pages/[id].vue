@@ -23,6 +23,8 @@ const badgeData = ref(null)
 const reportsData = ref(null)
 const sentZapsData = ref(null)
 const receivedZapsData = ref(null)
+const zapGoalData = ref(null)
+const userStatusData = ref(null)
 const liveData = ref(null)
 const eventsData = ref(null)
 const classifiedsData = ref(null)
@@ -370,8 +372,12 @@ function onLoadProfileEvent(data) {
   } else if(data.kind == 9735) {
     // A zap
     handleLoadedZapEvent(data)
+  } else if(data.kind == 9041) {
+    storeEvent(zapGoalData, data)
   } else if(data.kind == 30311) {
     storeEvent(liveData, data)
+  } else if(data.kind == 30315) {
+    storeEvent(userStatusData, data)
   } else if(data.kind == 31922) {
     storeEvent(eventsData, data)
   } else if(data.kind == 31923) {
@@ -720,6 +726,7 @@ onMounted(() => {
             :publicKey="publicKey"
             :relayData="relayEvent"
             :followData="followData"
+            :userStatusData="userStatusData"
             :hasBanner="hasBanner"
             @showDataOverlay="onShowDataOverlay"
           />
@@ -897,6 +904,8 @@ onMounted(() => {
       :productData="productData"
       :sentZapsData="sentZapsData"
       :receivedZapsData="receivedZapsData"
+      :zapGoalData="zapGoalData"
+      :userStatusData="userStatusData"
       :reportsData="reportsData"
       :fileData="fileData"
       :liveData="liveData"

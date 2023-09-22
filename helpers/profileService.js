@@ -72,6 +72,7 @@ export default {
         3, // Contacts
         1984, // Reports
         9735, // Zaps
+        9041, // Zap goals
         10000, // Mute list
         10001, // Pin list
         10002, // Relay list meta data
@@ -95,6 +96,12 @@ export default {
       authors: [this.publicKey]
     }
 
+    const statusFilter = {
+      kinds: [30315],
+      authors: [this.publicKey],
+      limit: 1,
+    }
+
     const receivedZapsFilter = {
       kinds: [9735],
       '#p': [this.publicKey]
@@ -102,6 +109,7 @@ export default {
 
     this.service.start(this.relaysToCheck, [
       createdContentFilter,
+      statusFilter,
       receivedZapsFilter
     ])
   },
@@ -119,10 +127,18 @@ export default {
     } else if(data.kind == 3) {
       this.loadContactList(data)
       // window.emitter.emit('contacts-'+this.publicKey, data)
+    } else if(data.kind == 8) {
+      // console.log('!!! Seeing a badge 8', data)
+    } else if(data.kind == 1063) {
+      // console.log('!!! Seeing a file', data)
     } else if(data.kind == 1984) {
       // console.log('!!! Seeing a report', data)
+    } else if(data.kind == 9041) {
+      console.log('!!! Seeing a zap goal', data)
     } else if(data.kind == 9735) {
       // console.log('!!! Seeing a zap', data)
+    } else if(data.kind == 9802) {
+      console.log('!!! Seeing a highlight', data)
     } else if(data.kind == 10000) {
       // console.log('!!! Seeing mute list data', data)
     } else if(data.kind == 10001) {
@@ -141,12 +157,10 @@ export default {
       // console.log('!!! Seeing a stall', data)
     } else if(data.kind == 30018) {
       // console.log('!!! Seeing a product', data)
-    } else if(data.kind == 1063) {
-      // console.log('!!! Seeing a file', data)
-    } else if(data.kind == 9802) {
-      console.log('!!! Seeing a highlight', data)
     } else if(data.kind == 30311) {
       // console.log('!!! Seeing a live activity', data)
+    } else if(data.kind == 30315) {
+      console.log('!!! Seeing a user status', data)
     } else if(data.kind == 30402) {
       console.log('!!! Seeing a classified', data)
     } else if(data.kind == 31337) {
@@ -159,8 +173,6 @@ export default {
       // console.log('!!! Seeing a handler recommendation', data)
     } else if(data.kind == 31990) {
       // console.log('!!! Seeing a handler information', data)
-    } else if(data.kind == 8) {
-      // console.log('!!! Seeing a badge 8', data)
     } else if(data.type == 'end') {
       // this.checkNextRelay()
     }
