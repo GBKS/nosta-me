@@ -137,7 +137,6 @@ const formattedAbout = computed(() => {
     justify-content: center;
     width: 24px;
     height: 24px;
-    padding: 4px;
     border: 1px solid var(--front);
     color: var(--front);
     opacity: 0.25;
@@ -148,6 +147,8 @@ const formattedAbout = computed(() => {
 
     :deep(svg) {
       stroke-width: 1.5px;
+      width: 14px;
+      height: 14px;
     }
     
     &:hover {

@@ -50,7 +50,6 @@ button {
   justify-content: center;
   width: 24px;
   height: 24px;
-  padding: 5px;
   border: 1px solid var(--front);
   color: var(--front);
   opacity: 0.25;
@@ -60,7 +59,8 @@ button {
   box-sizing: border-box;
 
   :deep(svg) {
-
+    width: 12px;
+    height: 12px;
   }
 
   &:not(:disabled) {
