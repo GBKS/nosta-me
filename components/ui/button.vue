@@ -11,7 +11,7 @@ const props = defineProps([
   'disabled',
   'icon',
   'size',
-  'look', // Chunky, tab
+  'look', // Chunky, tab, outline
   'title'
 ])
 

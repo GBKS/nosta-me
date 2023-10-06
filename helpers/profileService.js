@@ -71,6 +71,7 @@ export default {
         2, // Recommended relays
         3, // Contacts
         1984, // Reports
+        1985, // Labels
         9735, // Zaps
         9041, // Zap goals
         10000, // Mute list
@@ -92,6 +93,7 @@ export default {
         31923, // Calendar events
         31989, // Handler recommendation
         31990, // Handler information
+        33889, // Pinstr board
       ],
       authors: [this.publicKey]
     }
@@ -133,6 +135,8 @@ export default {
       // console.log('!!! Seeing a file', data)
     } else if(data.kind == 1984) {
       // console.log('!!! Seeing a report', data)
+    } else if(data.kind == 1985) {
+      console.log('!!! Seeing a label', data)
     } else if(data.kind == 9041) {
       console.log('!!! Seeing a zap goal', data)
     } else if(data.kind == 9735) {
@@ -173,6 +177,8 @@ export default {
       // console.log('!!! Seeing a handler recommendation', data)
     } else if(data.kind == 31990) {
       // console.log('!!! Seeing a handler information', data)
+    } else if(data.kind == 33889) {
+      console.log('!!! Seeing a Pinstr board', data)
     } else if(data.type == 'end') {
       // this.checkNextRelay()
     }
