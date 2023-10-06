@@ -23,6 +23,8 @@ const props = defineProps([
   'classifiedsData',
   'zapGoalData',
   'userStatusData',
+  'pinstrData',
+  'labelData',
   'stats'
 ])
 
@@ -116,6 +118,16 @@ const navOptions = computed(() => {
       id: 'classifieds',
       name: 'Classifieds',
       count: props.classifiedsData ? props.classifiedsData.length : 0 
+    },
+    {
+      id: 'pinstr',
+      name: 'Pinstr',
+      count: props.pinstrData ? props.pinstrData.length : 0 
+    },
+    {
+      id: 'labels',
+      name: 'Labels',
+      count: props.labelData ? props.labelData.length : 0 
     }
   ]
 })
@@ -243,6 +255,16 @@ function close() {
           <ProfileDataOverlayZapGoals
             v-if="activeNavOptionId == 'zapgoals'"
             :info="zapGoalData"
+          />
+
+          <ProfileDataOverlayPinstr
+            v-if="activeNavOptionId == 'pinstr'"
+            :info="pinstrData"
+          />
+
+          <ProfileDataOverlayLabels
+            v-if="activeNavOptionId == 'labels'"
+            :info="labelData"
           />
         </div>
       </div>

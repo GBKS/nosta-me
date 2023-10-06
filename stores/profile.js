@@ -41,6 +41,19 @@ export const useProfileStore = defineStore({
 
     addFollow(value) {
       this.follows.push(value)
+    },
+
+    removeFollow(value) {
+      for(let i=0; i<this.follows.length; i++) {
+        if(this.follows[i].npub == value.npub) {
+          this.follows.splice(i, 1)
+          break
+        }
+      }
+    },
+
+    clearFollows() {
+      this.follows.value = []
     }
   }
 })

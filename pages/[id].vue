@@ -31,7 +31,9 @@ const classifiedsData = ref(null)
 const stallData = ref(null)
 const productData = ref(null)
 const fileData = ref(null)
+const labelData = ref(null)
 const listsData = ref(null)
+const pinstrData = ref(null)
 const status = ref(null)
 let nip05Data = null
 let loadCallback = null
@@ -336,6 +338,19 @@ function onLoadProfileEvent(data) {
   } else if(data.kind == 3) {
     // Contact list
     handleLoadedContactList(data)
+  } else if(data.kind == 1063) {
+    // A file
+    handleLoadedFileEvent(data)
+  } else if(data.kind == 1984) {
+    // A report
+    handleLoadedReportEvent(data)
+  } else if(data.kind == 1985) {
+    storeEvent(labelData, data)
+  } else if(data.kind == 9041) {
+    storeEvent(zapGoalData, data)
+  } else if(data.kind == 9735) {
+    // A zap
+    handleLoadedZapEvent(data)
   } else if(data.kind == 10000) {
     // A list of muted people
     handleListsEvent(data)
@@ -360,30 +375,21 @@ function onLoadProfileEvent(data) {
   } else if(data.kind == 30018) {
     // A product
     handleLoadedProductEvent(data)
-  } else if(data.kind == 1984) {
-    // A report
-    handleLoadedReportEvent(data)
-  } else if(data.kind == 1063) {
-    // A file
-    handleLoadedFileEvent(data)
-  } else if(data.kind == 31989) {
-    // A handler
-    handleLoadedHandlerEvent(data)
-  } else if(data.kind == 9735) {
-    // A zap
-    handleLoadedZapEvent(data)
-  } else if(data.kind == 9041) {
-    storeEvent(zapGoalData, data)
   } else if(data.kind == 30311) {
     storeEvent(liveData, data)
   } else if(data.kind == 30315) {
     storeEvent(userStatusData, data)
+  } else if(data.kind == 30402) {
+    storeEvent(classifiedsData, data)
   } else if(data.kind == 31922) {
     storeEvent(eventsData, data)
   } else if(data.kind == 31923) {
     storeEvent(eventsData, data)
-  } else if(data.kind == 30402) {
-    storeEvent(classifiedsData, data)
+  } else if(data.kind == 31989) {
+    // A handler
+    handleLoadedHandlerEvent(data)
+  } else if(data.kind == 33889) {
+    storeEvent(pinstrData, data)
   }
 
   // Track event
@@ -658,6 +664,8 @@ function reset() {
   stallData.value = null
   productData.value = null
   fileData.value = null
+  pinstrData.value = null
+  labelData.value = null
 }
 
 function updateHistory() {
@@ -910,6 +918,8 @@ onMounted(() => {
       :fileData="fileData"
       :liveData="liveData"
       :eventsData="eventsData"
+      :pinstrData="pinstrData"
+      :labelData="labelData"
       :classifiedsData="classifiedsData"
       :stats="profileDataStats"
       @close="closeDataOverlay"

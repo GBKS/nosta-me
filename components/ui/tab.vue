@@ -5,7 +5,7 @@ const props = defineProps([
   'tabId',
   'info',
   'activeId',
-  'theme'
+  'theme' // theme, light
 ])
 
 const emit = defineEmits(['select'])
@@ -13,7 +13,7 @@ const emit = defineEmits(['select'])
 const classObject = computed(() => {
   const c = [
     'tab',
-    '-'+props.theme
+    '-' + (props.theme ? props.theme : 'theme')
   ]
 
   if(active.value) {
@@ -57,18 +57,36 @@ function click() {
   padding: 5px 15px;
   font-weight: 600;
   font-size: 15px;
-  color: rgba(var(--theme-front-rgb), 0.85);
-  background-color: rgba(var(--theme-front-rgb), 0.05);
   white-space: nowrap;
 
-  &:hover {
-    color: var(--theme-active);
-    background-color: rgba(var(--theme-active-rgb), 0.1);
+  &.-theme {
+    color: rgba(var(--theme-front-rgb), 0.85);
+    background-color: rgba(var(--theme-front-rgb), 0.05);
+
+    &:hover {
+      color: var(--theme-active);
+      background-color: rgba(var(--theme-active-rgb), 0.1);
+    }
+
+    &.-active {
+      color: var(--theme-back);
+      background-color: var(--theme-active);
+    }
   }
 
-  &.-active {
-    color: var(--theme-back);
-    background-color: var(--theme-active);
+  &.-light {
+    color: rgba(var(--front-rgb), 0.85);
+    background-color: rgba(var(--front-rgb), 0.05);
+
+    &:hover {
+      color: var(--front);
+      background-color: rgba(var(--back-rgb), 0.1);
+    }
+
+    &.-active {
+      color: var(--back);
+      background-color: var(--front);
+    }
   }
 }
 

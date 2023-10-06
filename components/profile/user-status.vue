@@ -70,7 +70,18 @@ const linkRel = computed(() => {
 })
 
 const content = computed(() => {
-  return ToolBox.trim(latestStatus.value.content, 40)
+  let result = null
+
+  const content = latestStatus.value.content
+  if(content && content.length > 0) {
+    result = ToolBox.trim(latestStatus.value.content, 40)
+  }
+
+  return result
+})
+
+const visible = computed(() => {
+  return props.info && content.value
 })
 
 /*
@@ -115,7 +126,7 @@ const dateText = computed(() => {
 
 <template>
   <component
-    v-if="info"
+    v-if="visible"
     :class="classObject" 
     :is="type"
     :href="link"

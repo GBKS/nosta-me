@@ -24,7 +24,7 @@ export default {
 
     this.initKeys()
     this.initRelays()
-    this.initFollows()
+    // this.initFollows()
   },
 
   initKeys() {
