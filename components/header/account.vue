@@ -1,22 +1,17 @@
 <script setup>
+import { storeToRefs } from 'pinia'
 import { useSessionStore } from '@/stores/session'
 
 const sessionStore = useSessionStore()
 
+const { isLoggedIn } = storeToRefs(sessionStore);
+
 const title = computed(() => {
-  if(sessionStore.isLoggedIn) {
-    return 'View profile'
-  } else {
-    return 'Sign in'
-  }
+  return isLoggedIn ? 'View profile' : 'Sign in'
 })
 
 const link = computed(() => {
-  if(sessionStore.isLoggedIn) {
-    return '/'+sessionStore.publicKey
-  } else {
-    return '/login/options'
-  }
+  return isLoggedIn ? '/'+sessionStore.publicKey : '/login/options'
 })
 </script>
 

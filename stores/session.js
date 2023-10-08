@@ -42,7 +42,6 @@ export const useSessionStore = defineStore('session', {
     },
 
     setLoggedIn(value) {
-      // console.log('useSessionStore.setLoggedIn', this.isLoggedIn)
       this.isLoggedIn = value
     },
 
