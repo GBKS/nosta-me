@@ -1,5 +1,6 @@
 <script setup>
 import { useProfileStore } from '@/stores/profile'
+import { useSessionStore } from '@/stores/session'
 import profilePublisher from '@/helpers/create/profilePublisher.js'
 import profileInitializer from '@/helpers/create/profileInitializer.js'
 import Icons from '@/helpers/icons'
@@ -22,6 +23,7 @@ definePageMeta({
 
 const router = useRouter()
 const store = useProfileStore()
+const sessionStore = useSessionStore()
 const state = ref('default')
 const saveStart = ref(null)
 let publisher = null
@@ -79,10 +81,22 @@ function onTimer() {
 
 function onSaveSuccess() {
   state.value = 'success'
+
+  login()
 }
 
 function onSaveError() {
   state.value = 'error'
+
+  // Log user in anyways.
+  login()
+}
+
+function login() {
+  sessionStore.setLoginType('privatekey')
+  sessionStore.setPrivateKey(store.privateKey)
+  sessionStore.setPublicKey(store.publicKey)
+  sessionStore.setLoggedIn(true)
 }
 
 const optionsClass = computed(() => {
@@ -139,6 +153,8 @@ const buttonLabel = computed(() => {
 
 onMounted(() => {
   profileInitializer.init()
+
+  login()
 })
 </script>
 
