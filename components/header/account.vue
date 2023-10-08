@@ -4,7 +4,7 @@ import { useSessionStore } from '@/stores/session'
 
 const sessionStore = useSessionStore()
 
-const { isLoggedIn } = storeToRefs(sessionStore);
+const { isLoggedIn } = storeToRefs(sessionStore)
 
 const title = computed(() => {
   return isLoggedIn ? 'View profile' : 'Sign in'
