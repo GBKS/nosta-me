@@ -24,11 +24,13 @@ export default {
   currentRelay: null, // Numerical index of relaysToCheck
   service: null,
   loadCallback: null,
+  endCallback: null,
+  internalEndCallback: null,
   findCallback: null,
   searchType: null,
   contactsService: null,
 
-  findProfile(publicKey, relaysToCheck, findCallback) {
+  findProfile(publicKey, relaysToCheck, findCallback, endCallback) {
     if(this.log) {
       console.log('profileService.findProfile', publicKey, relaysToCheck, findCallback)
     }
@@ -37,6 +39,7 @@ export default {
 
     this.publicKey = publicKey
     this.findCallback = findCallback
+    this.endCallback = endCallback
 
     if(relaysToCheck) {
       this.searchType = 'relays-known'
@@ -59,7 +62,8 @@ export default {
     }
 
     this.loadCallback = this.onEvent.bind(this)
-    this.service.init(this.loadCallback)
+    this.internalEndCallback = this.onEndOfEvents.bind(this)
+    this.service.init(this.loadCallback, this.endCallback)
 
     if(this.log) {
       console.log('profileService.checkCurrentRelay', this.searchType, this.publicKey, this.relaysToCheck)
@@ -72,7 +76,6 @@ export default {
         3, // Contacts
         1984, // Reports
         1985, // Labels
-        9735, // Zaps
         9041, // Zap goals
         10000, // Mute list
         10001, // Pin list
@@ -104,14 +107,22 @@ export default {
       limit: 1,
     }
 
+    const sentZapsFilter = {
+      kinds: [9735],
+      authors: [this.publicKey],
+      limit: 100,
+    }
+
     const receivedZapsFilter = {
       kinds: [9735],
-      '#p': [this.publicKey]
+      '#p': [this.publicKey],
+      limit: 100
     }
 
     this.service.start(this.relaysToCheck, [
       createdContentFilter,
       statusFilter,
+      sentZapsFilter,
       receivedZapsFilter
     ])
   },
@@ -184,6 +195,12 @@ export default {
     }
   },
 
+  onEndOfEvents() {
+    if(this.endCallback) {
+      this.endCallback()
+    }
+  },
+
   checkNextRelay() {
     if(this.currentRelay < (this.relaysToCheck.length - 1)) {
       this.currentRelay++
@@ -210,6 +227,7 @@ export default {
     }
 
     this.loadCallback = null
+    this.endCallback = null
     this.findCallback = null
   },
 

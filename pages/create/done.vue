@@ -32,19 +32,26 @@ const profileLink = computed(() => {
 const nprofile = computed(() => {
   let result = null
 
-  // Use the first relay in our list
   let relay
+  let relays = []
   for(let i=0; i<store.relays.length; i++) {
     relay = store.relays[i]
 
     if(relay.added) {
-      return window.NostrTools.nip19.nprofileEncode({
-        pubkey: store.publicKey,
-        relays: [relay.url]
-      })
+      relays.push(relay.url)
+    }
 
+    if(relays.length >= 5) {
+      // Stop at 5 relays
       break
     }
+  }
+
+  if(relays.length > 0) {
+    result = window.NostrTools.nip19.nprofileEncode({
+      pubkey: store.publicKey,
+      relays: relays
+    })
   }
 
   return result

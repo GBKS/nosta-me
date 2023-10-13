@@ -24,13 +24,15 @@ export default function multiRelayRequest () {
     eventStore: null,
     userStore: null,
     callback: null,
+    endCallback: null,
     connectCallback: null,
 
-    init(callback) {
+    init(callback, endCallback) {
       if(!this.initialized) {
         this.initialized = true
 
         this.callback = callback
+        this.endCallback = endCallback
         
         this.relayStore = useRelayStore()
         this.eventStore = useEventStore()
@@ -162,6 +164,10 @@ export default function multiRelayRequest () {
       }
 
       this.unsubscribeFromRelay(relayId)
+
+      if(this.endCallback) {
+        this.endCallback()
+      }
     }
   }
 }

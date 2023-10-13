@@ -108,7 +108,7 @@ export default {
     return result
   },
 
-  dig(object, path, fallback) {
+  dig(object, path, fallback, requireLength) {
     let result = null
 
     if(object) {
@@ -128,8 +128,28 @@ export default {
       }
     }
 
+    if(!result !== null && requireLength && result.length == 0) {
+      result = null
+    }
+
     if(result == null && fallback) {
       result = fallback
+    }
+
+    return result
+  },
+
+  digDeep(object, paths, fallback, requireLength) {
+    let result = fallback || null
+
+    if(object) {
+      for(let i=0; i<paths.length; i++) {
+        result = this.dig(object, paths[i], null, requireLength)
+
+        if(result !== null) {
+          break
+        }
+      }
     }
 
     return result

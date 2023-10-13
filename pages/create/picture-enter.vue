@@ -71,8 +71,6 @@ const imageSource = computed(() => {
 function loadImage() {
   loadImageClicked.value = true
 
-  console.log('store.picture', store.picture)
-  console.log('imageUrl', imageUrl.value)
   store.picture = imageUrl.value
 }
 
@@ -89,36 +87,29 @@ const buttonLabel = computed(() => {
 })
 
 const showImage = computed(() => {
-  console.log('showImage', hasInput.value, loadImageClicked.value)
   return hasInput.value && loadImageClicked.value
 })
 
 function clickNext() {
-  if(nextAllowed) {
+  if(nextAllowed.value) {
+    store.picture = imageUrl.value
     router.push('/create/recovery-phrase')
   }
 }
 
 const nextAllowed = computed(() => {
-  console.log('nextAllowed', isInputValid.value)
   return !hasInput.value || (isInputValid.value && imageLoadWorked.value)
 })
 
 function inputChange(stuff) {
-  console.log('inputChange', stuff)
-
   imageLoadWorked.value = false
 }
 
 function imageLoadSuccess(stuff) {
-  console.log('imageLoadSuccess', stuff)
-
   imageLoadWorked.value = true
 }
 
 function imageLoadError(stuff) {
-  console.log('imageLoadError', stuff)
-
   imageLoadWorked.value = false
 }
 
@@ -134,7 +125,6 @@ function inputPaste() {
 }
 
 onMounted(() => {
-  console.log('onMounted', store.picture)
   if(store.picture.length > 0) {
     imageUrl.value = store.picture
     loadImageClicked.value = true
