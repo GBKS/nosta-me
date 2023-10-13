@@ -94,6 +94,9 @@ const tabInfo = ref({
   'classified': {
     name: 'Classified',
     info: null
+  },
+  'tips': {
+    name: 'Tips'
   }
 })
 const activeTabId = ref(null)
@@ -313,7 +316,7 @@ function loadPublicKey(newPublicKey, relayIds) {
 
   console.log('loadPublicKey', newPublicKey, relayIds)
 
-  profileService.findProfile(newPublicKey, relayIds, onLoadProfileEvent)
+  profileService.findProfile(newPublicKey, relayIds, onLoadProfileEvent, onEndProfileEvents)
 
   // Check if we already have a cached version. If so, use it.
   const profileEvent = userStore.getUser(newPublicKey)
@@ -406,6 +409,10 @@ function onLoadProfileEvent(data) {
   } else {
     profileDataStats.value.relays[data.relay]++
   }
+}
+
+function onEndProfileEvents() {
+  console.log('onEndProfileEvents')
 }
 
 function handleLoadedContactList(data) {
@@ -677,6 +684,10 @@ const activeThemeId = computed(() => {
   return sessionStore.theme
 })
 
+const isOwner = computed(() => {
+  return sessionStore.isLoggedIn && sessionStore.publicKey == publicKey.value
+})
+
 const classObject = computed(() => {
   return [
     'profile-page',
@@ -893,6 +904,28 @@ onMounted(() => {
               :info="classifiedsData"
               @back="selectTab"
             />
+            <ProfileTipsTab
+              v-if="activeTabId == 'tips'"
+              :profileData="profileData"
+              :relayData="relayDataEvents"
+              :followData="followData"
+              :badgeData="badgeData"
+              :handlerData="handlerData"
+              :listsData="listsData"
+              :stallData="stallData"
+              :productData="productData"
+              :sentZapsData="sentZapsData"
+              :receivedZapsData="receivedZapsData"
+              :zapGoalData="zapGoalData"
+              :userStatusData="userStatusData"
+              :reportsData="reportsData"
+              :fileData="fileData"
+              :liveData="liveData"
+              :eventsData="eventsData"
+              :labelData="labelData"
+              :classifiedsData="classifiedsData"
+              @back="selectTab"
+            />
           </div>
         </div>
       </template>
@@ -925,6 +958,28 @@ onMounted(() => {
       @close="closeDataOverlay"
     />
     <ProfileNostaIntro v-if="profileData" />
+    <ProfileTipsSummary
+      v-if="isOwner && activeTabId != 'tips'"
+      :profileData="profileData"
+      :relayData="relayDataEvents"
+      :followData="followData"
+      :badgeData="badgeData"
+      :handlerData="handlerData"
+      :listsData="listsData"
+      :stallData="stallData"
+      :productData="productData"
+      :sentZapsData="sentZapsData"
+      :receivedZapsData="receivedZapsData"
+      :zapGoalData="zapGoalData"
+      :userStatusData="userStatusData"
+      :reportsData="reportsData"
+      :fileData="fileData"
+      :liveData="liveData"
+      :eventsData="eventsData"
+      :labelData="labelData"
+      :classifiedsData="classifiedsData"
+      @navigate="selectTab"
+    />
   </div>
 </template>
 

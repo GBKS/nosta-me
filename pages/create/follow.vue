@@ -3,6 +3,7 @@ import { useProfileStore } from '@/stores/profile'
 import profileInitializer from '@/helpers/create/profileInitializer.js'
 import localProfiles from '@/data/nostr-band-profiles.json'
 import sampleFollows from '@/data/sample-follows.json'
+import ToolBox from '@/helpers/toolBox'
 
 const store = useProfileStore()
 const profiles = ref([])
@@ -62,20 +63,6 @@ function prepareLocalProfiles() {
   prepareLocalProfiles(localProfiles.profiles)
 }
 
-function pickValue(object, props) {
-  let result = null, i=0, prop
-
-  for(; i<props.length; i++) {
-    prop = object[props[i]]
-    if(prop && prop.length > 0) {
-      result = prop
-      break
-    }
-  }
-
-  return result
-}
-
 function prepareSampleProfiles() {
   let i=0, profile, content, name, about, picture
   for(; i<sampleFollows.follows.length; i++) {
@@ -101,9 +88,9 @@ function prepareLoadedProfiles(newProfiles) {
     profile = sortedProfiles[i]
     content = JSON.parse(profile.profile.content)
 
-    name = pickValue(content, ['name', 'display_name', 'username'])
-    about = pickValue(content, ['about'])
-    picture = pickValue(content, ['picture'])
+    name = ToolBox.digDeep(content, ['display_name', 'name', 'displayName', 'username'])
+    about = ToolBox.dig(content, 'about')
+    picture = ToolBox.dig(content, 'picture')
 
     if(name && about && picture) {
       profiles.value.push({

@@ -31,13 +31,12 @@ const imageClass = computed(() => {
 })
 
 const name = computed(() => {
-  let result = 'Anonymous'
-
-  if(hasName.value) {
-    result = props.info.profile.name
-  }
-
-  return result
+  return ToolBox.digDeep(props, [
+    'info.profile.display_name',
+    'info.profile.name',
+    'info.profile.displayName',
+    'info.profile.username'
+  ], 'Anonymous')
 })
 
 const hasName = computed(() => {
@@ -45,7 +44,7 @@ const hasName = computed(() => {
 })
 
 const description = computed(() => {
-  return ToolBox.dig(props, 'info.profile.about', null)
+  return ToolBox.dig(props, 'info.profile.about', null, true)
 })
 
 // Split description by URLs and nostr: links and build a virtual DOM
