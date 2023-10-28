@@ -20,6 +20,8 @@ const followData = ref(null)
 const followDataEvents = ref(null)
 const handlerData = ref(null)
 const badgeData = ref(null)
+const shortNotesData = ref(null)
+const longNotesData = ref(null)
 const reportsData = ref(null)
 const sentZapsData = ref(null)
 const receivedZapsData = ref(null)
@@ -122,7 +124,7 @@ function updateFromRoute() {
     queryRelayIds.value = null
   }
 
-  console.log('updateFromRoute', queryRelayIds, route.query.r)
+  // console.log('updateFromRoute', queryRelayIds, route.query.r)
 
   if(route.query.t && themes[sessionStore.theme]) {
     sessionStore.theme = route.query.t
@@ -335,6 +337,8 @@ function onLoadProfileEvent(data) {
     saveProfileInfo(data)
 
     loading.value = false
+  } else if(data.kind == 1) {
+    storeEvent(shortNotesData, data)
   } else if(data.kind == 2) {
     // Recommended relay
     handleLoadedRecommendedRelay(data)
@@ -378,6 +382,8 @@ function onLoadProfileEvent(data) {
   } else if(data.kind == 30018) {
     // A product
     handleLoadedProductEvent(data)
+  } else if(data.kind == 30023) {
+    storeEvent(longNotesData, data)
   } else if(data.kind == 30311) {
     storeEvent(liveData, data)
   } else if(data.kind == 30315) {
@@ -429,7 +435,7 @@ function handleLoadedContactList(data) {
 }
 
 function handleLoadedRecommendedRelay(data) {
-  console.log('handleLoadedRecommendedRelay', data)
+  // console.log('handleLoadedRecommendedRelay', data)
 
   if(!relayData.value) {
     relayData.value = []
@@ -661,6 +667,8 @@ function reset() {
   handlerData.value = null
   nip05Data = null
   publicKey.value = null
+  shortNotesData.value = null
+  longNotesData.value = null
   reportsData.value = null
   sentZapsData.value = null
   receivedZapsData.value = null
@@ -721,7 +729,6 @@ onMounted(() => {
     listenToLightningPayments()
   }
 
-  // console.log('mounted', process.client)
   window.emitter.on('set-theme', updateHistory)
 })
 
@@ -763,6 +770,14 @@ onMounted(() => {
                 :count="followData ? followData.tags.length : null"
                 @navigate="selectTab"
               />
+              <ProfileShortNotesSummary
+                :info="shortNotesData"
+                :count="shortNotesData ? shortNotesData.length : null"
+              />
+              <ProfileLongNotesSummary
+                :info="longNotesData"
+                :count="longNotesData ? longNotesData.length : null"
+              />
               <ProfileStallSummary
                 :info="stallData"
                 :products="productData"
@@ -782,11 +797,6 @@ onMounted(() => {
                 direction="received"
                 @navigate="selectTab"
               />
-              <ProfileBadgeSummary
-                :info="badgeData"
-                :count="badgeData ? badgeData.length : null"
-                @navigate="selectTab"
-              />
               <ProfileLiveSummary
                 :info="liveData"
                 :count="liveData ? liveData.length : null"
@@ -795,6 +805,11 @@ onMounted(() => {
               <ProfileClassifiedsSummary
                 :info="classifiedsData"
                 :count="classifiedsData ? classifiedsData.length : null"
+                @navigate="selectTab"
+              />
+              <ProfileBadgeSummary
+                :info="badgeData"
+                :count="badgeData ? badgeData.length : null"
                 @navigate="selectTab"
               />
               <ProfileListsSummary
@@ -947,6 +962,8 @@ onMounted(() => {
       :receivedZapsData="receivedZapsData"
       :zapGoalData="zapGoalData"
       :userStatusData="userStatusData"
+      :shortNotesData="shortNotesData"
+      :longNotesData="longNotesData"
       :reportsData="reportsData"
       :fileData="fileData"
       :liveData="liveData"
@@ -972,6 +989,8 @@ onMounted(() => {
       :receivedZapsData="receivedZapsData"
       :zapGoalData="zapGoalData"
       :userStatusData="userStatusData"
+      :shortNotesData="shortNotesData"
+      :longNotesData="longNotesData"
       :reportsData="reportsData"
       :fileData="fileData"
       :liveData="liveData"
