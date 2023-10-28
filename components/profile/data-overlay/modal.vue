@@ -16,6 +16,8 @@ const props = defineProps([
   'productData',
   'sentZapsData',
   'receivedZapsData',
+  'shortNotesData',
+  'longNotesData',
   'reportsData',
   'fileData',
   'liveData',
@@ -55,6 +57,21 @@ const navOptions = computed(() => {
       count: props.relayData ? props.relayData.length : 0 
     },
     {
+      id: 'userstatuses',
+      name: 'Status',
+      count: props.userStatusData ? props.userStatusData.length : 0 
+    },
+    {
+      id: 'short-notes',
+      name: 'Short notes',
+      count: props.shortNotesData ? props.shortNotesData.length : 0 
+    },
+    {
+      id: 'long-notes',
+      name: 'Long notes',
+      count: props.longNotesData ? props.longNotesData.length : 0 
+    },
+    {
       id: 'stalls',
       name: 'Stalls',
       count: props.stallData ? props.stallData.length : 0 
@@ -88,11 +105,6 @@ const navOptions = computed(() => {
       id: 'zapgoals',
       name: 'Zap goals',
       count: props.zapGoalData ? props.zapGoalData.length : 0 
-    },
-    {
-      id: 'userstatuses',
-      name: 'Status',
-      count: props.userStatusData ? props.userStatusData.length : 0 
     },
     {
       id: 'reports',
@@ -189,6 +201,16 @@ function close() {
           <ProfileDataOverlayRelays
             v-if="activeNavOptionId == 'relays'"
             :info="relayData"
+          />
+
+          <ProfileDataOverlayShortNotes
+            v-if="activeNavOptionId == 'short-notes'"
+            :info="shortNotesData"
+          />
+
+          <ProfileDataOverlayLongNotes
+            v-if="activeNavOptionId == 'long-notes'"
+            :info="longNotesData"
           />
 
           <ProfileDataOverlayStalls

@@ -2,6 +2,7 @@
 import Icons from '@/helpers/icons'
 
 const props = defineProps([
+  'url',
   'title',
   'clickable'
 ])
@@ -9,15 +10,21 @@ const props = defineProps([
 const emit = defineEmits(['select'])
 
 const classObject = computed(() => {
-  return props.clickable ? '-clickable' : null
+  return (props.clickable || props.url) ? '-clickable' : null
 })
 
 </script>
 
 <template>
   <h2 :class="classObject">
+    <a
+      v-if="url" 
+      :href="url"
+      target="_blank"
+      rel="nofollow noreferrer"
+    >{{ title }} <span v-html="Icons.caretRight"/></a>
     <button v-if="clickable" @click="$emit('select')">{{ title }} <span v-html="Icons.caretRight"/></button>
-    <template v-if="!clickable">{{ title }}</template>
+    <template v-if="!(url || clickable)">{{ title }}</template>
   </h2>
 </template>
 
@@ -29,6 +36,7 @@ h2 {
   color: var(--theme-front);
 
   &.-clickable {
+    a,
     button {
       appearance: none;
       background-color: transparent;
@@ -37,6 +45,7 @@ h2 {
       font-weight: 600;
       padding: 0;
       color: var(--theme-front);
+      text-decoration: none;
 
       padding: 7px 12px 6px 15px;
       border-radius: 15px;
@@ -54,7 +63,7 @@ h2 {
       }
 
       &:hover {
-        background-color: rgba(var(--theme-active-rgb), 0.2);
+        background-color: rgba(var(--theme-active-rgb), 0.1);
 
         span {
           transform: translateX(10px);

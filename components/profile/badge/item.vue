@@ -120,7 +120,7 @@ const link = computed(() => {
       kind: bits[0],
       pubkey: bits[1],
       identifier: bits[2],
-      relays: [relay.id]
+      relays: [relay.url]
     })
 
     result = 'https://badges.page/b/' + naddr

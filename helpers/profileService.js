@@ -71,15 +71,11 @@ export default {
 
     const createdContentFilter = {
       kinds: [
-        0, // Profile info (meta data)
-        2, // Recommended relays
-        3, // Contacts
         1984, // Reports
         1985, // Labels
         9041, // Zap goals
         10000, // Mute list
         10001, // Pin list
-        10002, // Relay list meta data
         30000, // Categorized people
         30001, // Categorized bookmarks
         // 30009, // Badge definition
@@ -101,8 +97,44 @@ export default {
       authors: [this.publicKey]
     }
 
+    const profileFilter = {
+      kinds: [0], // Profile info (meta data)
+      authors: [this.publicKey],
+      limit: 1,
+    }
+
+    const contactsFilter = {
+      kinds: [3], // Contacts
+      authors: [this.publicKey],
+      limit: 1,
+    }
+
+    const relayFilter = {
+      kinds: [10002], // Relay list meta data
+      authors: [this.publicKey],
+      limit: 1,
+    }
+
+    const relayMetaFilter = {
+      kinds: [2], // Recommended relays
+      authors: [this.publicKey],
+      limit: 1,
+    }
+
+    const shortNoteFilter = {
+      kinds: [1], // Short note
+      authors: [this.publicKey],
+      limit: 3,
+    }
+
+    const longNoteFilter = {
+      kinds: [30023], // Long note
+      authors: [this.publicKey],
+      limit: 1,
+    }
+
     const statusFilter = {
-      kinds: [30315],
+      kinds: [30315], // User status
       authors: [this.publicKey],
       limit: 1,
     }
@@ -120,10 +152,16 @@ export default {
     }
 
     this.service.start(this.relaysToCheck, [
+      profileFilter,
+      contactsFilter,
+      relayFilter,
+      relayMetaFilter,
       createdContentFilter,
+      shortNoteFilter,
+      longNoteFilter,
       statusFilter,
-      sentZapsFilter,
-      receivedZapsFilter
+      // sentZapsFilter,
+      // receivedZapsFilter
     ])
   },
 
@@ -135,6 +173,8 @@ export default {
     this.findCallback(data)
     if(data.kind === 0) {
       // window.emitter.emit('profile-'+this.publicKey, data)
+    } else if(data.kind == 1) {
+      // console.log('!!! Seeing a short note', data)
     } else if(data.kind == 2) {
       // window.emitter.emit('relays-'+this.publicKey, data)
     } else if(data.kind == 3) {
@@ -172,6 +212,8 @@ export default {
       // console.log('!!! Seeing a stall', data)
     } else if(data.kind == 30018) {
       // console.log('!!! Seeing a product', data)
+    } else if(data.kind == 30023) {
+      // console.log('!!! Seeing a long note', data)
     } else if(data.kind == 30311) {
       // console.log('!!! Seeing a live activity', data)
     } else if(data.kind == 30315) {

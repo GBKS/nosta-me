@@ -105,7 +105,7 @@ const image = computed(() => {
   let result = null
 
   if(userData.value) {
-    result = userData.value.content ? userData.value.content.picture : null
+    result = ToolBox.dig(userData.value, 'content.picture')
   }
 
   return result
@@ -120,6 +120,8 @@ const title = computed(() => {
     } else {
       result = 'Loading...'
     }
+  } else {
+    result = ToolBox.digDeep(userData.value.content, ['display_name', 'name', 'displayName', 'username'])
   }
 
   return result

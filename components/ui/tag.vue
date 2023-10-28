@@ -23,13 +23,15 @@ const type = computed(() => {
     :class="classObject"
     :is="type"
     :href="info.url"
+    :target="info.target"
+    :rel="info.rel"
   >{{ info.name }}</component>
 </template>
 
 <style scoped lang="scss">
 
 .tag {
-  transition: all 250ms $ease;
+  transition: all 150ms $ease;
   font-size: 12px;
   padding: 3px 7px 4px 7px;
   border-radius: 3px;
@@ -40,12 +42,12 @@ const type = computed(() => {
 
   &.-theme {
     color: rgba(var(--theme-front-rgb), 0.85);
-    background-color: rgba(var(--theme-front-rgb), 0.05);
+    background-color: rgba(var(--theme-front-rgb), 0.1);
 
     &:is(a) {
       &:hover {
         color: var(--theme-active);
-        background-color: rgba(var(--theme-active-rgb), 0.1);
+        background-color: rgba(var(--theme-active-rgb), 0.25);
       }
     }
   }

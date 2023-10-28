@@ -26,6 +26,22 @@ export default {
       })
     }
 
+    if(!data.shortNotes || data.shortNotes.length == 0) {
+      result.push({
+        title: 'Post an update',
+        description: 'What you had for breakfast, philosophical insights, or anything else on your mind.',
+        kind: 1
+      })
+    }
+
+    if(!data.longNotes || data.longNotes.length == 0) {
+      result.push({
+        title: 'Write an article',
+        description: 'Write a fiction story, recipes, code tutorials, etc.',
+        kind: 30023
+      })
+    }
+
     // if(!data.relays || data.relays.length == 0) {
     //   result.push({
     //     title: 'Get connected',
