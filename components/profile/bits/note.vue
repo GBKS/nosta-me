@@ -4,6 +4,7 @@ import linkifyStr from "linkify-string"
 import UiUsername from '@/components/ui/username'
 import relayManager from '@/helpers/relayManager.js'
 import ToolBox from '@/helpers/toolBox'
+import Icons from '@/helpers/icons'
 
 const copyElement = ref(null)
 
@@ -45,10 +46,14 @@ const ContentNode = () => {
         images.push(token)
       } else if(token.v.indexOf('.png') !== -1) {
         images.push(token)
+      } else if(token.v.indexOf('.gif') !== -1) {
+        images.push(token)
       } else if(token.v.indexOf('.mov') !== -1) {
         children.push(turnVideoToNode(token.v, 'mp4'))
       } else if(token.v.indexOf('.mp4') !== -1) {
         children.push(turnVideoToNode(token.v, 'mp4'))
+      } else if(token.v.indexOf('youtube.com/watch?') !== -1) {
+        children.push(turnYoutubeToNode(token.v))
       } else {
         children.push(turnUrlToNode(token.v))
       }
@@ -144,9 +149,7 @@ function turnImageToNode(text) {
 }
 
 function turnNRelayToNode(text) {
-  console.log('turnNRelayToNode', text)
   const data = window.NostrTools.nip19.decode(text.split(':')[1]).data;
-  console.log('decoded', data)
 
   return h('a', {
     href: token.v,
@@ -158,9 +161,7 @@ function turnNRelayToNode(text) {
 }
 
 function turnNAddrToNode(text) {
-  console.log('turnNAddrToNode', text)
   const data = window.NostrTools.nip19.decode(text.split(':')[1]).data;
-  console.log('decoded', data)
 
   return h('a', {
     href: token.v,
@@ -172,8 +173,6 @@ function turnNAddrToNode(text) {
 }
 
 function turnVideoToNode(text, extension) {
-  console.log('turnVideoToNode', text, extension)
-
   const props = { controls: true }
   const meta = findUrlMeta(text)
   if(meta.width && meta.height) {
@@ -186,6 +185,32 @@ function turnVideoToNode(text, extension) {
     src: text,
     type: 'video/' + extension
   }))
+}
+
+function turnYoutubeToNode(text) {
+  // https://www.youtube.com/watch?v=rqjO5Z9Lt_M
+  const urlObject = new URL(text)
+  const videoId = urlObject.searchParams.get('v')
+
+  if(videoId) {
+    const url = 'https://img.youtube.com/vi/' + videoId + '/0.jpg'
+
+    return h('a', { 
+        href: text,
+        rel: 'nofollow noopener noreferrer',
+        target: '_blank',
+        class: '-video'
+      }, 
+      [
+        h('img', { 
+          src: url
+        }),
+        h('span', { innerHTML: Icons.video })
+      ]
+    )
+  } else {
+    return turnUrlToNode(text)
+  }
 }
 
 function findUrlMeta(url) {
@@ -238,7 +263,6 @@ function findUrlMeta(url) {
       word-wrap: break-word;
       color: var(--theme-text-medium);
       text-wrap: balance;
-
       text-overflow: ellipsis;
       /* height: 100%; */
       -webkit-line-clamp: 10;
@@ -283,6 +307,45 @@ function findUrlMeta(url) {
       border-radius: 5px;
       object-fit: cover;
       object-position: center;
+    }
+  }
+
+  :deep(.-video) {
+    position: relative;
+    display: block;
+
+    img {
+      width: 100%;
+      height: auto;
+    }
+
+    span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      border: 1.5px solid white;
+      border-radius: 100px;
+      width: 35px;
+      height: 35px;
+      background-color: rgba(black, 0.5);
+      transition: all 150ms $ease;
+
+      svg {
+        width: 18px;
+        height: 18px;
+        transform: translateX(2px);
+        color: white;
+      }
+    }
+
+    &:hover {
+      span {
+        transform: translate(-50%, -50%) scale(1.15);
+      }
     }
   }
 }

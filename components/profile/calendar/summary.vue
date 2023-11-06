@@ -1,0 +1,58 @@
+<script setup>
+import Icons from '@/helpers/icons'
+import ToolBox from '@/helpers/toolBox'
+
+const props = defineProps([
+  'info',
+  'count',
+  'baseUrl'
+])
+
+const emit = defineEmits(['navigate'])
+
+const visibleItems =  computed(() => {
+  return props.count > 0 ? props.info.slice(0, 2) : null
+})
+
+const titleCopy = computed(() => {
+  let result = 'No calendars yet'
+
+  if(props.count > 0) {
+    result = props.count + ' calendar' + (props.count == 1 ? '' : 's')
+  }
+
+  return result
+})
+
+function navigate() {
+  emit('navigate', 'calendars')
+}
+</script>
+
+<template>
+  <Transition name="fade" appear>
+    <div v-if="count > 0" class="calendar-summary">
+      <ProfileSectionTitle
+        :title="titleCopy"
+        :clickable="true"
+        @select="navigate"
+      />
+      <ProfileCalendarList
+        class="items"
+        :info="visibleItems"
+      />
+    </div>
+  </Transition>
+</template>
+
+<style scoped lang="scss">
+
+.calendar-summary {
+  .items {
+    margin-top: 15px;
+    display: flex;
+    @include r('gap', 10, 25);
+  }
+}
+
+</style>
