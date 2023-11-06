@@ -1,5 +1,6 @@
 <script setup>
 import Icons from '@/helpers/icons'
+import ToolBox from '@/helpers/toolBox'
 
 const props = defineProps([
   'info',
@@ -9,8 +10,12 @@ const props = defineProps([
 
 const isCopied = ref(false)
 
+const nip05 = computed(() => {
+  return props.info.profile.nip05
+})
+
 function copy() {
-  navigator.clipboard.writeText(props.info.profile.nip05)
+  navigator.clipboard.writeText(nip05.value)
   isCopied.value = true
 
   setTimeout(resetCopied, 2000)
@@ -21,7 +26,11 @@ function resetCopied() {
 }
 
 const text = computed(() => {
-  return isCopied.value ? 'Copied to clipboard' : props.info.profile.nip05
+  if(isCopied.value) {
+    return 'Copied to clipboard'
+  } else {
+    return ToolBox.trim(nip05.value, 30)
+  }
 })
 
 const classObject = computed(() => {
@@ -34,10 +43,10 @@ const classObject = computed(() => {
 
 <template>
   <button
-    v-if="info.profile.nip05"
+    v-if="nip05"
     :class="classObject"
-    :to="'/'+info.profile.nip05"
-    title="Copy handle"
+    title="Copy Nostr address"
+    aria-live="polite"
     @click="copy"
   ><span v-html="Icons.contactCircle" />{{ text }}</button>
 </template>

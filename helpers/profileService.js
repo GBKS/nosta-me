@@ -78,24 +78,25 @@ export default {
         10001, // Pin list
         30000, // Categorized people
         30001, // Categorized bookmarks
-        // 30009, // Badge definition
-        // 8, // Badge award
         30008, // Badges
         30017, // Stall
         30018, // Product
         1063, // Files
-        // 9802, // Highlights
         30311, // Live activities
         30402, // Classified
         31337, // Zapstr tracks
         31922, // Calendar events
         31923, // Calendar events
+        31924, // Calendar
         31989, // Handler recommendation
         31990, // Handler information
-        33889, // Pinstr board
       ],
       authors: [this.publicKey]
     }
+        // 33889, // Pinstr board
+        // 30009, // Badge definition
+        // 8, // Badge award
+        // 9802, // Highlights
 
     const profileFilter = {
       kinds: [0], // Profile info (meta data)
@@ -156,12 +157,12 @@ export default {
       contactsFilter,
       relayFilter,
       relayMetaFilter,
-      createdContentFilter,
       shortNoteFilter,
       longNoteFilter,
       statusFilter,
-      // sentZapsFilter,
-      // receivedZapsFilter
+      createdContentFilter,
+      sentZapsFilter,
+      receivedZapsFilter
     ])
   },
 
@@ -170,7 +171,7 @@ export default {
       console.log('profileService.onEvent', data)
     }
 
-    this.findCallback(data)
+    let tag
     if(data.kind === 0) {
       // window.emitter.emit('profile-'+this.publicKey, data)
     } else if(data.kind == 1) {
@@ -226,6 +227,8 @@ export default {
       console.log('!!! Seeing a calendar event', data)
     } else if(data.kind == 31923) {
       console.log('!!! Seeing a calendar event', data)
+    } else if(data.kind == 31924) {
+      console.log('!!! Seeing a calendar', data)
     } else if(data.kind == 31989) {
       // console.log('!!! Seeing a handler recommendation', data)
     } else if(data.kind == 31990) {
@@ -235,6 +238,8 @@ export default {
     } else if(data.type == 'end') {
       // this.checkNextRelay()
     }
+
+    this.findCallback(data)
   },
 
   onEndOfEvents() {

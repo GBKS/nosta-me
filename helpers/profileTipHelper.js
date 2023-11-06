@@ -106,6 +106,14 @@ export default {
       })
     }
 
+    if(!data.calendars || data.calendars.length == 0) {
+      result.push({
+        title: 'Share a calendar',
+        description: 'Let others know about events you organize or attend.',
+        kind: 31924
+      })
+    }
+
     if(!data.files || data.files.length == 0) {
       result.push({
         title: 'Share files',
