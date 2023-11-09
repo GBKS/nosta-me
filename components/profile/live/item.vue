@@ -1,11 +1,13 @@
 <script setup>
 import { useRelayStore } from '@/stores/relays'
 import ToolBox from '@/helpers/toolBox'
+import linkHelper from '@/helpers/linkHelper.js'
 
 const relayStore = useRelayStore()
 
 const props = defineProps([
-  'info'
+  'info',
+  'handlers'
 ])
 
 const title = computed(() => {
@@ -52,14 +54,14 @@ const link = computed(() => {
   const tag = ToolBox.findTag(props.info, 'd')
   const relay = relayStore.getRelay(props.info.relay)
 
-  const data = {
-    kind: 30311,
-    pubkey: props.info.pubkey,
-    identifier: tag[0],
-    relays: [relay.url]
-  }
-
-  return 'https://zap.stream/' + window.NostrTools.nip19.naddrEncode(data)
+  return linkHelper.address(
+    tag[0], 
+    props.info.pubkey,
+    props.info.kind,
+    relay.url,
+    props.handlers,
+    linkHelper.zap.stream
+  )
 })
 
 const classObject = computed(() => {

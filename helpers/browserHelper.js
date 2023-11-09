@@ -1,10 +1,8 @@
-
 /*
 
-Loads profiles from a kind 3 event.
+For interacting with an extension
 
  */
-
 export default { 
   log: !false,
 

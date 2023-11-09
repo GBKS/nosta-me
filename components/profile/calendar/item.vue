@@ -2,11 +2,13 @@
 import { useRelayStore } from '@/stores/relays'
 import ToolBox from '@/helpers/toolBox'
 import Icons from '@/helpers/icons'
+import linkHelper from '@/helpers/linkHelper.js'
 
 const relayStore = useRelayStore()
 
 const props = defineProps([
-  'info'
+  'info',
+  'handlers'
 ])
 
 const title = computed(() => {
@@ -56,24 +58,20 @@ const link = computed(() => {
   const tag = ToolBox.findTag(props.info, 'd')
   const relay = relayStore.getRelay(props.info.relay)
 
-  const data = {
-    kind: 30311,
-    pubkey: props.info.pubkey,
-    identifier: tag[0],
-    relays: [relay.url]
-  }
-
-  return 'https://www.flockstr.com/calendar/' + window.NostrTools.nip19.naddrEncode(data)
+  return linkHelper.address(
+    tag[0],
+    props.info.pubkey, 
+    props.info.kind,
+    relay.url,
+    props.handlers,
+    linkHelper.flockstr.calendar
+  )
 })
 
 const classObject = computed(() => {
   const c = ['calendar-item']
 
   return c.join(' ')
-})
-
-onBeforeMount(() => {
-  console.log('event list calendar item', props.info)
 })
 </script>
 

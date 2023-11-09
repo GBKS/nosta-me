@@ -3,7 +3,8 @@ import relayManager from '@/helpers/relayManager.js'
 
 const props = defineProps([
   'info',
-  'count'
+  'count',
+  'handlers'
 ])
 
 const latestNote = computed(() => {
@@ -34,6 +35,7 @@ const latestNote = computed(() => {
       <ProfileLongNotesItem
         :key="latestNote.id"
         :info="latestNote"
+        :handlers="handlers"
       />
     </div>
   </Transition>

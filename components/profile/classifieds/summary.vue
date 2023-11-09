@@ -4,7 +4,8 @@ import ToolBox from '@/helpers/toolBox'
 
 const props = defineProps([
   'info',
-  'count'
+  'count',
+  'handlers'
 ])
 
 const emit = defineEmits(['navigate'])
@@ -39,6 +40,7 @@ function navigate() {
       <ProfileClassifiedsList
         class="items"
         :info="visibleItems"
+        :handlers="handlers"
       />
     </div>
   </Transition>

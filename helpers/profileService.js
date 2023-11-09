@@ -224,11 +224,11 @@ export default {
     } else if(data.kind == 31337) {
       console.log('!!! Seeing a Zapstr track', data)
     } else if(data.kind == 31922) {
-      console.log('!!! Seeing a calendar event', data)
+      // console.log('!!! Seeing a calendar event', data)
     } else if(data.kind == 31923) {
-      console.log('!!! Seeing a calendar event', data)
+      // console.log('!!! Seeing a calendar event', data)
     } else if(data.kind == 31924) {
-      console.log('!!! Seeing a calendar', data)
+      // console.log('!!! Seeing a calendar', data)
     } else if(data.kind == 31989) {
       // console.log('!!! Seeing a handler recommendation', data)
     } else if(data.kind == 31990) {

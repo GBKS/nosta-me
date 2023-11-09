@@ -1,6 +1,7 @@
 <script setup>
 const props = defineProps([
-  'info'
+  'info',
+  'handlers'
 ])
 
 const emit = defineEmits(['navigate', 'back'])
@@ -21,6 +22,7 @@ function navigate(info) {
       v-for="(item, index) in info"
       :key="item.id"
       :info="item"
+      :handlers="handlers"
     />
   </div>
 </template>

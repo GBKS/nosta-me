@@ -2,7 +2,8 @@
 import ToolBox from '@/helpers/toolBox'
 
 const props = defineProps([
-  'info'
+  'info',
+  'handlers'
 ])
 
 const emit = defineEmits(['back'])
@@ -24,6 +25,7 @@ const title = computed(() => {
       <ProfileLiveList
         class="items"
         :info="info" 
+        :handlers="handlers"
       />
     </div>
   </Transition>
