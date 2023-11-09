@@ -70,7 +70,7 @@ const tabInfo = ref({
 })
 
 function selectTab(value, info) {
-  // console.log('selectTab', value, info)
+  console.log('selectTab', value, info)
   activeTabId.value = value
   if(tabInfo.value[value] && info) {
     tabInfo.value[value].info = info
@@ -736,10 +736,12 @@ onMounted(() => {
               <ProfileShortNotesSummary
                 :info="shortNotesData"
                 :count="shortNotesData ? shortNotesData.length : null"
+                :handlers="handlerData"
               />
               <ProfileLongNotesSummary
                 :info="longNotesData"
                 :count="longNotesData ? longNotesData.length : null"
+                :handlers="handlerData"
               />
               <ProfileStallSummary
                 :info="stallData"
@@ -763,26 +765,31 @@ onMounted(() => {
               <ProfileLiveSummary
                 :info="liveData"
                 :count="liveData ? liveData.length : null"
+                :handlers="handlerData"
                 @navigate="selectTab"
               />
               <ProfileEventSummary
                 :info="eventsData"
                 :count="eventsData ? eventsData.length : null"
+                :handlers="handlerData"
                 @navigate="selectTab"
               />
               <ProfileCalendarSummary
                 :info="calendarData"
                 :count="calendarData ? calendarData.length : null"
+                :handlers="handlerData"
                 @navigate="selectTab"
               />
               <ProfileClassifiedsSummary
                 :info="classifiedsData"
                 :count="classifiedsData ? classifiedsData.length : null"
+                :handlers="handlerData"
                 @navigate="selectTab"
               />
               <ProfileBadgeSummary
                 :info="badgeData"
                 :count="badgeData ? badgeData.length : null"
+                :handlers="handlerData"
                 @navigate="selectTab"
               />
               <ProfileListsSummary
@@ -821,6 +828,7 @@ onMounted(() => {
               v-if="activeTabId == 'badges'" 
               :info="badgeData"
               :profileService="profileService"
+              :handlers="handlerData"
               @back="selectTab"
             />
             <ProfileRelayList 
@@ -885,21 +893,25 @@ onMounted(() => {
             <ProfileLiveTab 
               v-if="activeTabId == 'live'"
               :info="liveData"
+              :handlers="handlerData"
               @back="selectTab"
             />
             <ProfileClassifiedsTab 
               v-if="activeTabId == 'classifieds'"
               :info="classifiedsData"
+              :handlers="handlerData"
               @back="selectTab"
             />
             <ProfileEventTab 
               v-if="activeTabId == 'events'"
               :info="eventsData"
+              :handlers="handlerData"
               @back="selectTab"
             />
             <ProfileCalendarTab 
               v-if="activeTabId == 'calendars'"
               :info="calendarData"
+              :handlers="handlerData"
               @back="selectTab"
             />
             <ProfileTipsTab

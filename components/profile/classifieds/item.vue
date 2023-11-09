@@ -1,11 +1,13 @@
 <script setup>
 import { useRelayStore } from '@/stores/relays'
 import ToolBox from '@/helpers/toolBox'
+import linkHelper from '@/helpers/linkHelper.js'
 
 const relayStore = useRelayStore()
 
 const props = defineProps([
-  'info'
+  'info',
+  'handlers'
 ])
 
 const title = computed(() => {
@@ -52,14 +54,14 @@ const link = computed(() => {
   const tag = props.info.tags.find(tag => tag[0] == 'd')
   const relay = relayStore.getRelay(props.info.relay)
 
-  const data = {
-    kind: 30402,
-    pubkey: props.info.pubkey,
-    identifier: tag[1],
-    relays: [relay.url]
-  }
-
-  return 'https://ostrich.work/jobs/' + window.NostrTools.nip19.naddrEncode(data)
+  return linkHelper.address(
+    tag[1], 
+    props.info.pubkey,
+    props.info.kind,
+    relay.url,
+    props.handlers,
+    linkHelper.ostrich.job
+  )
 })
 
 const formattedDate = computed(() => {

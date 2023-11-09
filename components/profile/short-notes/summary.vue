@@ -3,7 +3,8 @@ import relayManager from '@/helpers/relayManager.js'
 
 const props = defineProps([
   'info',
-  'count'
+  'count',
+  'handlers'
 ])
 
 const latestNote = computed(() => {
@@ -64,6 +65,7 @@ const titleUrl = computed(() => {
           v-for="item in latestNotes"
           :key="item.id"
           :info="item"
+          :handlers="handlers"
         />
       </div>
     </div>

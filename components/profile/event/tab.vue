@@ -3,7 +3,7 @@ import ToolBox from '@/helpers/toolBox'
 
 const props = defineProps([
   'info',
-  'calendars'
+  'handlers'
 ])
 
 const emit = defineEmits(['back'])
@@ -22,13 +22,10 @@ const title = computed(() => {
     <div v-if="info" class="events-tab">
       <ProfileSectionBack @select="$emit('back')" />
       <ProfileSectionTitle :title="title" />
-      <ProfileEventCalendarList
+      <ProfileEventList
         class="items"
-        :info="calendars" 
-      />
-      <ProfileEventEventList
-        class="items"
-        :info="info" 
+        :info="info"
+        :handlers="handlers"
       />
     </div>
   </Transition>

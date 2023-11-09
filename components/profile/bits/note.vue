@@ -175,7 +175,7 @@ function turnNAddrToNode(text) {
 function turnVideoToNode(text, extension) {
   const props = { controls: true }
   const meta = findUrlMeta(text)
-  if(meta.width && meta.height) {
+  if(meta && meta.width && meta.height) {
     props.style = {
       aspectRatio: Math.round(meta.width/meta.height*100)/100
     }

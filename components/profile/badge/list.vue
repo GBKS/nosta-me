@@ -1,7 +1,8 @@
 <script setup>
 const props = defineProps([
   'info',
-  'profileService'
+  'profileService',
+  'handlers'
 ])
 
 const emit = defineEmits(['back'])
@@ -25,6 +26,7 @@ const title = computed(() => {
           v-for="(item, index) in info"
           :key="item.id"
           :info="item"
+          :handlers="handlers"
         />
       </div>
     </div>
