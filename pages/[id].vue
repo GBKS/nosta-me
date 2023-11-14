@@ -4,6 +4,7 @@ import profileService from '@/helpers/profileService.js'
 import themes from '@/data/themes.json'
 import { useUserStore } from '@/stores/users'
 import { useSessionStore } from '@/stores/session'
+import ToolBox from '@/helpers/toolBox'
 
 const route = useRoute()
 const router = useRouter()
@@ -22,12 +23,16 @@ const handlerData = ref(null)
 const badgeData = ref(null)
 const reportsData = ref(null) // Reports the user has made
 const reportedData = ref(null) // The user has been reported
+const shortNotesData = ref(null)
+const longNotesData = ref(null)
+const reportsData = ref(null)
 const sentZapsData = ref(null)
 const receivedZapsData = ref(null)
 const zapGoalData = ref(null)
 const userStatusData = ref(null)
 const liveData = ref(null)
 const eventsData = ref(null)
+const calendarData = ref(null)
 const classifiedsData = ref(null)
 const stallData = ref(null)
 const productData = ref(null)
@@ -42,72 +47,30 @@ const publicKey = ref(null)
 const loading = ref(true)
 const showDataOverlay = ref(false)
 const profileDataStats = ref(null)
+const activeTabId = ref(null)
 
 const tabInfo = ref({
-  'following': {
-    name: 'Following'
-  },
-  'badges': {
-    name: 'Badges'
-  },
-  'relays': {
-    name: 'Relays'
-  },
-  'reports': {
-    name: 'Reports'
-  },
-  'zaps-sent': {
-    name: 'Zaps sent'
-  },
-  'zaps-received': {
-    name: 'Zaps received'
-  },
-  'files': {
-    name: 'Files'
-  },
-  'lists': {
-    name: 'Lists'
-  },
-  'list': {
-    name: 'List',
-    info: null
-  },
-  'stalls': {
-    name: 'Stalls'
-  },
-  'stall': {
-    name: 'Stall',
-    info: null
-  },
-  'handlers': {
-    name: 'Handlers'
-  },
-  'handler': {
-    name: 'Handler',
-    info: null
-  },
-  'live': {
-    name: 'Live events'
-  },
-  'pinstr-boards': {
-    name: 'Pinstr boards'
-  },
-  'pinstr-board': {
-    name: 'Pinstr board',
-    info: null
-  },
-  'classifieds': {
-    name: 'Classifieds'
-  },
-  'classified': {
-    name: 'Classified',
-    info: null
-  },
-  'tips': {
-    name: 'Tips'
-  }
+  'following': { name: 'Following' },
+  'badges': { name: 'Badges' },
+  'relays': { name: 'Relays' },
+  'reports': { name: 'Reports' },
+  'zaps-sent': { name: 'Zaps sent' },
+  'zaps-received': { name: 'Zaps received' },
+  'files': { name: 'Files' },
+  'lists': { name: 'Lists' },
+  'list': { name: 'List', info: null },
+  'stalls': { name: 'Stalls' },
+  'stall': { name: 'Stall', info: null },
+  'handlers': { name: 'Handlers' },
+  'handler': { name: 'Handler', info: null },
+  'live': { name: 'Live events' },
+  'classifieds': { name: 'Classifieds' },
+  'classified': { name: 'Classified', info: null },
+  'calendars': { name: 'Calendars', info: null },
+  'events': { name: 'Events', info: null },
+  'tips': { name: 'Tips' },
+  'pinstr-boards': { name: 'Tips' }
 })
-const activeTabId = ref(null)
 
 function selectTab(value, info) {
   console.log('selectTab', value, info)
@@ -130,7 +93,7 @@ function updateFromRoute() {
     queryRelayIds.value = null
   }
 
-  console.log('updateFromRoute', queryRelayIds, route.query.r)
+  // console.log('updateFromRoute', queryRelayIds, route.query.r)
 
   if(route.query.t && themes[sessionStore.theme]) {
     sessionStore.theme = route.query.t
@@ -155,11 +118,12 @@ const theme = computed(() => {
 })
 
 const pageTitle = computed(() => {
-  return profileData.value ? (profileData.value.profile.name + ' | Nosta') : 'Nosta'
+  const name = ToolBox.digDeep(profileData.value, ['profile.display_name', 'profile.name', 'profile.displayName', 'profile.username'], null, true)
+  return name ? (name + ' | Nosta') : 'Nosta'
 })
 
 const pageDescription = computed(() => {
-  return profileData.value ? profileData.value.profile.about : 'Nostr profile'
+  return ToolBox.dig(profileData.value, 'profile.about', 'Nostr profile', true)
 })
 
 const lightningMetaTag = computed(() => {
@@ -343,6 +307,8 @@ function onLoadProfileEvent(data) {
     saveProfileInfo(data)
 
     loading.value = false
+  } else if(data.kind == 1) {
+    storeEvent(shortNotesData, data)
   } else if(data.kind == 2) {
     handleLoadedRecommendedRelay(data)
   } else if(data.kind == 3) {
@@ -377,6 +343,8 @@ function onLoadProfileEvent(data) {
     handleLoadedStallEvent(data)
   } else if(data.kind == 30018) {
     handleLoadedProductEvent(data)
+  } else if(data.kind == 30023) {
+    storeEvent(longNotesData, data)
   } else if(data.kind == 30311) {
     storeEvent(liveData, data)
   } else if(data.kind == 30315) {
@@ -387,6 +355,8 @@ function onLoadProfileEvent(data) {
     storeEvent(eventsData, data)
   } else if(data.kind == 31923) {
     storeEvent(eventsData, data)
+  } else if(data.kind == 31924) {
+    storeEvent(calendarData, data)
   } else if(data.kind == 31989) {
     storeEvent(handlerData, data)
   } else if(data.kind == 33889) {
@@ -428,7 +398,7 @@ function handleLoadedContactList(data) {
 }
 
 function handleLoadedRecommendedRelay(data) {
-  console.log('handleLoadedRecommendedRelay', data)
+  // console.log('handleLoadedRecommendedRelay', data)
 
   if(!relayData.value) {
     relayData.value = []
@@ -650,10 +620,14 @@ function reset() {
   handlerData.value = null
   nip05Data = null
   publicKey.value = null
+  shortNotesData.value = null
+  longNotesData.value = null
   reportsData.value = null
   reportedData.value = null
   sentZapsData.value = null
   receivedZapsData.value = null
+  zapGoalData.value = null
+  userStatusData.value = null
   badgeData.value = null
   listsData.value = null
   profileDataStats.value = null
@@ -663,6 +637,9 @@ function reset() {
   fileData.value = null
   pinstrData.value = null
   labelData.value = null
+  eventsData.value = null
+  calendarData.value = null
+  classifiedsData.value = null
 }
 
 function updateHistory() {
@@ -687,7 +664,8 @@ const classObject = computed(() => {
 })
 
 const hasBanner = computed(() => {
-  return profileData.value && profileData.value.profile && profileData.value.profile.banner && profileData.value.profile.banner.length > 0
+  const banner = ToolBox.dig(profileData.value, 'profile.banner', null, true)
+  return banner && banner.length > 0
 })
 
 // https://github.com/BitcoinAndLightningLayerSpecs/rfc/issues/1
@@ -711,7 +689,6 @@ onMounted(() => {
     listenToLightningPayments()
   }
 
-  // console.log('mounted', process.client)
   window.emitter.on('set-theme', updateHistory)
 })
 
@@ -753,6 +730,16 @@ onMounted(() => {
                 :count="followData ? followData.tags.length : null"
                 @navigate="selectTab"
               />
+              <ProfileShortNotesSummary
+                :info="shortNotesData"
+                :count="shortNotesData ? shortNotesData.length : null"
+                :handlers="handlerData"
+              />
+              <ProfileLongNotesSummary
+                :info="longNotesData"
+                :count="longNotesData ? longNotesData.length : null"
+                :handlers="handlerData"
+              />
               <ProfileStallSummary
                 :info="stallData"
                 :products="productData"
@@ -772,19 +759,34 @@ onMounted(() => {
                 direction="received"
                 @navigate="selectTab"
               />
-              <ProfileBadgeSummary
-                :info="badgeData"
-                :count="badgeData ? badgeData.length : null"
-                @navigate="selectTab"
-              />
               <ProfileLiveSummary
                 :info="liveData"
                 :count="liveData ? liveData.length : null"
+                :handlers="handlerData"
+                @navigate="selectTab"
+              />
+              <ProfileEventSummary
+                :info="eventsData"
+                :count="eventsData ? eventsData.length : null"
+                :handlers="handlerData"
+                @navigate="selectTab"
+              />
+              <ProfileCalendarSummary
+                :info="calendarData"
+                :count="calendarData ? calendarData.length : null"
+                :handlers="handlerData"
                 @navigate="selectTab"
               />
               <ProfileClassifiedsSummary
                 :info="classifiedsData"
                 :count="classifiedsData ? classifiedsData.length : null"
+                :handlers="handlerData"
+                @navigate="selectTab"
+              />
+              <ProfileBadgeSummary
+                :info="badgeData"
+                :count="badgeData ? badgeData.length : null"
+                :handlers="handlerData"
                 @navigate="selectTab"
               />
               <ProfileListsSummary
@@ -828,6 +830,7 @@ onMounted(() => {
               v-if="activeTabId == 'badges'" 
               :info="badgeData"
               :profileService="profileService"
+              :handlers="handlerData"
               @back="selectTab"
             />
             <ProfileRelayList 
@@ -892,11 +895,25 @@ onMounted(() => {
             <ProfileLiveTab 
               v-if="activeTabId == 'live'"
               :info="liveData"
+              :handlers="handlerData"
               @back="selectTab"
             />
             <ProfileClassifiedsTab 
               v-if="activeTabId == 'classifieds'"
               :info="classifiedsData"
+              :handlers="handlerData"
+              @back="selectTab"
+            />
+            <ProfileEventTab 
+              v-if="activeTabId == 'events'"
+              :info="eventsData"
+              :handlers="handlerData"
+              @back="selectTab"
+            />
+            <ProfileCalendarTab 
+              v-if="activeTabId == 'calendars'"
+              :info="calendarData"
+              :handlers="handlerData"
               @back="selectTab"
             />
             <ProfilePinstrBoardsTab 
@@ -924,10 +941,13 @@ onMounted(() => {
               :receivedZapsData="receivedZapsData"
               :zapGoalData="zapGoalData"
               :userStatusData="userStatusData"
+              :shortNotesData="shortNotesData"
+              :longNotesData="longNotesData"
               :reportsData="reportsData"
               :fileData="fileData"
               :liveData="liveData"
               :eventsData="eventsData"
+              :calendarData="calendarData"
               :labelData="labelData"
               :classifiedsData="classifiedsData"
               @back="selectTab"
@@ -953,11 +973,14 @@ onMounted(() => {
       :receivedZapsData="receivedZapsData"
       :zapGoalData="zapGoalData"
       :userStatusData="userStatusData"
+      :shortNotesData="shortNotesData"
+      :longNotesData="longNotesData"
       :reportsData="reportsData"
       :reportedData="reportedData"
       :fileData="fileData"
       :liveData="liveData"
       :eventsData="eventsData"
+      :calendarData="calendarData"
       :pinstrData="pinstrData"
       :labelData="labelData"
       :classifiedsData="classifiedsData"
@@ -979,10 +1002,13 @@ onMounted(() => {
       :receivedZapsData="receivedZapsData"
       :zapGoalData="zapGoalData"
       :userStatusData="userStatusData"
+      :shortNotesData="shortNotesData"
+      :longNotesData="longNotesData"
       :reportsData="reportsData"
       :fileData="fileData"
       :liveData="liveData"
       :eventsData="eventsData"
+      :calendarData="calendarData"
       :labelData="labelData"
       :classifiedsData="classifiedsData"
       @navigate="selectTab"

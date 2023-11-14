@@ -11,33 +11,33 @@ const props = defineProps([
 const emit = defineEmits(['navigate'])
 
 const visibleItems =  computed(() => {
-  return props.count > 0 ? props.info.slice(0, 3) : null
+  return props.count > 0 ? props.info.slice(0, 2) : null
 })
 
 const titleCopy = computed(() => {
-  let result = 'No live activities yet'
+  let result = 'No calendars yet'
 
   if(props.count > 0) {
-    result = props.count + ' live activit' + (props.count == 1 ? 'y' : 'ies')
+    result = props.count + ' calendar' + (props.count == 1 ? '' : 's')
   }
 
   return result
 })
 
 function navigate() {
-  emit('navigate', 'live')
+  emit('navigate', 'calendars')
 }
 </script>
 
 <template>
   <Transition name="fade" appear>
-    <div v-if="count > 0" class="live-summary">
+    <div v-if="count > 0" class="calendar-summary">
       <ProfileSectionTitle
         :title="titleCopy"
         :clickable="true"
         @select="navigate"
       />
-      <ProfileLiveList
+      <ProfileCalendarList
         class="items"
         :info="visibleItems"
         :handlers="handlers"
@@ -48,9 +48,9 @@ function navigate() {
 
 <style scoped lang="scss">
 
-.live-summary {
+.calendar-summary {
   .items {
-    margin-top: 25px;
+    margin-top: 15px;
     display: flex;
     @include r('gap', 10, 25);
   }

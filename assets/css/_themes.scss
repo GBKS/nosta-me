@@ -88,3 +88,14 @@
 	--theme-active: #ED7B45;
 	--theme-active-rgb: 237, 136, 69;
 }
+
+.site-wrap.-theme-bitcoin {
+	.-theme-content-frame {
+		// background-color: #A9326D;
+		background-color: rgba(#A9326D, 0.95);
+		border: 2px solid rgba(#F27822, 0.5);
+	}
+
+	--theme-active: #ED7B45;
+	--theme-active-rgb: 237, 136, 69;
+}

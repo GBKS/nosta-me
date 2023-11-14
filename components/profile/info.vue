@@ -227,6 +227,7 @@ function showDataOverlay() {
       @include r('font-size', 40, 64);
       color: var(--theme-text-bright);
       word-break: break-word;
+      // white-space: nowrap;
     }
 
     .user-status {
@@ -238,6 +239,8 @@ function showDataOverlay() {
     p {
       color: var(--theme-text-medium);
       text-wrap: balance;
+      word-wrap: break-word;
+      white-space: normal;
 
       :deep(a) {
         color: var(--theme-text-medium);
@@ -259,6 +262,7 @@ function showDataOverlay() {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
+        min-width: 0;
       }
     }
   }

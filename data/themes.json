@@ -38,5 +38,10 @@
         "name": "Bubbles",
         "color": "#5F002D",
         "brightness": "dark"
+    },
+    "bitcoin": {
+        "name": "Bitcoin",
+        "color": "#BC3879",
+        "brightness": "dark"
     }
 }

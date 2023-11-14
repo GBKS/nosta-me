@@ -4,17 +4,13 @@ import Icons from '@/helpers/icons'
 const props = defineProps([
   'info',
   'count',
-  'baseUrl'
+  'handlers'
 ])
 
 const emit = defineEmits(['navigate'])
 
 const visibleBadges =  computed(() => {
   return props.count > 0 ? props.info.slice(0, 5) : null
-})
-
-const detailUrl = computed(() => {
-  return props.baseUrl + '/badges'
 })
 
 const titleCopy = computed(() => {
@@ -45,6 +41,7 @@ function navigate() {
           v-for="(item, index) in visibleBadges"
           :key="item.id"
           :info="item"
+          :handlers="handlers"
         />
       </div>
     </div>

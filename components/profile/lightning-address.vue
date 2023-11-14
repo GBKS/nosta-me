@@ -50,6 +50,7 @@ function select() {
     :is="type"
     :class="classObject"
     :title="title"
+    aria-live="polite"
     @click="select"
   ><span v-html="Icons.bitcoin" />{{ formattedAddress }}</component>
 </template>
@@ -60,6 +61,11 @@ function select() {
   vertical-align: middle;
   text-decoration: none;
   transition: all 150ms $ease;
+  text-align: left;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   span {
     display: inline-block;

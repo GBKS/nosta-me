@@ -1,43 +1,41 @@
 <script setup>
+import ToolBox from '@/helpers/toolBox'
+
 const props = defineProps([
   'info',
-  'profileService',
   'handlers'
 ])
 
 const emit = defineEmits(['back'])
 
-const badgeCount = computed(() => {
+const itemCount = computed(() => {
   return props.info.length
 })
 
 const title = computed(() => {
-  return badgeCount.value + ' badge' + (badgeCount.value == 1 ? '' : 's')
+  return itemCount.value + ' event' + (itemCount.value == 1 ? '' : 's')
 })
 </script>
 
 <template>
   <Transition name="fade" appear>
-    <div v-if="info" class="badge-list">
+    <div v-if="info" class="events-tab">
       <ProfileSectionBack @select="$emit('back')" />
       <ProfileSectionTitle :title="title" />
-      <div class="badges">
-        <ProfileBadgeItem
-          v-for="(item, index) in info"
-          :key="item.id"
-          :info="item"
-          :handlers="handlers"
-        />
-      </div>
+      <ProfileCalendarList
+        class="items"
+        :info="info" 
+        :handlers="handlers"
+      />
     </div>
   </Transition>
 </template>
 
 <style scoped lang="scss">
 
-.badge-list {
-  .badges {
-    margin-top: 10px;
+.events-tab {
+  .items {
+    margin-top: 25px;
     display: flex;
     gap: 20px;
     flex-wrap: wrap;
@@ -48,7 +46,7 @@ const title = computed(() => {
   }
 
   @include media-query(small) {
-    .badges {
+    .items {
       > * {
         flex-basis: 40%;
       }
@@ -56,7 +54,7 @@ const title = computed(() => {
   }
 
   @include media-query(medium) {
-    .badges {
+    .items {
       > * {
         flex-basis: 30%;
       }
@@ -64,7 +62,7 @@ const title = computed(() => {
   }
 
   @include media-query(large) {
-    .badges {
+    .items {
       > * {
         flex-basis: 20%;
       }

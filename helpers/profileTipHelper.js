@@ -26,6 +26,22 @@ export default {
       })
     }
 
+    if(!data.shortNotes || data.shortNotes.length == 0) {
+      result.push({
+        title: 'Post an update',
+        description: 'What you had for breakfast, philosophical insights, or anything else on your mind.',
+        kind: 1
+      })
+    }
+
+    if(!data.longNotes || data.longNotes.length == 0) {
+      result.push({
+        title: 'Write an article',
+        description: 'Write a fiction story, recipes, code tutorials, etc.',
+        kind: 30023
+      })
+    }
+
     // if(!data.relays || data.relays.length == 0) {
     //   result.push({
     //     title: 'Get connected',
@@ -87,6 +103,14 @@ export default {
         title: 'Organize an event',
         description: 'Meetups, birthdays, holidays, and anything else.',
         kind: 31922
+      })
+    }
+
+    if(!data.calendars || data.calendars.length == 0) {
+      result.push({
+        title: 'Share a calendar',
+        description: 'Let others know about events you organize or attend.',
+        kind: 31924
       })
     }
 

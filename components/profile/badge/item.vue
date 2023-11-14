@@ -2,9 +2,11 @@
 import relayRequest from '@/helpers/relayRequest.js'
 import multiRelayRequest from '@/helpers/multiRelayRequest.js'
 import { useRelayStore } from '@/stores/relays'
+import linkHelper from '@/helpers/linkHelper.js'
 
 const props = defineProps([
-  'info'
+  'info',
+  'handlers'
 ])
 
 let rawBadgeData = null
@@ -116,14 +118,18 @@ const link = computed(() => {
 
     const relay = relayStore.getRelay(rawBadgeData.relay)
 
-    const naddr = window.NostrTools.nip19.naddrEncode({
-      kind: bits[0],
-      pubkey: bits[1],
-      identifier: bits[2],
-      relays: [relay.id]
-    })
+    const url = linkHelper.address(
+      bits[2],
+      bits[1], 
+      bits[0],
+      relay.url,
+      props.handlers,
+      linkHelper.badges.badge
+    )
 
-    result = 'https://badges.page/b/' + naddr
+    if(url) {
+      result = url
+    }
   }
 
   return result
