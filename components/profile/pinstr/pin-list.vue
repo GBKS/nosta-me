@@ -7,27 +7,47 @@ const emit = defineEmits(['navigate', 'back'])
 
 const title = computed(() => {
   const count = props.info.length
-  return count + ' classified'  + (count == 1 ? '' : 's')
+  return count + ' pin'  + (count == 1 ? '' : 's')
 })
 
 function navigate(info) {
-  emit('navigate', 'classifieds', info)
+  emit('navigate', 'pinstr', info)
 }
+
+const pins = computed(() => {
+  return props.info.tags.filter(tag => tag[0] == 'pin')
+})
+
+const type = computed(() => {
+  const result = props.info.tags.find(tag => tag[0] == 'f')
+  return result ? result[1] : null
+})
+
+const headers = computed(() => {
+  const result = props.info.tags.find(tag => tag[0] == 'headers')
+  return result ? result : null
+})
+
+onMounted(() => {
+  console.log('pin-list', props.info)
+})
 </script>
 
 <template>
-  <div v-if="info" class="classifieds-list">
-    <ProfileClassifiedsItem
-      v-for="(item, index) in info"
+  <div v-if="info" class="pinstr-pin-list">
+    <ProfilePinstrPin
+      v-for="(item, index) in pins"
       :key="item.id"
       :info="item"
+      :type="type"
+      :headers="headers"
     />
   </div>
 </template>
 
 <style scoped lang="scss">
 
-.classifieds-list {
+.pinstr-pin-list {
   margin-top: 25px;
   display: flex;
   flex-wrap: wrap;

@@ -128,7 +128,7 @@ export default {
       }
     }
 
-    if(!result !== null && requireLength && result.length == 0) {
+    if(result !== null && requireLength && result.length == 0) {
       result = null
     }
 

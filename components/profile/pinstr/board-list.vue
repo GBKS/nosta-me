@@ -3,31 +3,32 @@ const props = defineProps([
   'info'
 ])
 
-const emit = defineEmits(['navigate', 'back'])
+const emit = defineEmits(['select'])
 
 const title = computed(() => {
   const count = props.info.length
-  return count + ' classified'  + (count == 1 ? '' : 's')
+  return count + ' board'  + (count == 1 ? '' : 's')
 })
 
 function navigate(info) {
-  emit('navigate', 'classifieds', info)
+  emit('select', info)
 }
 </script>
 
 <template>
-  <div v-if="info" class="classifieds-list">
-    <ProfileClassifiedsItem
+  <div v-if="info" class="pinstr-board-list">
+    <ProfilePinstrBoard
       v-for="(item, index) in info"
       :key="item.id"
       :info="item"
+      @navigate="navigate"
     />
   </div>
 </template>
 
 <style scoped lang="scss">
 
-.classifieds-list {
+.pinstr-board-list {
   margin-top: 25px;
   display: flex;
   flex-wrap: wrap;

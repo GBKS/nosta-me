@@ -17,6 +17,7 @@ const props = defineProps([
   'sentZapsData',
   'receivedZapsData',
   'reportsData',
+  'reportedData',
   'fileData',
   'liveData',
   'eventsData',

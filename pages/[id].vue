@@ -20,7 +20,8 @@ const followData = ref(null)
 const followDataEvents = ref(null)
 const handlerData = ref(null)
 const badgeData = ref(null)
-const reportsData = ref(null)
+const reportsData = ref(null) // Reports the user has made
+const reportedData = ref(null) // The user has been reported
 const sentZapsData = ref(null)
 const receivedZapsData = ref(null)
 const zapGoalData = ref(null)
@@ -88,6 +89,13 @@ const tabInfo = ref({
   'live': {
     name: 'Live events'
   },
+  'pinstr-boards': {
+    name: 'Pinstr boards'
+  },
+  'pinstr-board': {
+    name: 'Pinstr board',
+    info: null
+  },
   'classifieds': {
     name: 'Classifieds'
   },
@@ -102,7 +110,7 @@ const tabInfo = ref({
 const activeTabId = ref(null)
 
 function selectTab(value, info) {
-  // console.log('selectTab', value, info)
+  console.log('selectTab', value, info)
   activeTabId.value = value
   if(tabInfo.value[value] && info) {
     tabInfo.value[value].info = info
@@ -336,47 +344,38 @@ function onLoadProfileEvent(data) {
 
     loading.value = false
   } else if(data.kind == 2) {
-    // Recommended relay
     handleLoadedRecommendedRelay(data)
   } else if(data.kind == 3) {
-    // Contact list
     handleLoadedContactList(data)
   } else if(data.kind == 1063) {
-    // A file
-    handleLoadedFileEvent(data)
+    storeEvent(fileData, data)
   } else if(data.kind == 1984) {
-    // A report
     handleLoadedReportEvent(data)
   } else if(data.kind == 1985) {
     storeEvent(labelData, data)
   } else if(data.kind == 9041) {
     storeEvent(zapGoalData, data)
   } else if(data.kind == 9735) {
-    // A zap
     handleLoadedZapEvent(data)
   } else if(data.kind == 10000) {
     // A list of muted people
-    handleListsEvent(data)
+    storeEvent(listsData, data)
   } else if(data.kind == 10001) {
     // A list of pinned notes
-    handleListsEvent(data)
+    storeEvent(listsData, data)
   } else if(data.kind == 10002) {
-    // Relays they read from and write to
     handleLoadedRelayList(data)
   } else if(data.kind == 30000) {
     // A list of categorized people
-    handleListsEvent(data)
+    storeEvent(listsData, data)
   } else if(data.kind == 30001) {
     // A list of categorized bookmarks
-    handleListsEvent(data)
+    storeEvent(listsData, data)
   } else if(data.kind == 30008) {
-    // A badge
-    handleLoadedBadgeEvent(data)
+    storeEvent(badgeData, data)
   } else if(data.kind == 30017) {
-    // A stall
     handleLoadedStallEvent(data)
   } else if(data.kind == 30018) {
-    // A product
     handleLoadedProductEvent(data)
   } else if(data.kind == 30311) {
     storeEvent(liveData, data)
@@ -389,8 +388,7 @@ function onLoadProfileEvent(data) {
   } else if(data.kind == 31923) {
     storeEvent(eventsData, data)
   } else if(data.kind == 31989) {
-    // A handler
-    handleLoadedHandlerEvent(data)
+    storeEvent(handlerData, data)
   } else if(data.kind == 33889) {
     storeEvent(pinstrData, data)
   }
@@ -404,10 +402,11 @@ function onLoadProfileEvent(data) {
   }
 
   profileDataStats.value.count++
-  if(!profileDataStats.value.relays[data.relay]) {
-    profileDataStats.value.relays[data.relay] = 0 
+  const relays = profileDataStats.value.relays
+  if(!relays[data.relay]) {
+    relays[data.relay] = 0 
   } else {
-    profileDataStats.value.relays[data.relay]++
+    relays[data.relay]++
   }
 }
 
@@ -442,14 +441,6 @@ function handleLoadedRecommendedRelay(data) {
   relayData.value.push(relayId)
 }
 
-function handleListsEvent(data) {
-  storeEvent(listsData, data)
-}
-
-function handleLoadedBadgeEvent(data) {
-  storeEvent(badgeData, data)
-}
-
 function handleLoadedRelayList(data) {
   // console.log('handleLoadedRelayList', data)
 
@@ -478,15 +469,13 @@ function handleLoadedRelayList(data) {
 }
 
 function handleLoadedReportEvent(data) {
-  storeEvent(reportsData, data)
-}
-
-function handleLoadedFileEvent(data) {
-  storeEvent(fileData, data)
-}
-
-function handleLoadedHandlerEvent(data) {
-  storeEvent(handlerData, data)
+  if(data.pubkey == publicKey.value) {
+    // User made a report
+    storeEvent(reportsData, data)
+  } else {
+    // User got reported
+    storeEvent(reportedData, data)
+  }
 }
 
 function storeEvent(location, data) {
@@ -662,6 +651,7 @@ function reset() {
   nip05Data = null
   publicKey.value = null
   reportsData.value = null
+  reportedData.value = null
   sentZapsData.value = null
   receivedZapsData.value = null
   badgeData.value = null
@@ -802,6 +792,11 @@ onMounted(() => {
                 :count="listsData ? listsData.length : null"
                 @navigate="selectTab"
               />
+              <ProfilePinstrSummary
+                :info="pinstrData"
+                :count="pinstrData ? pinstrData.length : null"
+                @navigate="selectTab"
+              />
               <ProfileFileSummary
                 :info="fileData"
                 :count="fileData ? fileData.length : null"
@@ -904,6 +899,17 @@ onMounted(() => {
               :info="classifiedsData"
               @back="selectTab"
             />
+            <ProfilePinstrBoardsTab 
+              v-if="activeTabId == 'pinstr-boards'"
+              :info="pinstrData"
+              @navigate="selectTab"
+              @back="selectTab"
+            />
+            <ProfilePinstrBoardTab 
+              v-if="activeTabId == 'pinstr-board'"
+              :info="tabInfo['pinstr-board'].info" 
+              @back="selectTab"
+            />
             <ProfileTipsTab
               v-if="activeTabId == 'tips'"
               :profileData="profileData"
@@ -948,6 +954,7 @@ onMounted(() => {
       :zapGoalData="zapGoalData"
       :userStatusData="userStatusData"
       :reportsData="reportsData"
+      :reportedData="reportedData"
       :fileData="fileData"
       :liveData="liveData"
       :eventsData="eventsData"
