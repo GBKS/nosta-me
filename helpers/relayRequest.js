@@ -64,7 +64,9 @@ export default function relayRequest () {
 
       const relay = this.relayStore.getRelay(this.relayId)
       const connection = this.relayStore.getRelayConnection(this.relayId)
-      // console.log('relay', relay)
+      if(this.log) {
+        console.log('relay', relay, connection)
+      }
 
       if(relay.status == 'connected') {
         if(connection) {

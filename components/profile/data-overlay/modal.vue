@@ -23,6 +23,7 @@ const props = defineProps([
   'fileData',
   'liveData',
   'eventsData',
+  'calendarData',
   'classifiedsData',
   'zapGoalData',
   'userStatusData',
@@ -126,6 +127,11 @@ const navOptions = computed(() => {
       id: 'events',
       name: 'Events',
       count: props.eventsData ? props.eventsData.length : 0 
+    },
+    {
+      id: 'calendars',
+      name: 'Calendars',
+      count: props.calendarData ? props.calendarData.length : 0 
     },
     {
       id: 'classifieds',
@@ -263,6 +269,11 @@ function close() {
           <ProfileDataOverlayEvents
             v-if="activeNavOptionId == 'events'"
             :info="eventsData"
+          />
+
+          <ProfileDataOverlayCalendars
+            v-if="activeNavOptionId == 'calendars'"
+            :info="calendarData"
           />
 
           <ProfileDataOverlayClassifieds

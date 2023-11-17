@@ -110,9 +110,9 @@ const titleCopy = computed(() => {
 
   if(zapCount.value > 0) {
     if(props.direction == 'sent') {
-      result = 'Sent ' + zapCount.value + ' zap' + (zapCount.value == 1 ? '' : 's')
+      result = 'Sent ' + zapCount.value + ' zap' + (zapCount.value == 1 ? '' : 's recently')
     } else {
-      result = 'Received ' + zapCount.value + ' zap' + (zapCount.value == 1 ? '' : 's')
+      result = 'Received ' + zapCount.value + ' zap' + (zapCount.value == 1 ? '' : 's recently')
     }
   }
 

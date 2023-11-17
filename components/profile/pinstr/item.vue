@@ -79,10 +79,11 @@ function navigate() {
 </script>
 
 <template>
-  <div
+  <a
     :class="classObject"
-    role="button"
-    @click="navigate"
+    :href="link"
+    rel="nofollow noopener noreferrer"
+    target="_blank"
   >
     <UiImage
       :src="image[1]"
@@ -90,7 +91,7 @@ function navigate() {
     <h5 v-if="title">{{ title }}</h5>
     <p v-if="description">{{ description }}</p>
     <p v-if="meta">{{ meta }}</p>
-  </div>
+  </a>
 </template>
 
 <style scoped lang="scss">

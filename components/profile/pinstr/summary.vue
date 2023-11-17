@@ -24,11 +24,7 @@ const titleCopy = computed(() => {
 })
 
 function navigate() {
-  emit('navigate', 'pinstr-boards')
-}
-
-function navigateToBoard(info) {
-  emit('navigate', 'pinstr-board', info)
+  emit('navigate', 'pinstr')
 }
 </script>
 
@@ -40,10 +36,9 @@ function navigateToBoard(info) {
         :clickable="true"
         @select="navigate"
       />
-      <ProfilePinstrBoardList
+      <ProfilePinstrList
         class="items"
         :info="visibleItems"
-        @select="navigateToBoard"
       />
     </div>
   </Transition>

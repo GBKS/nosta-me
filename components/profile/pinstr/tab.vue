@@ -29,10 +29,6 @@ const itemCount = computed(() => {
 const title = computed(() => {
   return itemCount.value + ' board' + (itemCount.value == 1 ? '' : 's')
 })
-
-function navigate(info) {
-  emit('navigate', 'pinstr-board', info)
-}
 </script>
 
 <template>
@@ -40,10 +36,9 @@ function navigate(info) {
     <div v-if="info" class="pinstr-boards-tab">
       <ProfileSectionBack @select="$emit('back')" />
       <ProfileSectionTitle :title="title" />
-      <ProfilePinstrBoardList
+      <ProfilePinstrList
         class="items"
         :info="filteredBoards" 
-        @select="navigate"
       />
     </div>
   </Transition>

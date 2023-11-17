@@ -114,6 +114,14 @@ export default {
       })
     }
 
+    if(!data.pinstr || data.pinstr.length == 0) {
+      result.push({
+        title: 'Gather inspiration',
+        description: 'Create image, video, text and other boards full of ideas.',
+        kind: 33889
+      })
+    }
+
     if(!data.files || data.files.length == 0) {
       result.push({
         title: 'Share files',

@@ -25,7 +25,6 @@ const reportsData = ref(null) // Reports the user has made
 const reportedData = ref(null) // The user has been reported
 const shortNotesData = ref(null)
 const longNotesData = ref(null)
-const reportsData = ref(null)
 const sentZapsData = ref(null)
 const receivedZapsData = ref(null)
 const zapGoalData = ref(null)
@@ -69,7 +68,7 @@ const tabInfo = ref({
   'calendars': { name: 'Calendars', info: null },
   'events': { name: 'Events', info: null },
   'tips': { name: 'Tips' },
-  'pinstr-boards': { name: 'Tips' }
+  'pinstr': { name: 'Pinstr' }
 })
 
 function selectTab(value, info) {
@@ -916,15 +915,9 @@ onMounted(() => {
               :handlers="handlerData"
               @back="selectTab"
             />
-            <ProfilePinstrBoardsTab 
-              v-if="activeTabId == 'pinstr-boards'"
+            <ProfilePinstrTab 
+              v-if="activeTabId == 'pinstr'"
               :info="pinstrData"
-              @navigate="selectTab"
-              @back="selectTab"
-            />
-            <ProfilePinstrBoardTab 
-              v-if="activeTabId == 'pinstr-board'"
-              :info="tabInfo['pinstr-board'].info" 
               @back="selectTab"
             />
             <ProfileTipsTab
@@ -950,6 +943,7 @@ onMounted(() => {
               :calendarData="calendarData"
               :labelData="labelData"
               :classifiedsData="classifiedsData"
+              :pinstrData="pinstrData"
               @back="selectTab"
             />
           </div>
@@ -1011,6 +1005,7 @@ onMounted(() => {
       :calendarData="calendarData"
       :labelData="labelData"
       :classifiedsData="classifiedsData"
+      :pinstrData="pinstrData"
       @navigate="selectTab"
     />
   </div>

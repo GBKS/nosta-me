@@ -17,7 +17,7 @@ function navigate(info) {
 
 <template>
   <div v-if="info" class="pinstr-board-list">
-    <ProfilePinstrBoard
+    <ProfilePinstrItem
       v-for="(item, index) in info"
       :key="item.id"
       :info="item"
