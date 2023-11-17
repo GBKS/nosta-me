@@ -82,7 +82,7 @@ const classObject = computed(() => {
     target="_blank"
     rel="nofollow noopener noreferrer"
   >
-    <div class="image-wrap">
+    <div class="image-wrap" v-if="banner">
       <UiImage
         :src="banner"
         class="-banner"
@@ -90,6 +90,7 @@ const classObject = computed(() => {
         height="200"
       />
       <UiImage
+        v-if="image"
         :src="image"
         class="-image"
         radius="30"
@@ -97,6 +98,13 @@ const classObject = computed(() => {
         height="60"
       />
     </div>
+    <UiImage
+      v-if="image && !banner"
+      class="-image"
+      radius="30"
+      width="60"
+      height="60"
+    />
     <h5 v-if="title">{{ title }}</h5>
     <p v-if="summary" class="-summary">{{ summary }}</p>
     <p v-if="eventCountText" class="-count">{{ eventCountText }}</p>

@@ -24,6 +24,7 @@ const props = defineProps([
   'zapGoalData',
   'userStatusData',
   'labelData',
+  'pinstrData'
 ])
 
 const emit = defineEmits(['navigate'])
@@ -50,7 +51,8 @@ const tipList = computed(() => {
     classifieds: props.classifiedsData,
     zapGoals: props.zapGoalData,
     userStatuses: props.userStatusData,
-    labels: props.labelData
+    labels: props.labelData,
+    pinstr: props.pinstrData
   })
 })
 

@@ -14,6 +14,12 @@ import contactsService from '@/helpers/contactsService.js'
 Provides data to the profile page.
 Main job is to check various relays for info on public keys.
 
+TODO: Pinstr
+Messy here is the Pinstr integration. pinstr.app only looks at nos.lol right now.
+Since we want to link out to that site, we can only recognize board events from the
+nos.lol relay. So we set up a separate relay request for that. This needs to change
+in the future. It's on the Pinstr dev to-do list.
+
  */
 
 export default {
@@ -23,6 +29,7 @@ export default {
   relaysToCheck: null, // Array of relayIds
   currentRelay: null, // Numerical index of relaysToCheck
   service: null,
+  pinstrService: null,
   loadCallback: null,
   endCallback: null,
   internalEndCallback: null,
@@ -51,10 +58,23 @@ export default {
 
     this.currentRelay = 0
 
-    this.checkCurrentRelay()
+    // Check if our list of relays already includes nos.lol for Pinstr events
+    let includePinstr = false
+    for(let i=0; i<this.relaysToCheck.length; i++) {
+      if(this.relaysToCheck[i] == 'nos-lol') {
+        includePinstr = true
+        break
+      }
+    }
+
+    this.checkCurrentRelay(includePinstr)
+
+    if(!includePinstr) {
+      this.checkPinstr()
+    }
   },
 
-  checkCurrentRelay() {
+  checkCurrentRelay(includePinstr) {
     if(this.searchType == 'relays-known') {
       this.service = multiRelayRequest()
     } else {
@@ -69,31 +89,37 @@ export default {
       console.log('profileService.checkCurrentRelay', this.searchType, this.publicKey, this.relaysToCheck)
     }
 
+    const createdContentKinds = [
+      1984, // Reports
+      9041, // Zap goals
+      10000, // Mute list
+      10001, // Pin list
+      30000, // Categorized people
+      30001, // Categorized bookmarks
+      30008, // Badges
+      30017, // Stall
+      30018, // Product
+      1063, // Files
+      30311, // Live activities
+      30402, // Classified
+      31337, // Zapstr tracks
+      31922, // Calendar events
+      31923, // Calendar events
+      31924, // Calendar
+      31989, // Handler recommendation
+      31990, // Handler information
+    ]
+
+    // If it's nos.lol, also check for Pinstr boards
+    if(includePinstr) {
+      createdContentKinds.push(33889)
+    }
+
     const createdContentFilter = {
-      kinds: [
-        1984, // Reports
-        1985, // Labels
-        9041, // Zap goals
-        10000, // Mute list
-        10001, // Pin list
-        30000, // Categorized people
-        30001, // Categorized bookmarks
-        30008, // Badges
-        30017, // Stall
-        30018, // Product
-        1063, // Files
-        30311, // Live activities
-        30402, // Classified
-        31337, // Zapstr tracks
-        31922, // Calendar events
-        31923, // Calendar events
-        31924, // Calendar
-        31989, // Handler recommendation
-        31990, // Handler information
-      ],
+      kinds: createdContentKinds,
       authors: [this.publicKey]
     }
-        // 33889, // Pinstr board
+        // 1985, // Labels
         // 30009, // Badge definition
         // 8, // Badge award
         // 9802, // Highlights
@@ -140,16 +166,22 @@ export default {
       limit: 1,
     }
 
+    // Zaps only in last 30 days, otherwise they slow down things
+    // TODO: Need to update the profile page copy to reflect that
+    const oneMonthAgo = new Date()
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
     const sentZapsFilter = {
       kinds: [9735],
       authors: [this.publicKey],
       limit: 100,
+      since: Math.round(oneMonthAgo / 1000)
     }
 
     const receivedZapsFilter = {
       kinds: [9735],
       '#p': [this.publicKey],
-      limit: 100
+      limit: 100,
+      since: Math.round(oneMonthAgo / 1000)
     }
 
     this.service.start(this.relaysToCheck, [
@@ -164,6 +196,24 @@ export default {
       sentZapsFilter,
       receivedZapsFilter
     ])
+  },
+
+  checkPinstr() {
+    // Check nos.lol for Pinstr boards if this relay is not already in the list
+    const filter = {
+      kinds: [33889],
+      authors: [this.publicKey],
+      limit: 50
+    }
+
+    const url = 'wss://nos.lol/'
+    const relayId = relayManager.addRelayByUrl(url)
+
+    console.log('checkPinstr', relayId, filter)
+
+    this.pinstrService = relayRequest()
+    this.pinstrService.init(this.loadCallback, true)
+    this.pinstrService.start(relayId, [filter])
   },
 
   onEvent(data) {
@@ -218,11 +268,11 @@ export default {
     } else if(data.kind == 30311) {
       // console.log('!!! Seeing a live activity', data)
     } else if(data.kind == 30315) {
-      console.log('!!! Seeing a user status', data)
+      // console.log('!!! Seeing a user status', data)
     } else if(data.kind == 30402) {
-      console.log('!!! Seeing a classified', data)
+      // console.log('!!! Seeing a classified', data)
     } else if(data.kind == 31337) {
-      console.log('!!! Seeing a Zapstr track', data)
+      // console.log('!!! Seeing a Zapstr track', data)
     } else if(data.kind == 31922) {
       // console.log('!!! Seeing a calendar event', data)
     } else if(data.kind == 31923) {
@@ -234,7 +284,7 @@ export default {
     } else if(data.kind == 31990) {
       // console.log('!!! Seeing a handler information', data)
     } else if(data.kind == 33889) {
-      console.log('!!! Seeing a Pinstr board', data)
+      // console.log('!!! Seeing a Pinstr board', data)
     } else if(data.type == 'end') {
       // this.checkNextRelay()
     }
@@ -266,6 +316,11 @@ export default {
     if(this.service) {
       this.service.kill()
       this.service = null
+    }
+
+    if(this.pinstrService) {
+      this.pinstrService.kill()
+      this.pinstrService = null
     }
 
     if(this.contactsService) {

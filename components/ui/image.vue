@@ -102,7 +102,7 @@ const message = computed(() => {
   }
 
   p {
-
+    color: rgba(var(--theme-front-rgb), 0.5);
   }
 
   &.-shadow {

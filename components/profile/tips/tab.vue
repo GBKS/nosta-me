@@ -22,6 +22,7 @@ const props = defineProps([
   'zapGoalData',
   'userStatusData',
   'labelData',
+  'pinstrData'
 ])
 
 const emit = defineEmits(['back'])
@@ -47,7 +48,8 @@ const tipList = computed(() => {
     classifieds: props.classifiedsData,
     zapGoals: props.zapGoalData,
     userStatuses: props.userStatusData,
-    labels: props.labelData
+    labels: props.labelData,
+    pinstr: props.pinstrData
   })
 })
 

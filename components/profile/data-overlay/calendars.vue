@@ -14,10 +14,10 @@ const sortedInfo = computed(() => {
 
 <template>
   <div class="profile-data-overlay-events">
-    <h3>Events</h3>
-    <p>Information about events (<a href="https://github.com/nostr-protocol/nips/blob/master/52.md" target="_blank" rel="nofollow noopener noreferrer">NIP 52</a>).</p>
+    <h3>Calendars</h3>
+    <p>Events, organized (<a href="https://github.com/nostr-protocol/nips/blob/master/52.md" target="_blank" rel="nofollow noopener noreferrer">NIP 52</a>).</p>
     <ProfileDataOverlayEventBrowser v-if="info" :events="sortedInfo" />
-    <p v-if="!info">No events found on this profile.</p>
+    <p v-if="!info">No calendars found on this profile.</p>
   </div>
 </template>
 
