@@ -4,54 +4,37 @@ import Icons from '@/helpers/icons'
 const props = defineProps([
   'info',
   'count',
-  'baseUrl'
+  'handlers'
 ])
 
+const emit = defineEmits(['navigate'])
+
+const contentTags = ['p', 't', 'word', 'e', 'a', 'r', 'relay', 'emoji']
+
+// At least one valid content tag
 const filledLists = computed(() => {
-  let result
+  let result = null
 
-  if(props.info){
-    let i=0, list
-    for(; i<props.info.length; i++) {
-      list = props.info[i]
-      if(list.tags.length > 1) {
-        if(!result) result = []
-        result.push(list)
-      }
-    }
+  if(props.info) {
+    const contentTags = ['p', 't', 'word', 'e', 'a', 'r', 'relay', 'emoji']
+
+    return props.info.filter((item) => {
+      const tags = item.tags.filter(tag => contentTags.indexOf(tag[0]) !== -1)
+      return tags.length > 0
+    })
   }
 
   return result
 })
 
-const emptyLists = computed(() => {
-  let result
-
-  if(props.info){
-    let i=0, list
-    for(; i<props.info.length; i++) {
-      list = props.info[i]
-      if(list.tags.length >= 1) {
-        if(!result) result = []
-        result.push(list)
-      }
-    }
-  }
-
-  return result
-})
-
+// Filled, recently changed
 const visibleLists =  computed(() => {
   let result
 
   if(filledLists.value && filledLists.value.length > 0) {
     const sortedLists = filledLists.value.sort(function(a, b) {
-      const aCount = a.tags.length
-      const bCount = b.tags.length
-
-      if(aCount > bCount) return -1
-      if(aCount < bCount) return 1
-      return 0
+      if(a.created_at > b.created_at) return -1
+      if(a.created_at < b.created_at) return 1
     })
 
     result = sortedLists.slice(0, 3)
@@ -60,16 +43,12 @@ const visibleLists =  computed(() => {
   return result
 })
 
-const detailUrl = computed(() => {
-  return props.baseUrl + '/lists'
-})
-
 const filledListCount = computed(() => {
   return filledLists.value ? filledLists.value.length : 0
 })
 
 const emptyListCount = computed(() => {
-  return emptyLists.value ? emptyLists.value.length : 0
+  return props.info.length - filledListCount.value
 })
 
 const emptyListText = computed(() => {
@@ -96,35 +75,26 @@ const titleCopy = computed(() => {
   return result
 })
 
-const emit = defineEmits(['navigate'])
-
 function navigate() {
   emit('navigate', 'lists')
-}
-
-function selectList(info) {
-  emit('navigate', 'list', info)
 }
 </script>
 
 <template>
   <Transition name="fade" appear>
-    <div v-if="count > 0" class="lists-summary">
+    <div v-if="filledLists && filledLists.length > 0" class="lists-summary">
       <ProfileSectionTitle
         :title="titleCopy"
         :clickable="true"
         @select="navigate"
       />
       <p v-if="emptyListCount > 0">{{ emptyListText }}</p>
-      <div class="lists">
-        <ProfileListsItem
-          v-for="(item, index) in visibleLists"
-          :key="item.id"
-          :info="item"
-          layout="box"
-          @select="selectList"
-        />
-      </div>
+      <ProfileListsList
+        class="items"
+        :info="visibleLists"
+        :handlers="handlers"
+        layout="box"
+      />
     </div>
   </Transition>
 </template>
@@ -139,25 +109,8 @@ function selectList(info) {
     color: rgba(var(--theme-front-rgb), 0.75);
   }
 
-  .lists {
+  .items {
     margin-top: 10px;
-    display: flex;
-    @include r('gap', 10, 25);
-
-    > * {
-      flex-basis: 26%;
-      flex-grow: 1;
-    }
-  }
-
-  @include media-query(small) {
-    .lists {
-      flex-direction: column;
-    }
-  }
-
-  @include media-query(medium-up) {
-    
   }
 }
 

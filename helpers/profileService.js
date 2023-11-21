@@ -92,10 +92,24 @@ export default {
     const createdContentKinds = [
       1984, // Reports
       9041, // Zap goals
-      10000, // Mute list
-      10001, // Pin list
-      30000, // Categorized people
-      30001, // Categorized bookmarks
+
+      10000, // Mute list (NIP 51)
+      10001, // Pinned notes list (NIP 51)
+      10003, // Bookmarks list (NIP 51)
+      10004, // Communities list (NIP 51)
+      10005, // Public chats list (NIP 51)
+      10006, // Blocked relays list (NIP 51)
+      10007, // Search relays list (NIP 51)
+      10015, // Interests list (NIP 51)
+      10030, // Emoji list (NIP 51)
+      30000, // Follow sets (NIP 51)
+      // 30001, // Pin/bookmark/communities lists - deprecated (NIP 51)
+      30002, // Relay sets (NIP 51)
+      30003, // Bookmark sets (NIP 51)
+      30004, // Curation sets (NIP 51)
+      30015, // Interest sets (NIP 51)
+      30030, // Emoji sets (NIP 51)
+
       30008, // Badges
       30017, // Stall
       30018, // Product

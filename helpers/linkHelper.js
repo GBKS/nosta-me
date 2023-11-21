@@ -55,7 +55,11 @@ export default {
     stream: 'https://zap.stream/<bech32>'
   },
 
-  address(eventId, authorPubkey, eventKind, eventRelay, handlers, fallbackUrl) {
+  listr: {
+    list: 'https://listr.lol/{npub}/{kind}/<bech32>'
+  },
+
+  address(eventId, authorPubkey, eventKind, eventRelay, handlers, fallbackUrl, npub) {
     const platform = 'web'
     const linkType = 'naddr'
 
@@ -75,7 +79,11 @@ export default {
     if(this.log) console.log('handlerUrl', handlerUrl)
     if(this.log) console.log('url', url)
 
-    return url
+    let result = url
+    if(npub) result = result.split('{npub}').join(npub)
+    result = result.split('{kind}').join(eventKind)
+
+    return result
   },
 
   event(eventId, eventRelay, eventKind, handlers, fallbackUrl) {

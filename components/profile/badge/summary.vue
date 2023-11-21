@@ -55,6 +55,11 @@ function navigate() {
     margin-top: 25px;
     display: flex;
     @include r('gap', 10, 25);
+
+    > * {
+      flex-basis: 26%;
+      flex-grow: 1;
+    }
   }
 }
 
