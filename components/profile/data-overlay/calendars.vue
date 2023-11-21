@@ -13,7 +13,7 @@ const sortedInfo = computed(() => {
 </script>
 
 <template>
-  <div class="profile-data-overlay-events">
+  <div class="profile-data-overlay-calendars">
     <h3>Calendars</h3>
     <p>Events, organized (<a href="https://github.com/nostr-protocol/nips/blob/master/52.md" target="_blank" rel="nofollow noopener noreferrer">NIP 52</a>).</p>
     <ProfileDataOverlayEventBrowser v-if="info" :events="sortedInfo" />
@@ -23,7 +23,7 @@ const sortedInfo = computed(() => {
 
 <style scoped lang="scss">
 
-.profile-data-overlay-events {
+.profile-data-overlay-calendars {
   display: flex;
   flex-direction: column;
   min-width: 0; // CSS fix for pre tag
