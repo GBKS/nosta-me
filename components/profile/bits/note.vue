@@ -54,6 +54,8 @@ const ContentNode = () => {
         children.push(turnVideoToNode(token.v, 'mp4'))
       } else if(token.v.indexOf('youtube.com/watch?') !== -1) {
         children.push(turnYoutubeToNode(token.v))
+      } else if(token.v.indexOf('wavlake.com/track') !== -1) {
+        children.push(turnWavlakeToNode(token.v))
       } else {
         children.push(turnUrlToNode(token.v))
       }
@@ -213,6 +215,27 @@ function turnYoutubeToNode(text) {
   }
 }
 
+function turnWavlakeToNode(text) {
+  // https://wavlake.com/track/3cba9d6f-aa91-47ac-81f0-79245a4f7e62
+  // https://embed.wavlake.com/track/a33b5fdb-60a2-4e7e-a4d8-8f08bbd1f2fc
+  const urlObject = new URL(text)
+  const path = urlObject.pathname.split('/')
+  const trackIndex = path.indexOf('track')
+
+  if(trackIndex !== -1 && trackIndex < (path.length)-1) {
+    const trackId = path[trackIndex+1]
+    const url = 'https://embed.wavlake.com/track/' + trackId
+
+    return h('iframe', { 
+        src: url,
+        class: 'wavlake'
+      }
+    )
+  } else {
+    return turnUrlToNode(text)
+  }
+}
+
 function findUrlMeta(url) {
   let result = null
 
@@ -313,6 +336,7 @@ function findUrlMeta(url) {
   :deep(.-video) {
     position: relative;
     display: block;
+    margin-top: 5px;
 
     img {
       width: 100%;
@@ -346,6 +370,19 @@ function findUrlMeta(url) {
       span {
         transform: translate(-50%, -50%) scale(1.15);
       }
+    }
+  }
+
+  :deep(.wavlake) {
+    margin-top: 5px;
+    border-width: 0;
+    width: 100%;
+    height: 334px;
+  }
+
+  @include media-query(small) {
+    :deep(.wavlake) {
+      height: 380px;
     }
   }
 }

@@ -57,7 +57,6 @@ const tabInfo = ref({
   'zaps-received': { name: 'Zaps received' },
   'files': { name: 'Files' },
   'lists': { name: 'Lists' },
-  'list': { name: 'List', info: null },
   'stalls': { name: 'Stalls' },
   'stall': { name: 'Stall', info: null },
   'handlers': { name: 'Handlers' },
@@ -72,7 +71,7 @@ const tabInfo = ref({
 })
 
 function selectTab(value, info) {
-  console.log('selectTab', value, info)
+  // console.log('selectTab', value, info)
   activeTabId.value = value
   if(tabInfo.value[value] && info) {
     tabInfo.value[value].info = info
@@ -299,67 +298,93 @@ function loadPublicKey(newPublicKey, relayIds) {
 function onLoadProfileEvent(data) {
   // console.log('onLoadProfile', data.kind, data)
 
-  if(data.kind === 0) {
-    status.value = {state: 'loaded', event: data}
-
-    // Profile info
-    saveProfileInfo(data)
-
-    loading.value = false
-  } else if(data.kind == 1) {
-    storeEvent(shortNotesData, data)
-  } else if(data.kind == 2) {
-    handleLoadedRecommendedRelay(data)
-  } else if(data.kind == 3) {
-    handleLoadedContactList(data)
-  } else if(data.kind == 1063) {
-    storeEvent(fileData, data)
-  } else if(data.kind == 1984) {
-    handleLoadedReportEvent(data)
-  } else if(data.kind == 1985) {
-    storeEvent(labelData, data)
-  } else if(data.kind == 9041) {
-    storeEvent(zapGoalData, data)
-  } else if(data.kind == 9735) {
-    handleLoadedZapEvent(data)
-  } else if(data.kind == 10000) {
-    // A list of muted people
-    storeEvent(listsData, data)
-  } else if(data.kind == 10001) {
-    // A list of pinned notes
-    storeEvent(listsData, data)
-  } else if(data.kind == 10002) {
-    handleLoadedRelayList(data)
-  } else if(data.kind == 30000) {
-    // A list of categorized people
-    storeEvent(listsData, data)
-  } else if(data.kind == 30001) {
-    // A list of categorized bookmarks
-    storeEvent(listsData, data)
-  } else if(data.kind == 30008) {
-    storeEvent(badgeData, data)
-  } else if(data.kind == 30017) {
-    handleLoadedStallEvent(data)
-  } else if(data.kind == 30018) {
-    handleLoadedProductEvent(data)
-  } else if(data.kind == 30023) {
-    storeEvent(longNotesData, data)
-  } else if(data.kind == 30311) {
-    storeEvent(liveData, data)
-  } else if(data.kind == 30315) {
-    storeEvent(userStatusData, data)
-  } else if(data.kind == 30402) {
-    storeEvent(classifiedsData, data)
-  } else if(data.kind == 31922) {
-    storeEvent(eventsData, data)
-  } else if(data.kind == 31923) {
-    storeEvent(eventsData, data)
-  } else if(data.kind == 31924) {
-    storeEvent(calendarData, data)
-  } else if(data.kind == 31989) {
-    storeEvent(handlerData, data)
-  } else if(data.kind == 33889) {
-    storeEvent(pinstrData, data)
+  switch(data.kind) {
+    case 0:
+      // Profile info
+      status.value = {state: 'loaded', event: data}
+      saveProfileInfo(data)
+      loading.value = false
+      break
+    case 1:
+      storeEvent(shortNotesData, data)
+      break
+    case 2:
+      handleLoadedRecommendedRelay(data)
+      break
+    case 3:
+      handleLoadedContactList(data)
+      break
+    case 1063:
+      storeEvent(fileData, data)
+      break
+    case 1984:
+      handleLoadedReportEvent(data)
+      break
+    case 1985:
+      storeEvent(labelData, data)
+      break
+    case 9041:
+      storeEvent(zapGoalData, data)
+      break
+    case 9735:
+      handleLoadedZapEvent(data)
+      break
+    case 10000:
+    case 10001:
+    case 10003:
+    case 10004:
+    case 10005:
+    case 10006:
+    case 10007:
+    case 10015:
+    case 10030:
+    case 30000:
+    case 30002:
+    case 30003:
+    case 30004:
+    case 30015:
+    case 30030: 
+      storeEvent(listsData, data)
+      break
+    case 10002:
+      handleLoadedRelayList(data)
+      break
+    case 30008:
+      storeEvent(badgeData, data)
+      break
+    case 30017:
+      handleLoadedStallEvent(data)
+      break
+    case 30018:
+      handleLoadedProductEvent(data)
+      break
+    case 30023:
+      storeEvent(longNotesData, data)
+      break
+    case 30311:
+      storeEvent(liveData, data)
+      break
+    case 30315:
+      storeEvent(userStatusData, data)
+      break
+    case 30402:
+      storeEvent(classifiedsData, data)
+      break
+    case 31922:
+      storeEvent(eventsData, data)
+      break
+    case 31923:
+      storeEvent(eventsData, data)
+      break
+    case 31924:
+      storeEvent(calendarData, data)
+      break
+    case 31989:
+      storeEvent(handlerData, data)
+      break
+    case 33889:
+      storeEvent(pinstrData, data)
+      break
   }
 
   // Track event
@@ -791,6 +816,7 @@ onMounted(() => {
               <ProfileListsSummary
                 :info="listsData"
                 :count="listsData ? listsData.length : null"
+                :handlers="handlerData"
                 @navigate="selectTab"
               />
               <ProfilePinstrSummary
@@ -860,15 +886,10 @@ onMounted(() => {
               @navigate="selectTab"
               @back="selectTab"
             />
-            <ProfileListsList 
+            <ProfileListsTab 
               v-if="activeTabId == 'lists'" 
               :info="listsData" 
-              @navigate="selectTab"
-              @back="selectTab"
-            />
-            <ProfileListsListList 
-              v-if="activeTabId == 'list'" 
-              :info="tabInfo.list.info" 
+              :handlers="handlerData"
               @navigate="selectTab"
               @back="selectTab"
             />

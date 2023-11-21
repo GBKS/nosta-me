@@ -225,6 +225,7 @@ onMounted(() => {
     font-size: 17px;
     font-weight: 600;
     color: var(--theme-front);
+    text-align: center;
   }
 
   p {
@@ -232,6 +233,7 @@ onMounted(() => {
     font-size: 15px;
     color: var(--theme-front);
     opacity: 0.75;
+    text-align: center;
   }
 }
 
