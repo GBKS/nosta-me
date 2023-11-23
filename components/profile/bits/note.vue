@@ -283,7 +283,8 @@ function findUrlMeta(url) {
     overflow: hidden;
 
     p {
-      word-wrap: break-word;
+      // word-wrap: break-word;
+      word-break: break-word;
       color: var(--theme-text-medium);
       text-wrap: balance;
       text-overflow: ellipsis;

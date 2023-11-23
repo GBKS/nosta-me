@@ -16,20 +16,18 @@ const title = computed(() => {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div v-if="info" class="report-list">
-      <ProfileSectionBack @select="$emit('back')" />
-      <ProfileSectionTitle :title="title" />
-      <p v-if="false">Report are not checked by anyone, so make sure to see if these are valid.</p>
-      <div class="list">
-        <ProfileReportItem
-          v-for="(item, index) in info"
-          :key="item.id"
-          :info="item"
-        />
-      </div>
+  <div v-if="info" class="report-list">
+    <ProfileSectionBack @select="$emit('back')" />
+    <ProfileSectionTitle :title="title" />
+    <p v-if="false">Report are not checked by anyone, so make sure to see if these are valid.</p>
+    <div class="list">
+      <ProfileReportItem
+        v-for="(item, index) in info"
+        :key="item.id"
+        :info="item"
+      />
     </div>
-  </Transition>
+  </div>
 </template>
 
 <style scoped lang="scss">

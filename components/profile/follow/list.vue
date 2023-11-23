@@ -76,11 +76,11 @@ function setupUnloadedProfiles() {
       }
     }
   }
-  // console.log('unloadedProfiles', unloadedProfiles.value, loadedProfiles.value)
+  console.log('unloadedProfiles', unloadedProfiles.value, loadedProfiles.value)
 }
 
 function onLoadProfile(data) {
-  // console.log('onLoadProfile', data)
+  console.log('onLoadProfile', data)
 
   const index = unloadedProfiles.value.indexOf(data.pubkey)
   if(index !== -1) {
@@ -100,6 +100,8 @@ if(props.info) {
 onMounted(() => {
   // console.log('FollowList.onMounted', props.profileService)
 
+  props.profileService.loadContactList()
+
   if(props.info) {
     setupUnloadedProfiles()
   }
@@ -117,31 +119,29 @@ const showLoader = computed(() => {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div v-if="info && info.tags" class="follow-list">
-      <ProfileSectionBack @select="$emit('back')" />
-      <ProfileSectionTitle :title="title" />
-      <UiLoadIndicator
-        v-if="showLoader"
-      />
-      <template v-if="!showLoader">
-        <div class="items">
-          <ProfileFollowItem
-            v-for="(publicKey, index) in displayProfileList"
-            :key="publicKey"
-            :publicKey="publicKey"
-            :tag="profileTags[publicKey]"
-          />
-        </div>
-        <UiPagination
-          v-if="pageCount > 1"
-          :activeIndex="currentPage"
-          :max="pageCount"
-          @selectPage="selectPage"
+  <div v-if="info && info.tags" class="follow-list">
+    <ProfileSectionBack @select="$emit('back')" />
+    <ProfileSectionTitle :title="title" />
+    <UiLoadIndicator
+      v-if="showLoader"
+    />
+    <template v-if="!showLoader">
+      <div class="items">
+        <ProfileFollowItem
+          v-for="(publicKey, index) in displayProfileList"
+          :key="publicKey"
+          :publicKey="publicKey"
+          :tag="profileTags[publicKey]"
         />
-      </template>
-    </div>
-  </Transition>
+      </div>
+      <UiPagination
+        v-if="pageCount > 1"
+        :activeIndex="currentPage"
+        :max="pageCount"
+        @selectPage="selectPage"
+      />
+    </template>
+  </div>
 </template>
 
 <style scoped lang="scss">

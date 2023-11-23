@@ -115,9 +115,9 @@ const isOwner = computed(() => {
 const classObject = computed(() => {
   return [
     'profile-info',
-    props.hasBanner ? '-banner' : 'no-banner',
-    image.value ? '-image' : 'no-image',
-    hasName.value ? '-name' : 'no-name'
+    props.hasBanner ? '-banner' : '-no-banner',
+    image.value ? '-image' : '-no-image',
+    hasName.value ? '-name' : '-no-name'
   ].join(' ')
 })
 
@@ -305,7 +305,7 @@ function showDataOverlay() {
   &.-no-name {
     .text {
       h1 {
-        opacity: 0.5;
+        // opacity: 0.5;
       }
     }
   }
@@ -313,6 +313,12 @@ function showDataOverlay() {
   @include media-query(small) {
     &.-no-banner {
       flex-direction: column;
+
+      .text {
+        h1 {
+          
+        }
+      }
     }
   }
 

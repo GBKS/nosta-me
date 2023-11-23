@@ -137,35 +137,33 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div class="follow-item">
-      <NuxtLink :to="profileLink">
-        <template v-if="profileContent">
-          <div :class="imageClass">
-            <img 
-              v-if="image"
-              :src="image" 
-              :alt="name"
-              @load="onImageLoaded" 
-            />
-          </div>
-          <div class="text">
-            <h3>{{ name }}</h3>
-            <p>{{ description }}</p>
-          </div>
-        </template>
-        <template v-if="!profileContent">
-          <div :class="imageClass" />
-          <div class="text">
-            <p 
-              class="-key"
-              :title="publicKey"
-            >{{ formattedPublicKey }}</p>
-          </div>
-        </template>
-      </NuxtLink>
-    </div>
-  </Transition>
+  <div class="follow-item">
+    <NuxtLink :to="profileLink">
+      <template v-if="profileContent">
+        <div :class="imageClass">
+          <img 
+            v-if="image"
+            :src="image" 
+            :alt="name"
+            @load="onImageLoaded" 
+          />
+        </div>
+        <div class="text">
+          <h3>{{ name }}</h3>
+          <p>{{ description }}</p>
+        </div>
+      </template>
+      <template v-if="!profileContent">
+        <div :class="imageClass" />
+        <div class="text">
+          <p 
+            class="-key"
+            :title="publicKey"
+          >{{ formattedPublicKey }}</p>
+        </div>
+      </template>
+    </NuxtLink>
+  </div>
 </template>
 
 <style scoped lang="scss">
@@ -180,10 +178,10 @@ onBeforeUnmount(() => {
     width: 100%;
     border-radius: 10px;
     @include r('gap', 10, 20);
-    transition: all 150ms $ease;
+    // transition: all 150ms $ease;
 
     .image {
-      background-color: rgba(black, 0.2);
+      background-color: rgba(var(--theme-front-rgb), 0.2);
       flex-basis: 50px;
       flex-shrink: 0;
       width: 50px;
@@ -196,7 +194,7 @@ onBeforeUnmount(() => {
         height: 50px;
         border-radius: 100px;
         opacity: 0;
-        transition: opacity 250ms $ease;
+        // transition: opacity 150ms $ease;
       }
 
       &.-loaded {

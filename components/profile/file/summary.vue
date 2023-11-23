@@ -28,22 +28,20 @@ function navigate() {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div v-if="count > 0" class="file-summary">
-      <ProfileSectionTitle
-        :title="titleCopy"
-        :clickable="true"
-        @select="navigate"
+  <div v-if="count > 0" class="file-summary">
+    <ProfileSectionTitle
+      :title="titleCopy"
+      :clickable="true"
+      @select="navigate"
+    />
+    <div class="files">
+      <ProfileFileItem
+        v-for="(item, index) in visibleFiles"
+        :key="item.id"
+        :info="item"
       />
-      <div class="files">
-        <ProfileFileItem
-          v-for="(item, index) in visibleFiles"
-          :key="item.id"
-          :info="item"
-        />
-      </div>
     </div>
-  </Transition>
+  </div>
 </template>
 
 <style scoped lang="scss">

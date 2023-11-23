@@ -28,13 +28,15 @@ const loadTimerDone = ref(false)
 const userData = ref(null)
 
 function loadUserData() {
+  // console.log('loadUserData', props.relayIds)
+  
   const filter = {
     kinds: [0],
     authors: [props.publicKey],
     limit: 1
   }
 
-  const relayIds = props.relayIds || relayStore.getAll
+  const relayIds = props.relayIds || relayStore.getRelayIds
 
   loadTimer = setTimeout(onLoadTimer, 5000)
 
@@ -195,11 +197,11 @@ onBeforeUnmount(() => {
   text-decoration: none;
   font-weight: 600;
   opacity: 0.25;
-  transition: opacity 150ms $ease;
+  // transition: opacity 150ms $ease;
   pointer-events: none;
 
   .avatar {
-    transition: all 250ms $ease;
+    // transition: all 250ms $ease;
   }
 
   &.-horizontal {

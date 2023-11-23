@@ -98,6 +98,7 @@ const statusText = computed(() => {
         result = 'Could not connect'
         break
       case 'connection-error':
+      case undefined:
         result = 'Connection error'
         break
     }

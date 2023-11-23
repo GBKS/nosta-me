@@ -18,17 +18,15 @@ const title = computed(() => {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div v-if="info" class="classifieds-tab">
-      <ProfileSectionBack @select="$emit('back')" />
-      <ProfileSectionTitle :title="title" />
-      <ProfileClassifiedsList
-        class="items"
-        :info="info" 
-        :handlers="handlers"
-      />
-    </div>
-  </Transition>
+  <div v-if="info" class="classifieds-tab">
+    <ProfileSectionBack @select="$emit('back')" />
+    <ProfileSectionTitle :title="title" />
+    <ProfileClassifiedsList
+      class="items"
+      :info="info" 
+      :handlers="handlers"
+    />
+  </div>
 </template>
 
 <style scoped lang="scss">

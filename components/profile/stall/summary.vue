@@ -34,25 +34,23 @@ function navigateToStall(info) {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div v-if="count > 0" class="stall-summary">
-      <ProfileSectionTitle
-        :title="titleCopy"
-        :clickable="true"
-        @select="navigate"
+  <div v-if="count > 0" class="stall-summary">
+    <ProfileSectionTitle
+      :title="titleCopy"
+      :clickable="true"
+      @select="navigate"
+    />
+    <div class="stalls">
+      <ProfileStallItem
+        v-for="(item, index) in visibleStalls"
+        :key="item.id"
+        :info="item"
+        :products="products"
+        layout="box"
+        @select="navigateToStall"
       />
-      <div class="stalls">
-        <ProfileStallItem
-          v-for="(item, index) in visibleStalls"
-          :key="item.id"
-          :info="item"
-          :products="products"
-          layout="box"
-          @select="navigateToStall"
-        />
-      </div>
     </div>
-  </Transition>
+  </div>
 </template>
 
 <style scoped lang="scss">

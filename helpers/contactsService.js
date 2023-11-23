@@ -38,11 +38,15 @@ export default function contactsService () {
       // Connect to provided relays
       this.relayIds = []
       if(data.content.length > 0) {
-        const relays = JSON.parse(data.content)
-        let relayId
-        for(let relayUrl in relays) {
-          relayId = relayManager.addRelayByUrl(relayUrl)
-          this.relayIds.push(relayId)
+        try {
+          const relays = JSON.parse(data.content)
+          let relayId
+          for(let relayUrl in relays) {
+            relayId = relayManager.addRelayByUrl(relayUrl)
+            this.relayIds.push(relayId)
+          }
+        } catch(error) {
+
         }
       } else {
         // Check our default relays

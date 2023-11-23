@@ -17,20 +17,18 @@ const title = computed(() => {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div v-if="info" class="badge-list">
-      <ProfileSectionBack @select="$emit('back')" />
-      <ProfileSectionTitle :title="title" />
-      <div class="badges">
-        <ProfileBadgeItem
-          v-for="(item, index) in info"
-          :key="item.id"
-          :info="item"
-          :handlers="handlers"
-        />
-      </div>
+  <div v-if="info" class="badge-list">
+    <ProfileSectionBack @select="$emit('back')" />
+    <ProfileSectionTitle :title="title" />
+    <div class="badges">
+      <ProfileBadgeItem
+        v-for="(item, index) in info"
+        :key="item.id"
+        :info="item"
+        :handlers="handlers"
+      />
     </div>
-  </Transition>
+  </div>
 </template>
 
 <style scoped lang="scss">

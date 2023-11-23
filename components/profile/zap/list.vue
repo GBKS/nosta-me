@@ -50,27 +50,25 @@ const title = computed(() => {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div v-if="info" class="zap-list">
-      <ProfileSectionBack @select="$emit('back')" />
-      <ProfileSectionTitle :title="title" />
-      <p>Zaps are bitcoin payments to other Nostr users.</p>
-      <div class="list">
-        <ProfileZapItem
-          v-for="(item, index) in visibleZaps"
-          :key="item.id"
-          :info="item"
-          :direction="props.direction"
-        />
-      </div>
-      <UiPagination
-        v-if="pageCount > 1"
-        :activeIndex="currentPage"
-        :max="pageCount"
-        @selectPage="selectPage"
+  <div v-if="info" class="zap-list">
+    <ProfileSectionBack @select="$emit('back')" />
+    <ProfileSectionTitle :title="title" />
+    <p>Zaps are bitcoin payments to other Nostr users.</p>
+    <div class="list">
+      <ProfileZapItem
+        v-for="(item, index) in visibleZaps"
+        :key="item.id"
+        :info="item"
+        :direction="props.direction"
       />
     </div>
-  </Transition>
+    <UiPagination
+      v-if="pageCount > 1"
+      :activeIndex="currentPage"
+      :max="pageCount"
+      @selectPage="selectPage"
+    />
+  </div>
 </template>
 
 <style scoped lang="scss">

@@ -29,19 +29,17 @@ function navigate() {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div v-if="count > 0" class="pinstr-summary">
-      <ProfileSectionTitle
-        :title="titleCopy"
-        :clickable="true"
-        @select="navigate"
-      />
-      <ProfilePinstrList
-        class="items"
-        :info="visibleItems"
-      />
-    </div>
-  </Transition>
+  <div v-if="count > 0" class="pinstr-summary">
+    <ProfileSectionTitle
+      :title="titleCopy"
+      :clickable="true"
+      @select="navigate"
+    />
+    <ProfilePinstrList
+      class="items"
+      :info="visibleItems"
+    />
+  </div>
 </template>
 
 <style scoped lang="scss">

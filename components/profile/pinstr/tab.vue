@@ -32,16 +32,14 @@ const title = computed(() => {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div v-if="info" class="pinstr-boards-tab">
-      <ProfileSectionBack @select="$emit('back')" />
-      <ProfileSectionTitle :title="title" />
-      <ProfilePinstrList
-        class="items"
-        :info="filteredBoards" 
-      />
-    </div>
-  </Transition>
+  <div v-if="info" class="pinstr-boards-tab">
+    <ProfileSectionBack @select="$emit('back')" />
+    <ProfileSectionTitle :title="title" />
+    <ProfilePinstrList
+      class="items"
+      :info="filteredBoards" 
+    />
+  </div>
 </template>
 
 <style scoped lang="scss">

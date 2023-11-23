@@ -207,41 +207,39 @@ function navigate() {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div v-if="info" class="zap-summary">
-      <ProfileZapIcon :amount="zappedAmount" />
-      <div class="copy">
-        <ProfileSectionTitle
-          :title="titleCopy"
-          :clickable="true"
-          @select="navigate"
-        />
+  <div v-if="info" class="zap-summary">
+    <ProfileZapIcon :amount="zappedAmount" />
+    <div class="copy">
+      <ProfileSectionTitle
+        :title="titleCopy"
+        :clickable="true"
+        @select="navigate"
+      />
 
-        <p v-if="uniqueRecipientEventCount > 0">
-          <template v-if="direction == 'sent'">To </template> 
-          <template v-if="direction != 'sent'">From </template> 
-          <UiUsername
-            :publicKey="recipientOne.publicKey" 
-            :relayIds="recipientOne.relayIds"
-          />
-          <template v-if="uniqueRecipientEventCount == 2"> and </template>
-          <template v-if="uniqueRecipientEventCount > 2">, </template>
-          <UiUsername
-            v-if="uniqueRecipientEventCount > 1"
-            :publicKey="recipientTwo.publicKey" 
-            :relayIds="recipientTwo.relayIds"
-          />
-          <template v-if="uniqueRecipientEventCount > 3">, </template>
-          <UiUsername
-            v-if="uniqueRecipientEventCount > 2"
-            :publicKey="recipientThree.publicKey" 
-            :relayIds="recipientThree.relayIds"
-          />
-          <template v-if="uniqueRecipientEventCount > 4">, and others</template>.
-        </p>
-      </div>
+      <p v-if="uniqueRecipientEventCount > 0">
+        <template v-if="direction == 'sent'">To </template> 
+        <template v-if="direction != 'sent'">From </template> 
+        <UiUsername
+          :publicKey="recipientOne.publicKey" 
+          :relayIds="recipientOne.relayIds"
+        />
+        <template v-if="uniqueRecipientEventCount == 2"> and </template>
+        <template v-if="uniqueRecipientEventCount > 2">, </template>
+        <UiUsername
+          v-if="uniqueRecipientEventCount > 1"
+          :publicKey="recipientTwo.publicKey" 
+          :relayIds="recipientTwo.relayIds"
+        />
+        <template v-if="uniqueRecipientEventCount > 3">, </template>
+        <UiUsername
+          v-if="uniqueRecipientEventCount > 2"
+          :publicKey="recipientThree.publicKey" 
+          :relayIds="recipientThree.relayIds"
+        />
+        <template v-if="uniqueRecipientEventCount > 4">, and others</template>.
+      </p>
     </div>
-  </Transition>
+  </div>
 </template>
 
 <style scoped lang="scss">

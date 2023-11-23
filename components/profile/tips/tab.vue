@@ -63,17 +63,15 @@ const title = computed(() => {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div v-if="tipList" class="tips-tab">
-      <ProfileSectionBack @select="$emit('back')" />
-      <ProfileSectionTitle :title="title" />
-      <p>There's a lot you can do on Nostr. Click each tip to find apps that help you do those activities.</p>
-      <ProfileTipsList
-        class="items"
-        :info="tipList" 
-      />
-    </div>
-  </Transition>
+  <div v-if="tipList" class="tips-tab">
+    <ProfileSectionBack @select="$emit('back')" />
+    <ProfileSectionTitle :title="title" />
+    <p>There's a lot you can do on Nostr. Click each tip to find apps that help you do those activities.</p>
+    <ProfileTipsList
+      class="items"
+      :info="tipList" 
+    />
+  </div>
 </template>
 
 <style scoped lang="scss">

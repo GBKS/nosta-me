@@ -3,8 +3,7 @@ import relayManager from '@/helpers/relayManager.js'
 
 const props = defineProps([
   'info',
-  'count',
-  'baseUrl'
+  'count'
 ])
 
 const titleCopy = computed(() => {
@@ -40,7 +39,7 @@ const followerFive = computed(() => {
 function prepFollowerInfo(index) {
   let result
   let relayId
-  let relayIds
+  let relayIds = []
   let publicKey
   let tag
 
@@ -49,24 +48,50 @@ function prepFollowerInfo(index) {
     publicKey = tag[1]
   }
 
+  // console.log('prepFollowerInfo', index, tag, props.info.content)
+
   // Try to get relays
-  if(tag.length > 2) {
+  if(tag.length > 2 && tag[2] !== '') {
     // From the follow entry. Should be precise.
     relayId = relayManager.addRelayByUrl(tag[2])
-    relayIds = [relayId]
-  } else if(props.info.content.length > 0) {
-    // From the event content.
-    const relayData = JSON.parse(props.info.content)
-    relayIds = []
-    let relayUrl
-    for(relayUrl in relayData) {
-      relayId = relayManager.addRelayByUrl(relayUrl)
-      relayIds.push(relayId)
+    relayIds.push(relayId)
+  }
+  
+  if(props.info.content.length > 0) {
+    try {
+      // From the event content.
+      // Check first if we're already connected to some of the relays
+      const relayData = JSON.parse(props.info.content)
+      let relayUrl, isAdded
+      for(relayUrl in relayData) {
+        isAdded = relayManager.isAdded(relayUrl)
+        if(isAdded) {
+          relayIds.push(relayManager.addRelayByUrl(relayUrl))
+        }
+      }
+
+      const relaysToAdd = 3
+      if(relayIds.length < relaysToAdd) {
+        for(relayUrl in relayData) {
+          isAdded = relayManager.isAdded(relayUrl)
+
+          if(!isAdded)
+            relayId = relayManager.addRelayByUrl(relayUrl)
+            relayIds.push(relayId)
+
+            if(relayIds.length >= relaysToAdd) break
+        }
+      }
+    } catch(error) {
+
     }
   } else {
     // TODO: No relays provided, how do we fill this in?
   }
 
+  if(relayIds.length == 0) relayIds = null
+
+  // console.log('relayIds', relayIds)
   return  {
     publicKey,
     relayIds
@@ -88,88 +113,86 @@ function navigate() {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div v-if="count > 0" class="follow-summary">
-      <div :class="classObject">
+  <div v-if="count > 0" class="follow-summary">
+    <div :class="classObject">
+      <UiUsername
+        v-if="followerOne"
+        :key="followerOne.publicKey"
+        :publicKey="followerOne.publicKey" 
+        :relayIds="followerOne.relayIds"
+        hideName="true"
+        showAvatar="true"
+        avatarSize="huge"
+      />
+      <UiUsername
+        v-if="count > 1 && followerTwo"
+        :key="followerTwo.publicKey" 
+        :publicKey="followerTwo.publicKey" 
+        :relayIds="followerTwo.relayIds"
+        hideName="true"
+        showAvatar="true"
+        avatarSize="huge"
+      />
+      <UiUsername
+        v-if="count > 2 && followerThree"
+        :key="followerThree.publicKey"
+        :publicKey="followerThree.publicKey" 
+        :relayIds="followerThree.relayIds"
+        hideName="true"
+        showAvatar="true"
+        avatarSize="huge"
+      />
+      <UiUsername
+        v-if="count > 3 && followerFour"
+        :key="followerFour.publicKey" 
+        :publicKey="followerFour.publicKey" 
+        :relayIds="followerFour.relayIds"
+        hideName="true"
+        showAvatar="true"
+        avatarSize="huge"
+      />
+      <UiUsername
+        v-if="count > 4 && followerFive"
+        :key="followerFive.publicKey" 
+        :publicKey="followerFive.publicKey" 
+        :relayIds="followerFive.relayIds"
+        hideName="true"
+        showAvatar="true"
+        avatarSize="huge"
+      />
+    </div>
+    <div class="copy">
+      <ProfileSectionTitle
+        :title="titleCopy"
+        :clickable="true"
+        @select="navigate"
+      />
+
+      <p v-if="count > 0">
+        Including 
         <UiUsername
-          v-if="followerOne"
           :key="followerOne.publicKey"
           :publicKey="followerOne.publicKey" 
           :relayIds="followerOne.relayIds"
-          hideName="true"
-          showAvatar="true"
-          avatarSize="huge"
         />
+        <template v-if="count == 2"> and </template>
+        <template v-if="count > 2">, </template>
         <UiUsername
-          v-if="count > 1 && followerTwo"
-          :key="followerTwo.publicKey" 
+          v-if="count > 1"
+          :key="followerTwo.publicKey"
           :publicKey="followerTwo.publicKey" 
           :relayIds="followerTwo.relayIds"
-          hideName="true"
-          showAvatar="true"
-          avatarSize="huge"
         />
+        <template v-if="count > 2">, and </template>
         <UiUsername
-          v-if="count > 2 && followerThree"
+          v-if="count > 2"
           :key="followerThree.publicKey"
           :publicKey="followerThree.publicKey" 
           :relayIds="followerThree.relayIds"
-          hideName="true"
-          showAvatar="true"
-          avatarSize="huge"
-        />
-        <UiUsername
-          v-if="count > 3 && followerFour"
-          :key="followerFour.publicKey" 
-          :publicKey="followerFour.publicKey" 
-          :relayIds="followerFour.relayIds"
-          hideName="true"
-          showAvatar="true"
-          avatarSize="huge"
-        />
-        <UiUsername
-          v-if="count > 4 && followerFive"
-          :key="followerFive.publicKey" 
-          :publicKey="followerFive.publicKey" 
-          :relayIds="followerFive.relayIds"
-          hideName="true"
-          showAvatar="true"
-          avatarSize="huge"
-        />
-      </div>
-      <div class="copy">
-        <ProfileSectionTitle
-          :title="titleCopy"
-          :clickable="true"
-          @select="navigate"
-        />
-
-        <p v-if="count > 0">
-          Including 
-          <UiUsername
-            :key="followerOne.publicKey"
-            :publicKey="followerOne.publicKey" 
-            :relayIds="followerOne.relayIds"
-          />
-          <template v-if="count == 2"> and </template>
-          <template v-if="count > 2">, </template>
-          <UiUsername
-            v-if="count > 1"
-            :key="followerTwo.publicKey"
-            :publicKey="followerTwo.publicKey" 
-            :relayIds="followerTwo.relayIds"
-          />
-          <template v-if="count > 2">, and </template>
-          <UiUsername
-            v-if="count > 2"
-            :key="followerThree.publicKey"
-            :publicKey="followerThree.publicKey" 
-            :relayIds="followerThree.relayIds"
-          />.
-        </p>
-      </div>
+        />.
+      </p>
     </div>
-  </Transition>
+  </div>
 </template>
 
 <style scoped lang="scss">
@@ -188,6 +211,10 @@ function navigate() {
     :deep(a) {
       position: absolute;
       top: 0;
+      width: 75px;
+      height: 75px;
+      background-color: rgba(black, 0.15);
+      border-radius: 100px;
     }
 
     > a:nth-child(2) { left: 50px; }

@@ -160,6 +160,10 @@ const title = computed(() => {
   let tag = props.info.tags.find(tag => tag[0] == 'title')
 
   if(!tag || tag.length == 1 || (tag.length > 1 && tag[1].length == 0)) {
+    tag = props.info.tags.find(tag => tag[0] == 'name')
+  }
+
+  if(!tag || tag.length == 1 || (tag.length > 1 && tag[1].length == 0)) {
     tag = props.info.tags.find(tag => tag[0] == 'd')
   }
 

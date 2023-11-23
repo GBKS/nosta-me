@@ -1,6 +1,6 @@
 
 import { useRelayStore } from "@/stores/relays.js"
-
+import ToolBox from '@/helpers/toolBox'
 import relayList from '@/helpers/relayList.js'
 import relayConnector from '@/helpers/relayConnector.js'
 
@@ -27,11 +27,21 @@ export default {
     }
   },
 
+  // Connect to 3 random ideas from our initial seed list
   addInitialRelays() {
-    for(let relayId in relayList) {
+    const relayIds = []
+    for(let i in relayList) relayIds.push(i)
+    ToolBox.shuffleArray(relayIds)
+
+    let relaysToAdd = 5, i=0, relayId
+    for(let i=0; i<relayIds.length; i++) {
+      relayId = relayIds[i]
       relayList[relayId].id = relayId
 
       this.relayStore.addRelay(relayList[relayId])
+
+      relaysToAdd--
+      if(relaysToAdd < 0) break
     }
   },
 
@@ -122,7 +132,7 @@ export default {
   },
 
   connectToAllRelays() {
-    // console.log('connectToRelays')
+    console.log('connectToRelays')
     const relays = this.relayStore.getAll
     for(let relayId in relays) {
       this.connectToRelay(relayId)

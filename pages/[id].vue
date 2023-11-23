@@ -438,26 +438,32 @@ function handleLoadedRecommendedRelay(data) {
 function handleLoadedRelayList(data) {
   // console.log('handleLoadedRelayList', data)
 
-  storeEvent(relayDataEvents, data)
+  const newEvent = storeEvent(relayDataEvents, data)
 
   if(!relayData.value) {
     relayData.value = []
   }
-  
-  let i, tag, relayId
-  for(i=0; i<data.tags.length; i++) {
-    tag = data.tags[i]
 
-    if(tag.length == 2 || (tag.length == 3 && tag[2] == 'write')) {
-      relayId = relayManager.addRelayByUrl(tag[1])
+  if(newEvent) {
+    let i, tag, relayId, relaysToAdd = 3
+    const tags = data.tags.filter(tag => tag[0] == 'r')
+    for(i=0; i<tags.length; i++) {
+      tag = tags[i]
 
-      if(relayData.value.indexOf(relayId) === -1) {
-        relayData.value.push(relayId)
+      if(tag.length == 2 || (tag.length == 3 && tag[2] == 'write')) {
+        relayId = relayManager.addRelayByUrl(tag[1])
 
-        if(profileService) {
-          profileService.addRelay(relayId)
+        if(relayData.value.indexOf(relayId) === -1) {
+          relayData.value.push(relayId)
+
+          if(profileService) {
+            profileService.addRelay(relayId)
+            relaysToAdd--
+          }
         }
       }
+
+      if(relaysToAdd <= 0) break
     }
   }
 }
@@ -489,6 +495,8 @@ function storeEvent(location, data) {
   if(!alreadyAdded) {
     location.value.push(data)
   }
+
+  return !alreadyAdded
 }
 
 function handleLoadedZapEvent(data) {
