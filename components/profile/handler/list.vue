@@ -14,18 +14,16 @@ const classObject = computed(() => {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div v-if="info" :class="classObject">
-      <ProfileHandlerItem
-        v-for="(item, appId) in info"
-        :key="appId"
-        :appId="appId"
-        :layout="layout"
-        :info="item"
-        :theme="theme"
-      />
-    </div>
-  </Transition>
+  <div v-if="info" :class="classObject">
+    <ProfileHandlerItem
+      v-for="(item, appId) in info"
+      :key="appId"
+      :appId="appId"
+      :layout="layout"
+      :info="item"
+      :theme="theme"
+    />
+  </div>
 </template>
 
 <style scoped lang="scss">

@@ -69,35 +69,33 @@ function navigate() {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div v-if="count > 0" class="report-summary">
-      <ProfileReportIcon :type="reportOne.reason" />
-      <div class="copy">
-        <ProfileSectionTitle
-          :title="titleCopy"
-          :clickable="true"
-          @select="navigate"
-        />
+  <div v-if="count > 0" class="report-summary">
+    <ProfileReportIcon :type="reportOne.reason" />
+    <div class="copy">
+      <ProfileSectionTitle
+        :title="titleCopy"
+        :clickable="true"
+        @select="navigate"
+      />
 
-        <p v-if="count > 0">
+      <p v-if="count > 0">
+        <UiUsername
+          :publicKey="reportOne.publicKey" 
+          :relayIds="reportOne.relayIds"
+        />
+        for {{ reportOne.reason }}
+        <template v-if="count > 1">
+          , 
           <UiUsername
-            :publicKey="reportOne.publicKey" 
-            :relayIds="reportOne.relayIds"
+            :publicKey="reportTwo.publicKey" 
+            :relayIds="reportTwo.relayIds"
           />
-          for {{ reportOne.reason }}
-          <template v-if="count > 1">
-            , 
-            <UiUsername
-              :publicKey="reportTwo.publicKey" 
-              :relayIds="reportTwo.relayIds"
-            />
-            for {{ reportTwo.reason }}
-          </template>
-          <template v-if="count > 2">, and more</template>.
-        </p>
-      </div>
+          for {{ reportTwo.reason }}
+        </template>
+        <template v-if="count > 2">, and more</template>.
+      </p>
     </div>
-  </Transition>
+  </div>
 </template>
 
 <style scoped lang="scss">

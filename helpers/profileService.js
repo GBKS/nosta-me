@@ -1,7 +1,6 @@
 
 import { useRelayStore } from "@/stores/relays.js"
 
-import relayList from '@/helpers/relayList.js'
 import relayConnector from '@/helpers/relayConnector.js'
 import relayManager from '@/helpers/relayManager.js'
 import findRelayRequest from '@/helpers/findRelayRequest.js'
@@ -36,6 +35,7 @@ export default {
   findCallback: null,
   searchType: null,
   contactsService: null,
+  contactList: null,
 
   findProfile(publicKey, relaysToCheck, findCallback, endCallback) {
     if(this.log) {
@@ -54,6 +54,12 @@ export default {
     } else {
       this.searchType = 'relays-unknown'
       this.relaysToCheck = relayManager.getAllRelayIds()
+    }
+
+    // Ensure we check 3 or more relays.
+    if(!relaysToCheck || relaysToCheck.length < 3) {
+      const relayStore = useRelayStore()
+      relaysToCheck = relayStore.getRelayIds
     }
 
     this.currentRelay = 0
@@ -223,7 +229,9 @@ export default {
     const url = 'wss://nos.lol/'
     const relayId = relayManager.addRelayByUrl(url)
 
-    console.log('checkPinstr', relayId, filter)
+    if(this.log) {
+      console.log('checkPinstr', relayId, filter)
+    }
 
     this.pinstrService = relayRequest()
     this.pinstrService.init(this.loadCallback, true)
@@ -237,14 +245,12 @@ export default {
 
     let tag
     if(data.kind === 0) {
-      // window.emitter.emit('profile-'+this.publicKey, data)
     } else if(data.kind == 1) {
       // console.log('!!! Seeing a short note', data)
     } else if(data.kind == 2) {
-      // window.emitter.emit('relays-'+this.publicKey, data)
     } else if(data.kind == 3) {
-      this.loadContactList(data)
-      // window.emitter.emit('contacts-'+this.publicKey, data)
+      this.contactList = data
+      // this.loadContactList(data)
     } else if(data.kind == 8) {
       // console.log('!!! Seeing a badge 8', data)
     } else if(data.kind == 1063) {
@@ -254,7 +260,7 @@ export default {
     } else if(data.kind == 1985) {
       console.log('!!! Seeing a label', data)
     } else if(data.kind == 9041) {
-      console.log('!!! Seeing a zap goal', data)
+      // console.log('!!! Seeing a zap goal', data)
     } else if(data.kind == 9735) {
       // console.log('!!! Seeing a zap', data)
     } else if(data.kind == 9802) {
@@ -321,6 +327,10 @@ export default {
   },
 
   addRelay(relayId) {
+    if(this.log) {
+      console.log('profileService.addRelay', relayId)
+    }
+
     if(this.service && this.service.addRelay) {
       this.service.addRelay(relayId)
     }
@@ -353,8 +363,14 @@ export default {
       console.log('profileService.loadContactList', data)
     }
 
-    this.contactsService = contactsService()
-    this.contactsService.start(data, this.onContactsEvent.bind(this))
+    if(!data && this.contactList) {
+      data = this.contactList
+    }
+
+    if(!this.contactsService) {
+      this.contactsService = contactsService()
+      this.contactsService.start(data, this.onContactsEvent.bind(this))
+    }
   },
 
   onContactsEvent(data) {
@@ -364,6 +380,10 @@ export default {
   },
 
   loadContactsPage(page) {
+    if(this.log) {
+      console.log('profileService.loadContactsPage', page)
+    }
+
     if(this.contactsService) {
       this.contactsService.loadPage(page)
     }

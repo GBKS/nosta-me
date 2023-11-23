@@ -71,17 +71,22 @@ const formattedDate = computed(() => {
 
 // Initial spec format is just a string, then changed to [price, number, currency, frequence]
 const price = computed(() => {
+  let result = null
+
   const price = props.info.tags.find(tag => tag[0] == 'price')
-  if(price.length == 2) {
-    return price[1]
-  } else {
-    const format = new Intl.NumberFormat(undefined, { style: 'currency', currency: price[2] })
-    let result = format.format(price[1])
-    if(price.length > 3) {
-      result += ' ' + price[3]
+  if(price) {
+    if(price.length == 2) {
+      result = price[1]
+    } else {
+      const format = new Intl.NumberFormat(undefined, { style: 'currency', currency: price[2] })
+      result = format.format(price[1])
+      if(price.length > 3) {
+        result += ' ' + price[3]
+      }
     }
-    return result
   }
+
+  return result
 })
 
 // Remote · 1000 sats per month · Jul 14

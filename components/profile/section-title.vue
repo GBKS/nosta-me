@@ -46,7 +46,7 @@ h2 {
       padding: 0;
       color: var(--theme-front);
       text-decoration: none;
-
+      text-align: left;
       padding: 7px 12px 6px 15px;
       border-radius: 15px;
       margin-left: -15px;

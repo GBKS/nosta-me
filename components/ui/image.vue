@@ -97,7 +97,7 @@ const message = computed(() => {
     width: 100%;
     height: auto;
     opacity: 0;
-    transition: all 250ms $ease;
+    // transition: all 250ms $ease;
     object-fit: cover;
   }
 

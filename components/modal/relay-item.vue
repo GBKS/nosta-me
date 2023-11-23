@@ -129,6 +129,8 @@ function onRelayDataError(error) {
   console.log('onRelayDataError', error)
 
   loadStatus.value = 'error'
+
+  relayStore.setRelayStatus(props.info.id, 'error')
 }
 
 function clickStatus(info) {

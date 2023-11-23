@@ -1,5 +1,4 @@
 
-import relayList from '@/helpers/relayList.js'
 import relayManager from '@/helpers/relayManager.js'
 import { useEventStore } from "@/stores/events.js"
 import { useRelayStore } from "@/stores/relays.js"

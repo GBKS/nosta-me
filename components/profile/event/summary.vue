@@ -30,20 +30,18 @@ function navigate() {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div v-if="count > 0" class="event-summary">
-      <ProfileSectionTitle
-        :title="titleCopy"
-        :clickable="true"
-        @select="navigate"
-      />
-      <ProfileEventList
-        class="items"
-        :info="visibleItems"
-        :handlers="handlers"
-      />
-    </div>
-  </Transition>
+  <div v-if="count > 0" class="event-summary">
+    <ProfileSectionTitle
+      :title="titleCopy"
+      :clickable="true"
+      @select="navigate"
+    />
+    <ProfileEventList
+      class="items"
+      :info="visibleItems"
+      :handlers="handlers"
+    />
+  </div>
 </template>
 
 <style scoped lang="scss">

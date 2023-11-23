@@ -27,18 +27,16 @@ const latestNote = computed(() => {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div v-if="count > 0" class="long-notes-summary">
-      <ProfileSectionTitle
-        title="Latest article"
-      />
-      <ProfileLongNotesItem
-        :key="latestNote.id"
-        :info="latestNote"
-        :handlers="handlers"
-      />
-    </div>
-  </Transition>
+  <div v-if="count > 0" class="long-notes-summary">
+    <ProfileSectionTitle
+      title="Latest article"
+    />
+    <ProfileLongNotesItem
+      :key="latestNote.id"
+      :info="latestNote"
+      :handlers="handlers"
+    />
+  </div>
 </template>
 
 <style scoped lang="scss">

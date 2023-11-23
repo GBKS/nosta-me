@@ -29,23 +29,21 @@ function navigate() {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div v-if="count > 0" class="badge-summary">
-      <ProfileSectionTitle
-        :title="titleCopy"
-        :clickable="true"
-        @select="navigate"
+  <div v-if="count > 0" class="badge-summary">
+    <ProfileSectionTitle
+      :title="titleCopy"
+      :clickable="true"
+      @select="navigate"
+    />
+    <div class="badges">
+      <ProfileBadgeItem
+        v-for="(item, index) in visibleBadges"
+        :key="item.id"
+        :info="item"
+        :handlers="handlers"
       />
-      <div class="badges">
-        <ProfileBadgeItem
-          v-for="(item, index) in visibleBadges"
-          :key="item.id"
-          :info="item"
-          :handlers="handlers"
-        />
-      </div>
     </div>
-  </Transition>
+  </div>
 </template>
 
 <style scoped lang="scss">

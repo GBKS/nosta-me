@@ -51,18 +51,16 @@ const title = computed(() => {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div v-if="info" class="handler-tab">
-      <ProfileSectionBack @select="$emit('back')" />
-      <ProfileSectionTitle :title="title" />
-      <ProfileHandlerList
-        class="handlers"
-        :info="groupedHandlers" 
-        layout="grid"
-        theme="theme"
-      />
-    </div>
-  </Transition>
+  <div v-if="info" class="handler-tab">
+    <ProfileSectionBack @select="$emit('back')" />
+    <ProfileSectionTitle :title="title" />
+    <ProfileHandlerList
+      class="handlers"
+      :info="groupedHandlers" 
+      layout="grid"
+      theme="theme"
+    />
+  </div>
 </template>
 
 <style scoped lang="scss">

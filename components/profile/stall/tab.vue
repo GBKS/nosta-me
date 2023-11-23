@@ -22,22 +22,20 @@ function navigate(info) {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div v-if="info" class="stalls-tab">
-      <ProfileSectionBack @select="$emit('back')" />
-      <ProfileSectionTitle :title="title" />
-      <div class="items">
-        <ProfileStallItem
-          v-for="(item, index) in info"
-          :key="item.id"
-          :info="item"
-          :products="products"
-          layout="box"
-          @select="navigate"
-        />
-      </div>
+  <div v-if="info" class="stalls-tab">
+    <ProfileSectionBack @select="$emit('back')" />
+    <ProfileSectionTitle :title="title" />
+    <div class="items">
+      <ProfileStallItem
+        v-for="(item, index) in info"
+        :key="item.id"
+        :info="item"
+        :products="products"
+        layout="box"
+        @select="navigate"
+      />
     </div>
-  </Transition>
+  </div>
 </template>
 
 <style scoped lang="scss">

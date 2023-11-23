@@ -160,37 +160,35 @@ onMounted(() => {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <a
-      v-if="badgeData"
-      :class="classObject"
-      :href="link"
-      target="_blank"
-      rel="nofollow noopener noreferrer"
+  <a
+    v-if="badgeData"
+    :class="classObject"
+    :href="link"
+    target="_blank"
+    rel="nofollow noopener noreferrer"
+  >
+    <img
+      v-if="thumb && imageStatus != 'error'"
+      :src="thumb.image"
+      :alt="badgeData.name"
+      :width="thumb.width"
+      :height="thumb.height"
+      @load="imageLoaded"
+      @error="imageLoadError"
+    />
+    <div
+      v-if="!thumb || imageStatus == 'error'"
+      class="error"
     >
-      <img
-        v-if="thumb && imageStatus != 'error'"
-        :src="thumb.image"
-        :alt="badgeData.name"
-        :width="thumb.width"
-        :height="thumb.height"
-        @load="imageLoaded"
-        @error="imageLoadError"
-      />
-      <div
-        v-if="!thumb || imageStatus == 'error'"
-        class="error"
-      >
-        <p>Could not load image.</p>
-      </div>
-      <h5>{{ badgeData.name }}</h5>
-      <p>{{ badgeData.name }}</p>
-      <UiUsername
-        :publicKey="rawBadgeData.pubkey"
-        :relayIds="[rawBadgeData.relay]"
-      />
-    </a>
-  </Transition>
+      <p>Could not load image.</p>
+    </div>
+    <h5>{{ badgeData.name }}</h5>
+    <p>{{ badgeData.name }}</p>
+    <UiUsername
+      :publicKey="rawBadgeData.pubkey"
+      :relayIds="[rawBadgeData.relay]"
+    />
+  </a>
 </template>
 
 <style scoped lang="scss">

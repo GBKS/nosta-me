@@ -124,23 +124,21 @@ const hasTags = computed(() => {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div :class="classObject">
-      <ProfileProductItemImages :images="images" />
-      <div class="copy">
-        <h5>
-          <a
-          :href="link"
-          target="_blank"
-          rel="nofollow noopener noreferrer"
-        >{{ title }}</a>
-        </h5>
-        <p>{{ description }}</p>
-        <p>{{ meta }}</p>
-        <ProfileBitsTags :info="info" align="left" />
-      </div>
+  <div :class="classObject">
+    <ProfileProductItemImages :images="images" />
+    <div class="copy">
+      <h5>
+        <a
+        :href="link"
+        target="_blank"
+        rel="nofollow noopener noreferrer"
+      >{{ title }}</a>
+      </h5>
+      <p>{{ description }}</p>
+      <p>{{ meta }}</p>
+      <ProfileBitsTags :info="info" align="left" />
     </div>
-  </Transition>
+  </div>
 </template>
 
 <style scoped lang="scss">

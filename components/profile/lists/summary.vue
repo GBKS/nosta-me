@@ -81,22 +81,20 @@ function navigate() {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div v-if="filledLists && filledLists.length > 0" class="lists-summary">
-      <ProfileSectionTitle
-        :title="titleCopy"
-        :clickable="true"
-        @select="navigate"
-      />
-      <p v-if="emptyListCount > 0">{{ emptyListText }}</p>
-      <ProfileListsList
-        class="items"
-        :info="visibleLists"
-        :handlers="handlers"
-        layout="box"
-      />
-    </div>
-  </Transition>
+  <div v-if="filledLists && filledLists.length > 0" class="lists-summary">
+    <ProfileSectionTitle
+      :title="titleCopy"
+      :clickable="true"
+      @select="navigate"
+    />
+    <p v-if="emptyListCount > 0">{{ emptyListText }}</p>
+    <ProfileListsList
+      class="items"
+      :info="visibleLists"
+      :handlers="handlers"
+      layout="box"
+    />
+  </div>
 </template>
 
 <style scoped lang="scss">

@@ -54,22 +54,20 @@ const titleUrl = computed(() => {
 </script>
 
 <template>
-  <Transition name="fade" appear>
-    <div v-if="count > 0" class="short-notes-summary">
-      <ProfileSectionTitle
-        :url="titleUrl"
-        title="Latest updates"
+  <div v-if="count > 0" class="short-notes-summary">
+    <ProfileSectionTitle
+      :url="titleUrl"
+      title="Latest updates"
+    />
+    <div class="items">
+      <ProfileShortNotesItem
+        v-for="item in latestNotes"
+        :key="item.id"
+        :info="item"
+        :handlers="handlers"
       />
-      <div class="items">
-        <ProfileShortNotesItem
-          v-for="item in latestNotes"
-          :key="item.id"
-          :info="item"
-          :handlers="handlers"
-        />
-      </div>
     </div>
-  </Transition>
+  </div>
 </template>
 
 <style scoped lang="scss">

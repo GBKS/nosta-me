@@ -84,11 +84,21 @@ onBeforeUnmount(() => {
 const buttonTitle = computed(() => {
   return active.value ? 'Hide relays' : 'Show relays'
 })
+
+const classObject = computed(() => {
+  const c = ['header-icon-button']
+
+  if(active.value) {
+    c.push('-active')
+  }
+
+  return c.join(' ')
+})
 </script>
 
 <template>
   <button
-    class="header-icon-button"
+    :class="classObject"
     :title="buttonTitle"
     :active="active"
     @click="toggle"
