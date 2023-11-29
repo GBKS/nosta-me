@@ -525,9 +525,6 @@ function handleLoadedZapEvent(data) {
   
   if(!alreadyAdded) {
     zapArray.value.push(data)
-
-    // const count = zapsData.value.length
-    // tabInfo.value.zaps.name = count + ' Zap' + (count !== 1 ? 's' : '')
   }
 }
 
@@ -563,9 +560,6 @@ function handleLoadedStallEvent(data) {
 
   if(!alreadyAdded) {
     stallData.value.push(data)
-
-    const count = stallData.value.length
-    tabInfo.value.stalls.name = count + ' Stall' + (count !== 1 ? 's' : '')
   }
 }
 
@@ -576,24 +570,29 @@ function handleLoadedProductEvent(data) {
     productData.value = []
   }
 
+  if(typeof data.content == 'string' && data.content.length > 0) {
+    data.content = JSON.parse(data.content)
+  }
+
   // Ensure it's not already added.
-  let alreadyAdded = false
-  for(let i=0; i<productData.value.length; i++) {
-    if(productData.value[i].id == data.id) {
+  let alreadyAdded = false, matchIndex, isNewer, i=0, product
+  for(; i<productData.value.length; i++) {
+    product = productData.value[i]
+
+    // Event and product ID can match.
+    if(product.id == data.id || product.content.id == data.content.id) {
       alreadyAdded = true
+      matchIndex = i
+      // Keep the newer one in case of a match.
+      isNewer = data.created_at > product.created_at
       break
     }
   }
 
-  if(!alreadyAdded) {
-    if(typeof data.content == 'string' && data.content.length > 0) {
-      data.content = JSON.parse(data.content)
-    }
-
+  if(alreadyAdded && isNewer) {
+    productData.value[matchIndex] = data
+  } else if(!alreadyAdded) {
     productData.value.push(data)
-
-    const count = productData.value.length
-    tabInfo.value.products.name = count + ' Product' + (count !== 1 ? 's' : '')
   }
 }
 

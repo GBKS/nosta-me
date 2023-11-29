@@ -36,9 +36,11 @@ const productCountText = computed(() => {
 const productCount = computed(() => {
   let result = 0
 
-  for(let i=0; i<props.products.length; i++) {
-    if(props.products[i].content.stall_id == props.info.content.id) {
-      result ++
+  if(props.products) {
+    for(let i=0; i<props.products.length; i++) {
+      if(props.products[i].content.stall_id == props.info.content.id) {
+        result ++
+      }
     }
   }
 
