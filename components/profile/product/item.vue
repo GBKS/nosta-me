@@ -48,10 +48,14 @@ const thumb = computed(() => {
 })
 
 const link = computed(() => {
+  // The seemingly duplicate params seem to be how market.nostr.com wants things formatted. Maybe double-check.
   const bits = {
     merchant_pubkey: props.info.pubkey,
     stall_id: props.info.content.stall_id,
-    product_id: props.info.content.id
+    product_id: props.info.content.id,
+    merchant: props.info.pubkey,
+    stall: props.info.content.stall_id,
+    product: props.info.content.id
   }
 
   const params = []
@@ -59,7 +63,7 @@ const link = computed(() => {
     params.push(key+'='+bits[key])
   }
 
-  return 'https://legend.lnbits.com/nostrmarket/market?' + params.join('&')
+  return 'https://market.nostr.com?' + params.join('&')
 })
 
 const classObject = computed(() => {
