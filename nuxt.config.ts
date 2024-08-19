@@ -30,7 +30,12 @@ export default defineNuxtConfig({
 				{ rel: 'manifest', href: '/manifest.json' }
 			],
 			script: [
-				{ src: '/lib/nostr-tools-1-12-1.js' } // npm i the lib did not work, so loading it in this way
+				{ src: '/lib/nostr-tools-1-12-1.js' }, // npm i the lib did not work, so loading it in this way
+				{ 
+					src: 'https://cloud.umami.is/script.js',
+					'data-website-id': 'f60ce998-27d4-421b-98a0-c54d38131290',
+					defer: true
+				}
 			]
 		}
 	},
