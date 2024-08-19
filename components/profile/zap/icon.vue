@@ -6,6 +6,8 @@ const props = defineProps([
   'relativeSize'
 ])
 
+const rankImage = ref()
+
 const ranks = [
   {
     amount: 1000,
@@ -35,10 +37,9 @@ const rank = computed(() => {
   return rank
 })
 
-const rankImage = computed(() => {
-  const image =  '/assets/images/zap-'+rank.value+'.jpg'
-  return useAssets(image)
-})
+async function updateRankImage() {
+  rankImage.value = await useAssets('/assets/images/zap-'+rank.value+'.jpg')
+}
 
 const formattedAmount = computed(() => {
   let result = props.amount
@@ -74,6 +75,10 @@ const styleObject = computed(() => {
   return {
     backgroundImage: 'url("'+rankImage.value+'")'
   }
+})
+
+onBeforeMount(() => {
+  updateRankImage()
 })
 </script>
 

@@ -1,6 +1,5 @@
 <script setup>
 import useAssets from  '@/composables/useAssets.js'
-import Icons from '@/helpers/icons'
 
 const props = defineProps([
   'name',
@@ -12,10 +11,12 @@ const props = defineProps([
   'size'
 ])
 
-const imageSource = computed(() => {
+const imageSource = ref()
+
+async function updateImageSource() {
   const image =  '/assets/images/apps/'+props.image+'.jpg'
-  return useAssets(image)
-})
+  imageSource.value = await useAssets(image)
+}
 
 const title = computed(() => {
   return 'View profile in '+props.name
@@ -39,6 +40,10 @@ const classObject = computed(() => {
   }
 
   return c.join(' ')
+})
+
+onBeforeMount(() => {
+  updateImageSource()
 })
 </script>
 

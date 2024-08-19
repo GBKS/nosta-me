@@ -8,6 +8,8 @@ const props = defineProps([
 ])
 
 const emit = defineEmits(['select'])
+const image = ref()
+const retinaImage = ref()
 
 const classObject = computed(() => {
   const c = [
@@ -23,16 +25,17 @@ const classObject = computed(() => {
 })
 
 const imageSource = computed(() => {
-  const image =  '/assets/images/themes/preview/'+props.themeId+'.jpg'
-  return useAssets(image)
+  return image.value
 })
 
 const imageSourceSet = computed(() => {
-  const retina =  '/images/themes/preview/'+props.themeId+'@2x.jpg'
-  const retinaUrl = new URL(retina, import.meta.url).href
-
-  return imageSource.value + ' 1x, ' + retinaUrl + ' 2x'
+  return image.value + ' 1x, ' + retinaImage.value + ' 2x'
 })
+
+async function updateImages() {
+  image.value = await useAssets('/assets/images/themes/preview/'+props.themeId+'.jpg')
+  retinaImage.value = await useAssets('/assets/images/themes/preview/'+props.themeId+'@2x.jpg')
+}
 
 const styleObject = computed(() => {
   return {
@@ -43,6 +46,10 @@ const styleObject = computed(() => {
 function click() {
   emit('select', props.themeId)
 }
+
+onBeforeMount(() => {
+  updateImages()
+})
 </script>
 
 <template>

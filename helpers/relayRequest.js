@@ -63,6 +63,12 @@ export default function relayRequest () {
       }
 
       const relay = this.relayStore.getRelay(this.relayId)
+
+      if(!relay) {
+        console.log('relayRequest.subscribe: No relay found with relayId: ' + this.relayId)
+        return
+      }
+
       const connection = this.relayStore.getRelayConnection(this.relayId)
       if(this.log) {
         console.log('relay', relay, connection)

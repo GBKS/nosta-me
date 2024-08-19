@@ -13,14 +13,20 @@ const props = defineProps([
   'type'
 ])
 
-const image = computed(() => {
+const image = ref()
+
+async function updateImage() {
   let type = props.type
   if(type && knownTypes.indexOf(type) === -1) {
     type = 'unknown'
   }
 
-  const image =  '/assets/images/report-'+type+'.jpg'
-  return useAssets(image)
+  const fileName =  '/assets/images/report-'+type+'.jpg'
+  image.value = await useAssets(fileName)
+}
+
+onBeforeMount(() => {
+  updateImage()
 })
 </script>
 

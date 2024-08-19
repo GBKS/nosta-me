@@ -13,6 +13,7 @@ const paymentNote = ref(null)
 const amount = ref(100)
 const info = ref()
 const status = ref('input')
+const rankImage = ref()
 
 const ranks = computed(() => {
   return [
@@ -21,38 +22,42 @@ const ranks = computed(() => {
       amount: 100,
       active: amount.value == 100,
       rank: 'bronze',
-      image: useAssets('/assets/images/texture-bronze.jpg')
+      image: '/assets/images/texture-bronze.jpg'
     },
     {
       name: '1000',
       amount: 1000,
       active: amount.value == 1000,
       rank: 'silver',
-      image: useAssets('/assets/images/texture-silver.jpg')
+      image: '/assets/images/texture-silver.jpg'
     },
     {
       name: '10K',
       amount: 10000,
       active: amount.value == 10000,
       rank: 'gold',
-      image: useAssets('/assets/images/texture-gold.jpg')
+      image: '/assets/images/texture-gold.jpg'
     },
     {
       name: '100K',
       amount: 100000,
       active: amount.value == 100000,
       rank: 'emerald',
-      image: useAssets('/assets/images/texture-emerald.jpg')
+      image: '/assets/images/texture-emerald.jpg'
     },
     {
       name: '1M',
       amount: 1000000,
       active: amount.value == 1000000,
       rank: 'neon',
-      image: useAssets('/assets/images/texture-neon.jpg')
+      image: '/assets/images/texture-neon.jpg'
     }
   ]
 })
+
+async function updateRankImage(image) {
+  rankImage.value = await useAssets(image)
+}
 
 const currentRank = computed(() => {
   let result = ranks.value[0]
@@ -60,6 +65,8 @@ const currentRank = computed(() => {
   for(let i=0; i<ranks.value.length; i++) {
     if(amount.value >= ranks.value[i].amount) {
       result = ranks.value[i]
+
+      updateRankImage(result.image)
     }
   }
 
@@ -211,7 +218,8 @@ const classObject = computed(() => {
   const c = [
     'zap-modal',
     '-modal',
-    '-'+status.value
+    '-'+status.value,
+    '-'+currentRank.value.name
   ]
 
   return c.join(' ')
@@ -244,7 +252,7 @@ const classObject = computed(() => {
             />
             <h3>{{ title }}</h3>
           </div>
-          <UiEffectCard :image="currentRank.image">
+          <UiEffectCard :image="rankImage">
             <div class="numbers">
               <ModalZapNumbers
                 :amount="amount"

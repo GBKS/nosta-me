@@ -41,6 +41,9 @@ definePageMeta({
   }
 })
 
+const image = ref()
+const retinaImage = ref()
+
 function privateKeyFromSeedWords(mnemonic, passphrase) {
   let root = HDKey.fromMasterSeed(mnemonicToSeedSync(mnemonic, passphrase))
   let privateKey = root.derive(`m/44'/1237'/0'/0/0`).privateKey
@@ -48,17 +51,22 @@ function privateKeyFromSeedWords(mnemonic, passphrase) {
   return secp256k1.utils.bytesToHex(privateKey)
 }
 
+async function updateImages() {
+  image.value = await useAssets('/assets/images/baby-nostrich.jpg')
+  retinaImage.value = await useAssets('/assets/images/baby-nostrich@2x.jpg')
+}
+
 const imageSource = computed(() => {
-  const image =  '/assets/images/baby-nostrich.jpg'
-  return useAssets(image)
+  return image.value
 })
 
 const imageSourceSet = computed(() => {
-  const retinaImage = '/assets/images/baby-nostrich@2x.jpg'
-  return imageSource.value + ' 1x, ' + useAssets(retinaImage) + ' 2x'
+  return image.value + ' 1x, ' + retinaImage.value + ' 2x'
 })
 
 onMounted(() => {
+  updateImages()
+
   const store = useProfileStore()
   console.log('mounted', store.privateKey, store.publicKey)  
   console.log('privateKey', store.privateKey == '')   
@@ -79,7 +87,6 @@ onBeforeRouteLeave((to, from) => {
     return true
   }
 })
-
 </script>
 
 <template>
