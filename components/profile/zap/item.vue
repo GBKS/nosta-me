@@ -1,6 +1,5 @@
 <script setup>
 import bolt11Decoder from 'light-bolt11-decoder'
-import Icons from '@/helpers/icons'
 import ToolBox from '@/helpers/toolBox'
 import useAssets from  '@/composables/useAssets.js'
 
@@ -10,6 +9,7 @@ const props = defineProps([
 ])
 
 const invoice = ref(null)
+const rankImage = ref()
 let targetUserPublicKey = null
 
 const hasContent = computed(() => {
@@ -57,10 +57,9 @@ const rank = computed(() => {
   return rank
 })
 
-const rankImage = computed(() => {
-  const image =  '/assets/images/zap-'+rank.value+'.jpg'
-  return useAssets(image)
-})
+async function updateRankImage() {
+  rankImage.value = await useAssets('/assets/images/zap-'+rank.value+'.jpg')
+}
 
 const rankStyle = computed(() => {
   return {
@@ -116,6 +115,8 @@ const classObject = computed(() => {
 })
 
 onMounted(() => {
+  updateRankImage()
+
   let i, tag
   for(i=0; i<props.info.tags.length; i++) {
     tag = props.info.tags[i]

@@ -46,6 +46,11 @@ export default {
   },
 
   addRelayByUrl(url) {
+    if(!url) {
+      console.log('relayManager.addRelayByUrl: No url provided', url)
+      return
+    }
+
     // Check if already added
     const relay = this.relayStore.getRelayByUrl(url)
 

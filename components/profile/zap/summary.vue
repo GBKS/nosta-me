@@ -1,7 +1,5 @@
 <script setup>
 import bolt11Decoder from 'light-bolt11-decoder'
-import useAssets from  '@/composables/useAssets.js'
-import ToolBox from '@/helpers/toolBox'
 
 const props = defineProps([
   'info',

@@ -7,9 +7,12 @@ const props = defineProps([
 ])
 
 const imageLoaded = ref(false)
+const image = ref()
+const retinaImage = ref()
 
 watch(() => props.themeId, () => {
   imageLoaded.value = false
+  updateImages()
 })
 
 const classObject = computed(() => {
@@ -24,21 +27,27 @@ function onImageLoaded() {
 }
 
 const imageSource = computed(() => {
-  const image =  '/assets/images/themes/'+props.themeId+'.jpg'
-  return useAssets(image)
+  return image.value
 })
 
 const imageSourceSet = computed(() => {
-  const image =  '/assets/images/themes/'+props.themeId+'.jpg'
-  const retinaImage =  '/assets/images/themes/'+props.themeId+'@2x.jpg'
-  return useAssets(image) + ' 1x, ' + useAssets(retinaImage) + ' 2x'
+  return image.value + ' 1x, ' + retinaImage.value + ' 2x'
 })
 
+async function updateImages() {
+  image.value = await useAssets('/assets/images/themes/'+props.themeId+'.jpg')
+  retinaImage.value = await useAssets('/assets/images/themes/'+props.themeId+'@2x.jpg')
+}
+
+onBeforeMount(() => {
+  updateImages()
+})
 </script>
 
 <template>
   <Transition name="fade" mode="out-in" appear>
     <img
+      v-if="image && retinaImage"
       :key="themeId"
       :class="classObject"
       :src="imageSource"

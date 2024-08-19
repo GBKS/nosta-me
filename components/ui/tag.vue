@@ -1,6 +1,4 @@
 <script setup>
-import useAssets from  '@/composables/useAssets.js'
-
 const props = defineProps([
   'info',
   'theme' // theme, light

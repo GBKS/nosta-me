@@ -40,8 +40,8 @@ function onHideModal(data) {
   }
 }
 
-function renderCode() {
-  const image = useAssets('/assets/images/nosta-qr.jpg')
+async function renderCode() {
+  const image = await useAssets('/assets/images/nosta-qr.jpg')
 
   const relay = relayStore.getRelay(profileEvent.value.relay)
   const nprofile = window.NostrTools.nip19.nprofileEncode({

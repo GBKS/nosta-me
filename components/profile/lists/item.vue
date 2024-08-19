@@ -2,6 +2,7 @@
 import ToolBox from '@/helpers/toolBox'
 import linkHelper from '@/helpers/linkHelper.js'
 import { useRelayStore } from '@/stores/relays'
+import useAssets from  '@/composables/useAssets.js'
 
 const relayStore = useRelayStore()
 
@@ -12,6 +13,7 @@ const props = defineProps([
 ])
 
 const contentTags = ['p', 't', 'word', 'e', 'a', 'r', 'relay', 'emoji']
+const listImage = ref()
 
 const emit = defineEmits(['select'])
 
@@ -193,10 +195,9 @@ const meta = computed(() => {
   return fillTemplate(type.value.title, entryCount.value)
 })
 
-const listImage = computed(() => {
-  const image =  '/assets/images/list-'+type.value.image+'.png'
-  return useAssets(image)
-})
+async function updateListImage() {
+  listImage.value = await useAssets('/assets/images/list-'+type.value.image+'.png')
+}
 
 const classObject = computed(() => {
   const c = ['lists-item']
@@ -229,6 +230,10 @@ const link = computed(() => {
 const hasIdentifier = computed(() => {
   const tag = props.info.tags.find(tag => tag[0] == 'd')
   return !!tag
+})
+
+onBeforeMount(() => {
+  updateListImage()
 })
 </script>
 

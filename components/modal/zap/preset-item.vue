@@ -6,6 +6,8 @@ const props = defineProps([
   'disabled'
 ])
 
+const image = ref()
+
 const classObject = computed(() => {
   const c = ['zap-preset-item']
 
@@ -20,10 +22,22 @@ const classObject = computed(() => {
   return c.join(' ')
 })
 
+async function updateImage() {
+  image.value = await useAssets('/assets/images/zap-'+props.info.rank+'.jpg')
+}
+
 const styleObject = computed(() => {
-  return {
-    backgroundImage: "url('" + useAssets('/assets/images/zap-'+props.info.rank+'.jpg') + "')"
+  const result = {}
+
+  if(image.value) {
+    result.backgroundImage = "url('" + image.value + "')"
   }
+
+  return result
+})
+
+onBeforeMount(() => {
+  updateImage()
 })
 </script>
 
