@@ -58,8 +58,7 @@ const rank = computed(() => {
 })
 
 const rankImage = computed(() => {
-  const image =  '/assets/images/zap-'+rank.value+'.jpg'
-  return useAssets(image)
+  return '/images/zap-'+rank.value+'.jpg'
 })
 
 const rankStyle = computed(() => {

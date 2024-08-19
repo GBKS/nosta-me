@@ -1,7 +1,6 @@
 <script setup>
 import zapHelper from '@/helpers/zapHelper.js'
 import Icons from '@/helpers/icons'
-import useAssets from  '@/composables/useAssets.js'
 import ToolBox from '@/helpers/toolBox'
 
 const active = ref(false)
@@ -13,6 +12,7 @@ const paymentNote = ref(null)
 const amount = ref(100)
 const info = ref()
 const status = ref('input')
+const rankImage = ref()
 
 const ranks = computed(() => {
   return [
@@ -21,35 +21,35 @@ const ranks = computed(() => {
       amount: 100,
       active: amount.value == 100,
       rank: 'bronze',
-      image: useAssets('/assets/images/texture-bronze.jpg')
+      image: '/images/texture-bronze.jpg'
     },
     {
       name: '1000',
       amount: 1000,
       active: amount.value == 1000,
       rank: 'silver',
-      image: useAssets('/assets/images/texture-silver.jpg')
+      image: '/images/texture-silver.jpg'
     },
     {
       name: '10K',
       amount: 10000,
       active: amount.value == 10000,
       rank: 'gold',
-      image: useAssets('/assets/images/texture-gold.jpg')
+      image: '/images/texture-gold.jpg'
     },
     {
       name: '100K',
       amount: 100000,
       active: amount.value == 100000,
       rank: 'emerald',
-      image: useAssets('/assets/images/texture-emerald.jpg')
+      image: '/images/texture-emerald.jpg'
     },
     {
       name: '1M',
       amount: 1000000,
       active: amount.value == 1000000,
       rank: 'neon',
-      image: useAssets('/assets/images/texture-neon.jpg')
+      image: '/images/texture-neon.jpg'
     }
   ]
 })
@@ -60,11 +60,18 @@ const currentRank = computed(() => {
   for(let i=0; i<ranks.value.length; i++) {
     if(amount.value >= ranks.value[i].amount) {
       result = ranks.value[i]
+
+      updateRankImage(result.image)
     }
   }
 
   return result
 })
+
+async function updateRankImage(image) {
+  rankImage.value = image
+  // rankImage.value = await useAssets(image)
+}
 
 function onShowModal(data) {
   const isActive = data.id === 'zap'

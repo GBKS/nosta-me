@@ -1,6 +1,4 @@
 <script setup>
-import useAssets from  '@/composables/useAssets.js'
-
 const props = defineProps([
   'themeId',
   'info',
@@ -23,8 +21,8 @@ const classObject = computed(() => {
 })
 
 const imageSource = computed(() => {
-  const image =  '/assets/images/themes/preview/'+props.themeId+'.jpg'
-  return useAssets(image)
+  const image = '/images/themes/preview/'+props.themeId+'.jpg'
+  return image
 })
 
 const imageSourceSet = computed(() => {

@@ -12,6 +12,7 @@ const props = defineProps([
 ])
 
 const contentTags = ['p', 't', 'word', 'e', 'a', 'r', 'relay', 'emoji']
+const listImage = ref()
 
 const emit = defineEmits(['select'])
 
@@ -193,10 +194,10 @@ const meta = computed(() => {
   return fillTemplate(type.value.title, entryCount.value)
 })
 
-const listImage = computed(() => {
+async function updateListImage() {
   const image =  '/assets/images/list-'+type.value.image+'.png'
-  return useAssets(image)
-})
+  listImage.value = await useAssets(image)
+}
 
 const classObject = computed(() => {
   const c = ['lists-item']
@@ -229,6 +230,10 @@ const link = computed(() => {
 const hasIdentifier = computed(() => {
   const tag = props.info.tags.find(tag => tag[0] == 'd')
   return !!tag
+})
+
+onBeforeMount(() => {
+  updateListImage()
 })
 </script>
 

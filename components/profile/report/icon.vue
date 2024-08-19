@@ -1,6 +1,4 @@
 <script setup>
-import useAssets from  '@/composables/useAssets.js'
-
 const knownTypes = [
   'nudity',
   'profanity',
@@ -19,8 +17,8 @@ const image = computed(() => {
     type = 'unknown'
   }
 
-  const image =  '/assets/images/report-'+type+'.jpg'
-  return useAssets(image)
+  const image =  '/images/report-'+type+'.jpg'
+  return image
 })
 </script>
 

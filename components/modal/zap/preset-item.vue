@@ -1,6 +1,4 @@
 <script setup>
-import useAssets from  '@/composables/useAssets.js'
-
 const props = defineProps([
   'info',
   'disabled'
@@ -22,7 +20,7 @@ const classObject = computed(() => {
 
 const styleObject = computed(() => {
   return {
-    backgroundImage: "url('" + useAssets('/assets/images/zap-'+props.info.rank+'.jpg') + "')"
+    backgroundImage: "url('/images/zap-"+props.info.rank+".jpg')"
   }
 })
 </script>

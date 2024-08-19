@@ -24,14 +24,14 @@ function onImageLoaded() {
 }
 
 const imageSource = computed(() => {
-  const image =  '/assets/images/themes/'+props.themeId+'.jpg'
-  return useAssets(image)
+  const image =  '/images/themes/'+props.themeId+'.jpg'
+  return image
 })
 
 const imageSourceSet = computed(() => {
-  const image =  '/assets/images/themes/'+props.themeId+'.jpg'
-  const retinaImage =  '/assets/images/themes/'+props.themeId+'@2x.jpg'
-  return useAssets(image) + ' 1x, ' + useAssets(retinaImage) + ' 2x'
+  const image =  '/images/themes/'+props.themeId+'.jpg'
+  const retinaImage =  '/images/themes/'+props.themeId+'@2x.jpg'
+  return image + ' 1x, ' + retinaImage + ' 2x'
 })
 
 </script>

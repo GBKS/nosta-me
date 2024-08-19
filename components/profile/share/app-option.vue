@@ -1,7 +1,4 @@
 <script setup>
-import useAssets from  '@/composables/useAssets.js'
-import Icons from '@/helpers/icons'
-
 const props = defineProps([
   'name',
   'description',
@@ -13,8 +10,8 @@ const props = defineProps([
 ])
 
 const imageSource = computed(() => {
-  const image =  '/assets/images/apps/'+props.image+'.jpg'
-  return useAssets(image)
+  const image =  '/images/apps/'+props.image+'.jpg'
+  return image
 })
 
 const title = computed(() => {

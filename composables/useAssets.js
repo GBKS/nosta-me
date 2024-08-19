@@ -1,12 +1,12 @@
 export default function useAssets(asset) {
-  const assets = import.meta.glob('/assets/images/*.jpg', {eager: true});
-  const assetsPng = import.meta.glob('/assets/images/*.png', {eager: true});
-  const themeAssets = import.meta.glob('/assets/images/themes/*.jpg', {eager: true});
-  const themeAssetsPng = import.meta.glob('/assets/images/themes/*.png', {eager: true});
-  const previewAssets = import.meta.glob('/assets/images/themes/preview/*.jpg', {eager: true});
-  const previewAssetsPng = import.meta.glob('/assets/images/themes/preview/*.png', {eager: true});
-  const appAssets = import.meta.glob('/assets/images/apps/*.jpg', {eager: true});
-  const appAssetsPng = import.meta.glob('/assets/images/apps/*.png', {eager: true});
+  const assets = import.meta.glob('/assets/images/*.jpg', {eager: false});
+  const assetsPng = import.meta.glob('/assets/images/*.png', {eager: false});
+  const themeAssets = import.meta.glob('/assets/images/themes/*.jpg', {eager: false});
+  const themeAssetsPng = import.meta.glob('/assets/images/themes/*.png', {eager: false});
+  const previewAssets = import.meta.glob('/assets/images/themes/preview/*.jpg', {eager: false});
+  const previewAssetsPng = import.meta.glob('/assets/images/themes/preview/*.png', {eager: false});
+  const appAssets = import.meta.glob('/assets/images/apps/*.jpg', {eager: false});
+  const appAssetsPng = import.meta.glob('/assets/images/apps/*.png', {eager: false});
 
   const locations = [
     assets,
@@ -19,10 +19,11 @@ export default function useAssets(asset) {
     appAssetsPng
   ]
 
-  const getAssetUrl = () => {
+  const getAssetUrl = async () => {
     for(let i=0; i<locations.length; i++) {
       if(locations[i][asset]) {
-        return locations[i][asset].default
+        const module = await locations[i][asset]();
+        return module.default;
       }
     }
     return null

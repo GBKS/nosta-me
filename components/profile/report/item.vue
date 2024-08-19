@@ -1,7 +1,5 @@
 <script setup>
-import relayRequest from '@/helpers/relayRequest.js'
 import multiRelayRequest from '@/helpers/multiRelayRequest.js'
-import Icons from '@/helpers/icons'
 import ToolBox from '@/helpers/toolBox'
 import { useRelayStore } from '@/stores/relays'
 import useAssets from  '@/composables/useAssets.js'
