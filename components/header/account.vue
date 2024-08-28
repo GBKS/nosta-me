@@ -7,11 +7,11 @@ const sessionStore = useSessionStore()
 const { isLoggedIn } = storeToRefs(sessionStore)
 
 const title = computed(() => {
-  return isLoggedIn ? 'View profile' : 'Sign in'
+  return isLoggedIn.value ? 'View profile' : 'Sign in'
 })
 
 const link = computed(() => {
-  return isLoggedIn ? '/'+sessionStore.publicKey : '/login/options'
+  return isLoggedIn.value ? '/'+sessionStore.publicKey : '/login/options'
 })
 </script>
 

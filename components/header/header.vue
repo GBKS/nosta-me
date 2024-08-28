@@ -9,7 +9,9 @@
       <HeaderTheme />
       <HeaderRelays />
       <HeaderSearch />
-      <HeaderAccount />
+      <client-only>
+        <HeaderAccount />
+      </client-only>
     </div>
   </header>
 </template>
