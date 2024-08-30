@@ -1,17 +1,16 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useUserStore } from "@/stores/users.js"
-import eventTracker from '@/helpers/eventTracker.js'
+import emitterHelper from '@/helpers/emitterHelper.js'
 
 const userStore = useUserStore()
 const unloadedProfiles = ref([])
 const loadedProfiles = ref([])
 const profileTags = {}
-const loadProfileCallback = onLoadProfile.bind(this)
-const loadEventTracker = eventTracker()
+const loadEmitter = emitterHelper()
 const currentPage = ref(0)
 const perPage = 10
-loadEventTracker.init(onLoadProfile)
+loadEmitter.init(onLoadProfile)
 
 const props = defineProps([
   'info',
@@ -72,7 +71,7 @@ function setupUnloadedProfiles() {
       } else {
         unloadedProfiles.value.push(publicKey)
 
-        loadEventTracker.add('profile-'+publicKey)
+        loadEmitter.add('profile-'+publicKey)
       }
     }
   }
@@ -86,7 +85,7 @@ function onLoadProfile(data) {
   if(index !== -1) {
     unloadedProfiles.value.splice(index, 1)
 
-    loadEventTracker.remove('profile-'+data.pubkey)
+    loadEmitter.remove('profile-'+data.pubkey)
   }
 
   loadedProfiles.value.push(data.pubkey)
@@ -108,7 +107,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  loadEventTracker.kill()
+  loadEmitter.kill()
 })
 
 watch(() => props.info, () => setupUnloadedProfiles)

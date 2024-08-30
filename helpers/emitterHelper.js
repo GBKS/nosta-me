@@ -1,4 +1,4 @@
-export default function eventTracker () { 
+export default function emitterHelper () { 
   return {
     events: [],
     callback: null,
