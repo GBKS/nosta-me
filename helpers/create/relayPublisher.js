@@ -4,6 +4,7 @@ import relayManager from '@/helpers/relayManager.js'
 
 export default function relayPublisher () { 
   return {
+    logEnabled: false,
     store: null,
     callback: null,
     relayId: null,
@@ -50,7 +51,7 @@ export default function relayPublisher () {
       this.status.status = 'saving'
       this.status.request = request
 
-      console.log('testPublishRelayData', signedEvent, this.status)
+      this.logger('testPublishRelayData', signedEvent, this.status)
 
       request.publish(
         this.relayId,
@@ -62,7 +63,7 @@ export default function relayPublisher () {
     },
 
     onResult(data) {
-      console.log('RelayResult', data)
+      this.logger('onResult', data)
 
       this.status.status = data.status
       this.status.result = data
@@ -125,7 +126,7 @@ export default function relayPublisher () {
       this.status.status = 'saving'
       this.status.request = request
 
-      console.log('testPublishRelayData', signedEvent, this.status)
+      this.logger('testPublish', signedEvent, this.status)
 
       const relayId = relayManager.addRelayByUrl('ws://umbrel.local:4848')
       request.publish(
@@ -135,6 +136,12 @@ export default function relayPublisher () {
       )
 
       return this.status
+    },
+
+    logger(...args) {
+      if(this.logEnabled) {
+        console.log('RelayPublisher', ...args)
+      }
     }
   }
 }

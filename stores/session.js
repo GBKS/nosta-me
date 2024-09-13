@@ -1,5 +1,13 @@
 import { defineStore } from 'pinia'
 import { useStorage, useLocalStorage } from '@vueuse/core'
+import sessionRelayService from '@/helpers/sessionRelayService.js'
+import sessionContactsService from '@/helpers/sessionContactsService.js'
+
+export const LOGIN_TYPE = {
+  BROWSER: 'browser',
+  PRIVATE_KEY: 'privatekey',
+  CONNECT: 'connect'
+}
 
 /*
 
@@ -43,6 +51,17 @@ export const useSessionStore = defineStore('session', {
 
     setLoggedIn(value) {
       this.isLoggedIn = value
+
+      // When the user logs in, we need to initialize the relay and contacts services
+      // We need the relays to find the contacts.
+      // This allows for showing follow/following state on profiles.
+      if(value) {
+        // The relay service will initialize the contacts service when it's ready
+        sessionRelayService.init()
+      } else {
+        sessionRelayService.reset()
+        sessionContactsService.reset()
+      }
     },
 
     setLoginType(value) {

@@ -19,11 +19,11 @@ export default {
     }
 
     if(delta < units.minute) {
-      return Math.round(delta/1000) + 's' + (includeAgo ? ' ago' : null)
+      return Math.round(delta/1000) + 's' + (includeAgo ? ' ago' : '')
     } else if(delta < units.hour) {
-      return Math.round(delta/1000/60) + 'm' + (includeAgo ? ' ago' : null)
+      return Math.round(delta/1000/60) + 'm' + (includeAgo ? ' ago' : '')
     } else if(delta < units.day) {
-      return Math.round(delta/1000/60/60) + 'h' + (includeAgo ? ' ago' : null)
+      return Math.round(delta/1000/60/60) + 'h' + (includeAgo ? ' ago' : '')
     } else {
       // Check if it's the same year
       if(d.getFullYear() == now.getFullYear()) {

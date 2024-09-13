@@ -116,7 +116,7 @@ function loadRelayData() {
 }
 
 function onRelayData(data) {
-  // console.log('onRelayData', data)
+  console.log('onRelayData', data)
 
   relayStore.setRelayInfo(props.info.id, data)
 

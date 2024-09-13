@@ -193,14 +193,14 @@ export default {
     const sentZapsFilter = {
       kinds: [9735],
       authors: [this.publicKey],
-      limit: 100,
+      limit: 10,
       since: Math.round(oneMonthAgo / 1000)
     }
 
     const receivedZapsFilter = {
       kinds: [9735],
       '#p': [this.publicKey],
-      limit: 100,
+      limit: 10,
       since: Math.round(oneMonthAgo / 1000)
     }
 

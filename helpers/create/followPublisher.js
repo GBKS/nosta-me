@@ -2,8 +2,9 @@ import relayPublishRequest from '@/helpers/relayPublishRequest.js'
 import { useProfileStore } from '@/stores/profile'
 import relayManager from '@/helpers/relayManager.js'
 
-export default function metaPublisher () { 
+export default function followPublisher () { 
   return {
+    logEnabled: !false,
     store: null,
     callback: null,
     relayId: null,
@@ -44,14 +45,14 @@ export default function metaPublisher () {
         }
       }
 
-      console.log('follows', this.store.follows)
+      this.logger('follows', this.store.follows)
 
       const signedEvent = this.signEvent(event)
 
       this.status.status = 'saving'
       this.status.requests = []
 
-      console.log('testPublishFollowData', signedEvent, this.status)
+      this.logger('publish', signedEvent, this.status)
 
       let relay, request, relayId
       for(i=0; i<this.store.relays.length; i++) {
@@ -61,7 +62,7 @@ export default function metaPublisher () {
           request = relayPublishRequest()
           relayId = relayManager.addRelayByUrl(relay.url)
 
-          console.log('Publishing to', relayId)
+          this.logger('Publishing to', relayId)
 
           this.status.requests.push(request)
 
@@ -77,7 +78,7 @@ export default function metaPublisher () {
     },
 
     onResult(data) {
-      console.log('followResult', data, this)
+      this.logger('onResult', data, this)
 
       this.status.status = data.status
       this.status.result = data
@@ -139,7 +140,7 @@ export default function metaPublisher () {
       this.status.status = 'saving'
       this.status.requests = []
 
-      console.log('testPublishFollowData', signedEvent, this.status)
+      this.logger('testPublish', signedEvent, this.status)
 
       const request = relayPublishRequest()
       const relayId = relayManager.addRelayByUrl('ws://umbrel.local:4848')
@@ -171,6 +172,12 @@ export default function metaPublisher () {
       // }
 
       return this.status
+    },
+    
+    logger(...args) {
+      if(this.logEnabled) {
+        console.log('FollowPublisher', ...args)
+      }
     }
   }
 }

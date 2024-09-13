@@ -19,7 +19,7 @@ Make connection to Blastr relay and post the profile notes
 
 export default function profilePublisher () { 
   return {
-    log: false,
+    logEnabled: false,
     requests: [],
     store: null,
     callback: null,
@@ -59,9 +59,7 @@ export default function profilePublisher () {
     },
 
     metaResult(status) {
-      if(this.log) {
-        console.log('metaResult', status)
-      }
+      this.logger('metaResult', status)
 
       this.status.meta = status
 
@@ -69,9 +67,7 @@ export default function profilePublisher () {
     },
 
     relayResult(status) {
-      if(this.log) {
-        console.log('relayResult', status)
-      }
+      this.logger('relayResult', status)
 
       this.status.relays = status
 
@@ -79,9 +75,7 @@ export default function profilePublisher () {
     },
 
     followResult(status) {
-      if(this.log) {
-        console.log('followResult', status)
-      }
+      this.logger('followResult', status)
 
       this.status.follows = status
 
@@ -136,6 +130,12 @@ export default function profilePublisher () {
     setupTestCalls() {
       this.store.publicKey = process.env.TEST_PUBLIC_KEY
       this.store.privateKey = process.env.TEST_PRIVATE_KEY
+    },
+
+    logger(...args) {
+      if(this.logEnabled) {
+        console.log('ProfilePublisher', ...args)
+      }
     }
   }
 }

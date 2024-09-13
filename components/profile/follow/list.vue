@@ -75,11 +75,11 @@ function setupUnloadedProfiles() {
       }
     }
   }
-  console.log('unloadedProfiles', unloadedProfiles.value, loadedProfiles.value)
+  // console.log('unloadedProfiles', unloadedProfiles.value, loadedProfiles.value)
 }
 
 function onLoadProfile(data) {
-  console.log('onLoadProfile', data)
+  // console.log('onLoadProfile', data)
 
   const index = unloadedProfiles.value.indexOf(data.pubkey)
   if(index !== -1) {

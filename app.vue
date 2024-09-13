@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onBeforeMount } from 'vue'
 import relayManager from '@/helpers/relayManager.js'
 import { useSessionStore } from '@/stores/session'
+import sessionRelayService from '@/helpers/sessionRelayService.js'
 import themes from '@/data/themes.json'
 import * as linkify from "linkifyjs"
 
@@ -66,6 +67,10 @@ onMounted(() => {
   linkify.registerCustomProtocol('nostr', true)
 
   isMounted.value = true
+
+  if(sessionStore.isLoggedIn) {
+    sessionRelayService.init()
+  }
 })
 
 updateFromRoute()

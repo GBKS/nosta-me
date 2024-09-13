@@ -18,6 +18,7 @@ export default {
   connectors: {},
 
   init() {
+    console.log('relayManager.init')
     if(!this.initialized) {
       this.initialized = true
 
@@ -46,6 +47,8 @@ export default {
   },
 
   addRelayByUrl(url) {
+    // console.log('addRelayByUrl', this.relayStore, url)
+
     if(!url) {
       console.log('relayManager.addRelayByUrl: No url provided', url)
       return
