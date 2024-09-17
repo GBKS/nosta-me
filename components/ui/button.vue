@@ -6,6 +6,7 @@ import Icons from '@/helpers/icons'
 const slots = useSlots()
 
 const props = defineProps([
+  'class',
   'to',
   'href',
   'disabled',
@@ -16,31 +17,15 @@ const props = defineProps([
 ])
 
 const classObject = computed(() => {
-  const c = []
+  const c = [
+    '-'+(props.size || 'medium'),
+    '-'+(props.look || 'chunky')
+  ]
 
-  if(props.icon) {
-    c.push('-icon')
-  }
-
-  if(props.size) {
-    c.push('-'+props.size)
-  } else {
-    c.push('-medium')
-  }
-
-  if(props.look) {
-    c.push('-'+props.look)
-  } else {
-    c.push('-chunky')
-  }
-
-  if(props.disabled) {
-    c.push('-disabled')
-  }
-
-  if(!slots.default) {
-    c.push('-empty')
-  }
+  if(props.class) c.push(props.class)
+  if(props.icon) c.push('-icon')
+  if(props.disabled) c.push('-disabled')
+  if(!slots.default) c.push('-empty')
 
   return c.join(' ')
 })
@@ -81,7 +66,7 @@ defineEmits(['click'])
   <button
     v-if="!(props.to || props.href)"
     :class="classObject"
-    :disabled="disabled"
+    :disabled="disabled ? 'disabled' : null"
     :title="title"
     @click="$emit('click')"
   >
@@ -128,13 +113,37 @@ button {
     background-color: rgba(var(--theme-front-rgb), 0.05);
 
     p {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
       padding: 5px 15px;
       font-weight: 600;
       font-size: 15px;
       color: rgba(var(--theme-front-rgb), 0.85);
     }
 
-    &:hover {
+    &.-icon {
+      span {
+        display: inline-block;
+
+        :deep(svg) {
+          width: 12px;
+          height: 12px;
+          transform: translateY(-2px);
+          vertical-align: middle;
+        }
+      }
+    }
+
+    &.-disabled {
+      pointer-events: none;
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    &:not(:disabled):hover {
       background-color: rgba(var(--theme-active-rgb), 0.1);
       
       p {

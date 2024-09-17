@@ -12,6 +12,10 @@ import multiRelayRequest from '@/helpers/multiRelayRequest.js'
 
 Loads profiles from a kind 3 event.
 
+Used in the follow list on profiles.
+
+Uses pagination to not load hundreds of profiles at once.
+
  */
 
 export default function contactsService () { 

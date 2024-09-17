@@ -6,6 +6,7 @@ import { useSessionStore } from '@/stores/session'
 import UiUsername from '@/components/ui/username'
 import ToolBox from '@/helpers/toolBox'
 import relayManager from '@/helpers/relayManager.js'
+import sessionContactsService from '@/helpers/sessionContactsService.js'
 
 const props = defineProps([
   'info',
@@ -112,6 +113,14 @@ const isOwner = computed(() => {
   return isLoggedIn.value && sessionStore.publicKey == props.publicKey
 })
 
+const showEditButton = computed(() => {
+  return isOwner.value
+})
+
+const showFollowButton = computed(() => {
+  return !isOwner.value && isLoggedIn.value
+})
+
 const classObject = computed(() => {
   return [
     'profile-info',
@@ -181,8 +190,12 @@ function showDataOverlay() {
           @showDataOverlay="showDataOverlay"
         />
       </div>
-      <ProfileFollowButton v-if="false && isLoggedIn && !isOwner" />
-      <ProfileEditButton v-if="isOwner" />
+      <ProfileEditButton v-if="showEditButton" />
+      <ProfileFollowButton
+        v-if="showFollowButton"
+        :key="publicKey"
+        :publicKey="publicKey"
+      />
     </div>
   </div>
 </template>

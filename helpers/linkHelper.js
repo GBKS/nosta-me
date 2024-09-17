@@ -94,7 +94,7 @@ export default {
 
     const bech = window.NostrTools.nip19.neventEncode({
       id: eventId,
-      relays: [eventRelay],
+      relays: eventRelay ? [eventRelay] : null,
       kind: eventKind
     })
 

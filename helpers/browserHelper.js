@@ -55,5 +55,28 @@ export default {
       }
       return null
     }
+  },
+
+  async getNostrRelays(callback) {
+    if(this.isNostrAvailable()) {
+      try {
+        return await window.nostr.getRelays()
+      } catch(error) {
+        if(callback) {
+          callback({
+            message: 'get-relays-failed',
+            error
+          })
+        }
+        return null
+      }
+    } else {
+      if(callback) {
+        callback({
+          message: 'nostr-not-available'
+        })
+      }
+      return null
+    }
   }
 }

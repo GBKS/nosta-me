@@ -35,6 +35,7 @@ const classObject = computed(() => {
     :class="classObject" 
     :title="title" 
     :disabled="disabled"
+    :aria-selected="active"
     @click="$emit('click')" 
   >
     <span v-html="Icons[icon]" />

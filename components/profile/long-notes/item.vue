@@ -1,14 +1,14 @@
 <script setup>
 import { storeToRefs } from 'pinia'
 import ToolBox from '@/helpers/toolBox'
-import { useHandlerStore } from "@/stores/handlers.js"
+// import { useHandlerStore } from "@/stores/handlers.js"
 import { useRelayStore } from '@/stores/relays'
 import linkHelper from '@/helpers/linkHelper.js'
 
-const handlerStore = useHandlerStore()
+// const handlerStore = useHandlerStore()
 const relayStore = useRelayStore()
 
-const { handlers } = storeToRefs(handlerStore)
+// const { handlers } = storeToRefs(handlerStore)
 
 const props = defineProps([
   'info',

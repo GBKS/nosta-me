@@ -38,6 +38,7 @@ const classObject = computed(() => {
       v-if="imageStatus != 'error'"
       :src="image" 
       :title="name"
+      :alt="name"
       @load="imageLoaded" 
       @error="imageLoadError"
     />
