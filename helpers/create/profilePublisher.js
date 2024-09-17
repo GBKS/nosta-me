@@ -19,7 +19,7 @@ Make connection to Blastr relay and post the profile notes
 
 export default function profilePublisher () { 
   return {
-    logEnabled: false,
+    logEnabled: !false,
     requests: [],
     store: null,
     callback: null,

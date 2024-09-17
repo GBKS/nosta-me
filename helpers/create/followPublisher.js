@@ -19,7 +19,8 @@ export default function followPublisher () {
       }
 
       if(!this.relayId) {
-        const relayUrl = "wss://nostr.mutinywallet.com"
+        // const relayUrl = "wss://nostr.mutinywallet.com"
+        const relayUrl = 'wss://relay.damus.io'
         this.relayId = relayManager.addRelayByUrl(relayUrl)
       }
     },
