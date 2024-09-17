@@ -32,19 +32,9 @@
             "url": "wss://nostr-pub.wellorder.net"
         },
         {
-            "id": "nostr-info",
-            "name": "Nostr.info",
-            "url": "wss://relay.nostr.info"
-        },
-        {
             "id": "offchain-pub",
             "name": "Offchain",
             "url": "wss://offchain.pub"
-        },
-        {
-            "id": "brb-io",
-            "name": "BRB",
-            "url": "wss://brb.io"
         },
         {
             "id": "snort-social",
@@ -52,14 +42,24 @@
             "url": "wss://relay.snort.social"
         },
         {
-            "id": "current-fyi",
-            "name": "Current",
-            "url": "wss://relay.current.fyi"
+            "id": "primal",
+            "name": "Primal",
+            "url": "wss://relay.primal.net"
         },
         {
-            "id": "relayer-se",
-            "name": "Relayer",
-            "url": "wss://nostr.relayer.se"
+            "id": "bitcoiner-social",
+            "name": "Bitcoiner Social",
+            "url": "wss://nostr.bitcoiner.social"
+        },
+        {
+            "id": "nostr-band",
+            "name": "Nostr.band",
+            "url": "wss://relay.nostr.band"
+        },
+        {
+            "id": "nostr-bg",
+            "name": "Nostr.bg",
+            "url": "wss://relay.nostr.bg"
         }
     ]
 }

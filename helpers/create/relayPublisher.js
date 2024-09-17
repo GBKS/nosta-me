@@ -4,7 +4,7 @@ import relayManager from '@/helpers/relayManager.js'
 
 export default function relayPublisher () { 
   return {
-    logEnabled: false,
+    logEnabled: !false,
     store: null,
     callback: null,
     relayId: null,
@@ -19,7 +19,8 @@ export default function relayPublisher () {
       }
 
       if(!this.relayId) {
-        const relayUrl = "wss://nostr.mutinywallet.com"
+        // const relayUrl = "wss://nostr.mutinywallet.com"
+        const relayUrl = 'wss://relay.damus.io'
         this.relayId = relayManager.addRelayByUrl(relayUrl)
       }
     },

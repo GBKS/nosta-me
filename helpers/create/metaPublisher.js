@@ -6,7 +6,7 @@ import { useUserStore } from "@/stores/users.js"
 
 export default function metaPublisher () { 
   return {
-    log: !false,
+    logEnabled: !false,
     store: null,
     sessionStore: null,
     userStore: null,
@@ -27,7 +27,8 @@ export default function metaPublisher () {
       }
 
       if(!this.relayId) {
-        const relayUrl = "wss://nostr.mutinywallet.com"
+        // const relayUrl = "wss://nostr.mutinywallet.com"
+        const relayUrl = 'wss://relay.damus.io'
         this.relayId = relayManager.addRelayByUrl(relayUrl)
       }
     },
@@ -39,6 +40,8 @@ export default function metaPublisher () {
       this.relayIds = relayIds
 
       this.init()
+
+      this.logger('publish', this.relayIds)
 
       const event = this.getBlankEvent()
 
@@ -57,7 +60,7 @@ export default function metaPublisher () {
       event.tags = []
       event.content = JSON.stringify(content)
 
-      console.log('event', event, this.store.publicKey)
+      this.logger('event', event, this.store.publicKey)
       this.signEvent(event)
 
       return this.status
@@ -69,9 +72,7 @@ export default function metaPublisher () {
       this.status.status = 'saving'
       this.status.request = request
 
-      if(this.log) {
-        console.log('publishMetaData', event, this.status)
-      }
+      this.logger('publishToBlastr', event, this.status)
 
       // Blast it out
       request.publish(
@@ -84,18 +85,14 @@ export default function metaPublisher () {
     publishToUserRelays(event) {
       this.status.requests = []
 
-      if(this.log) {
-        console.log('metaPublisher.publishToUserRelays', this.store.relays, this.relayIds)
-      }
+      this.logger('publishToUserRelays', this.store.relays, this.relayIds)
 
       let relay, request, relayId
       if(this.relayIds) {
         for(let i=0; i<this.relayIds.length; i++) {
           relayId = this.relayIds[i]
 
-          if(this.log) {
-            console.log('relayId', relayId)
-          }
+          this.logger('relayId', relayId)
 
           request = relayPublishRequest()
           this.status.requests.push(request)
@@ -113,9 +110,7 @@ export default function metaPublisher () {
           if(relay.added) {
             relayId = relayManager.addRelayByUrl(relay.url)
 
-            if(this.log) {
-              console.log('relayId', relayId)
-            }
+            this.logger('relayId', relayId)
 
             request = relayPublishRequest()
             this.status.requests.push(request)
@@ -132,9 +127,7 @@ export default function metaPublisher () {
     },
 
     onResult(data) {
-      if(this.log) {
-        console.log('metaPublisher.metaDataResult', data, this.callback)
-      }
+      this.logger('metaDataResult', data, this.callback)
 
       // Store updated user for later use
       if(data.status == 'success') {
@@ -172,14 +165,10 @@ export default function metaPublisher () {
     signEvent(event) {
       let privateKey
 
-      if(this.log) {
-        console.log('metaPublisher.isLoggedIn', event, this.sessionStore.isLoggedIn)
-      }
+      this.logger('isLoggedIn', event, this.sessionStore.isLoggedIn)
 
       if(this.sessionStore.isLoggedIn) {
-        if(this.log) {
-          console.log('metaPublisher.loginType', this.sessionStore.loginType)
-        }
+        this.logger('loginType', this.sessionStore.loginType)
 
         if(this.sessionStore.loginType == 'browser') {
           // Request from browser.
@@ -197,16 +186,14 @@ export default function metaPublisher () {
         } else if(this.sessionStore.loginType == 'privatekey') {
           privateKey = this.sessionStore.privateKey
         } else {
-          console.log('metaPublisher.signEvent unknown login type')
+          this.logger('signEvent unknown login type')
         }
       } else {
         // Assuming we're in the edit flow - this needs to get cleaner.
         privateKey = this.store.privateKey
       }
 
-      if(this.log) {
-        console.log('metaPublisher.signEvent', privateKey)
-      }
+      this.logger('signEvent', privateKey)
 
       if(privateKey) {
         event.id = window.NostrTools.getEventHash(event)
@@ -217,9 +204,7 @@ export default function metaPublisher () {
     },
 
     enableBrowser() {
-      if(this.log) {
-        console.log('metaPublisher.enableBrowser')
-      }
+      this.logger('enableBrowser')
 
       window.nostr.enable()
         .then(this.onEnableBrowser.bind(this))
@@ -227,9 +212,7 @@ export default function metaPublisher () {
     },
 
     onEnableBrowser() {
-      if(this.log) {
-        console.log('metaPublisher.onEnableBrowser', this.unsignedEvent)
-      }
+      this.logger('onEnableBrowser', this.unsignedEvent)
 
       window.nostr.signEvent(this.unsignedEvent)
         .then(this.onSignEvent.bind(this))
@@ -237,13 +220,11 @@ export default function metaPublisher () {
     },
 
     onEnableBrowserFailed() {
-      console.log('metaPublisher.onEnableBrowserFailed', arguments)
+      this.logger('onEnableBrowserFailed', arguments)
     },
 
     onSignEvent(signedEvent) {
-      if(this.log) {
-        console.log('metaPublisher.onSignEvent', signedEvent)
-      }
+      this.logger('onSignEvent', signedEvent)
 
       // Blast it out
       this.publishToBlastr(signedEvent)
@@ -253,13 +234,13 @@ export default function metaPublisher () {
     },
 
     onSignEventFailed() {
-      console.log('metaPublisher.onSignEventFailed', arguments)
+      this.logger('onSignEventFailed', arguments)
     },
 
     // Tests
 
     testPublish(callback) {
-      console.log('metaPublisher.testPublish', callback)
+      this.logger('testPublish', callback)
       this.callback = callback
 
       this.init()
@@ -289,7 +270,7 @@ export default function metaPublisher () {
       this.status.status = 'saving'
       this.status.request = request
 
-      console.log('testPublishMetaData', signedEvent, this.status)
+      this.logger('testPublishMetaData', signedEvent, this.status)
 
       const relayId = relayManager.addRelayByUrl('ws://umbrel.local:4848')
       request.publish(
@@ -302,7 +283,13 @@ export default function metaPublisher () {
     },
 
     kill() {
-      console.log('metaPublisher.kill need to implement this')
+      this.logger('kill need to implement this')
+    },
+
+    logger(...args) {
+      if(this.logEnabled) {
+        console.log('MetaPublisher', ...args)
+      }
     }
   }
 }
