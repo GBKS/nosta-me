@@ -2,7 +2,8 @@
 import ToolBox from '@/helpers/toolBox'
 
 const props = defineProps([
-  'info'
+  'info',
+  'isOwner'
 ])
 
 const sortedInfo = computed(() => {
@@ -22,6 +23,7 @@ const sortedInfo = computed(() => {
       v-if="info" 
       :events="sortedInfo"
       type="following"
+      :isOwner="isOwner"
     />
     <p v-if="!info">No follow list found on this profile.</p>
   </div>

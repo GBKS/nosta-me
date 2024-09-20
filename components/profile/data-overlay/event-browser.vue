@@ -2,10 +2,13 @@
 import Icons from '@/helpers/icons'
 import ToolBox from '@/helpers/toolBox'
 import { useRelayStore } from '@/stores/relays'
+import sessionRelayService from '@/helpers/sessionRelayService.js'
+import relayPublishRequest from '@/helpers/relayPublishRequest.js'
 
 const props = defineProps([
   'events',
-  'type'
+  'type',
+  'isOwner'
 ])
 
 const relayStore = useRelayStore()
@@ -54,12 +57,70 @@ const meta = computed(() => {
 
   return result
 })
+
+const showRepublish = computed(() => {
+  return props.isOwner && props.events.length > 0
+})
+
+function republish() {
+  if(confirm('Republish this event to your relays?')) {
+    // Need to figure out which relays to use
+    // Ideally get them from the sessionRelayService
+    const relayIds = sessionRelayService.relayIds
+    console.log('ProfileDataOvelayEventBrowser.relayIds', sessionRelayService.relayIds)
+
+    const newEvent = JSON.parse(JSON.stringify(currentEvent.value))
+    if(newEvent.originalContent) {
+      newEvent.content = newEvent.originalContent
+      delete newEvent.originalContent
+    }
+    if(newEvent.content && typeof newEvent.content !== 'string') {
+      newEvent.content = JSON.stringify(newEvent.content)
+    }
+    delete newEvent.relay
+
+    // Validate event
+    const oldId = newEvent.id
+    // const oldSig = newEvent.sig
+    // delete newEvent.id
+    // delete newEvent.sig
+    const newId = window.NostrTools.getEventHash(newEvent)
+    if(newId != oldId) {
+      console.error('Event id mismatch', oldId, newId)
+      console.error('newEvent', newEvent)
+      return
+    }
+
+    let request, relayId
+    for(let i=0; i<relayIds.length; i++) {
+      relayId = relayIds[i]
+
+      request = relayPublishRequest()
+      request.showNotification = true
+
+      console.log('Publishing to', relayId, newEvent)
+
+      request.publish(
+        relayId,
+        newEvent,
+        onRepublishEvent
+      )
+    }
+  }
+}
+
+function onRepublishEvent(result) {
+  console.log('onRepublishEvent', result)
+}
 </script>
 
 <template>
   <div>
     <div class="info">
-      <p>{{ formattedDate }} · <a :href="relayLink" target="_blank" rel="nofollow noopener noreferrer">{{ formattedRelay }}</a><template v-if="meta"> · {{ meta }}</template></p>
+      <p>{{ formattedDate }} · <a :href="relayLink" target="_blank" rel="nofollow noopener noreferrer">{{ formattedRelay }}</a>
+        <template v-if="meta"> · {{ meta }}</template>
+        <template v-if="showRepublish"> · <button @click="republish">Republish</button></template>
+      </p>
       <div class="pagination" v-if="events.length > 1">
         <button
           v-html="Icons.caretLeft"
@@ -97,6 +158,20 @@ div {
           color: var(--front);
           opacity: 1;
           text-decoration: underline;
+        }
+      }
+
+      button {
+        appearance: none;
+        border-width: 0;
+        padding: 0;
+        background-color: transparent;
+        opacity: 0.5;
+
+        &:hover {
+          opacity: 1;
+          text-decoration: underline;
+          cursor: pointer;
         }
       }
     }

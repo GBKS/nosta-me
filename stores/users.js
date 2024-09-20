@@ -28,6 +28,7 @@ export const useUserStore = defineStore({
     addUser(publicKey, data) {
       // Auto convert the content field to an object for convenience
       if(typeof data.content == 'string' && data.content.length > 0) {
+        data.originalContent = data.content
         data.content = JSON.parse(data.content)
       }
       
