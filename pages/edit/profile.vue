@@ -382,12 +382,12 @@ onMounted(() => {
       </div>
       <div class="options">
         <UiButton
-          size="small"
+          size="tiny"
           look="outline"
           @click="cancelChanges" 
         >Cancel</UiButton>
         <UiButton 
-          size="small"
+          size="tiny"
           :disabled="!hasFormChanged"
           @click="saveChanges" 
         >Save changes</UiButton>

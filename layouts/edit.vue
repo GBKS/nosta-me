@@ -21,6 +21,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-sizing: border-box;
   padding: 40px 20px;
 
   .content {
@@ -32,6 +33,7 @@
     display: flex;
     gap: 20px;
     flex-direction: column;
+    box-sizing: border-box;
 
     .header {
       display: flex;
@@ -96,8 +98,8 @@
   }
 
   @include media-query(small) {
-    .modal {
-      padding: 0 15px 15px 15px;
+    .content {
+      padding: 25px 15px;
     }
   }
 
