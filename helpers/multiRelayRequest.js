@@ -143,6 +143,9 @@ export default function multiRelayRequest () {
         console.log('onEvent', relayId, event)
       }
 
+      const connection = relayManager.getConnector(relayId)
+      connection.stats.events++
+
       event.relay = relayId
 
       if(event.kind === 0) {

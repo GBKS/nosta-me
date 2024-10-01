@@ -14,6 +14,7 @@ export default function metaPublisher () {
     relayId: null,
     relayIds: null,
     unsignedEvent: null,
+    showNotifications: false,
     status: {
       status: 'default',
       request: null,
@@ -68,6 +69,7 @@ export default function metaPublisher () {
 
     publishToBlastr(event) {
       const request = relayPublishRequest()
+      request.showNotification = this.showNotifications
 
       this.status.status = 'saving'
       this.status.request = request
@@ -95,6 +97,7 @@ export default function metaPublisher () {
           this.logger('relayId', relayId)
 
           request = relayPublishRequest()
+          request.showNotification = this.showNotifications
           this.status.requests.push(request)
 
           request.publish(
@@ -113,6 +116,7 @@ export default function metaPublisher () {
             this.logger('relayId', relayId)
 
             request = relayPublishRequest()
+            request.showNotification = this.showNotifications
             this.status.requests.push(request)
 
             request.publish(

@@ -125,6 +125,9 @@ export default function relayRequest () {
         console.log('onEvent', this.relayId, event)
       }
 
+      const connection = relayManager.getConnector(this.relayId)
+      connection.stats.events++
+
       event.relay = this.relayId
 
       if(event.kind === 0) {

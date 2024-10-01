@@ -11,8 +11,8 @@ const props = defineProps([
   'href',
   'disabled',
   'icon',
-  'size',
-  'look', // Chunky, tab, outline
+  'size', // tiny, small, medium, large
+  'look', // chunky, tab, outline
   'title'
 ])
 

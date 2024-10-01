@@ -16,6 +16,12 @@ const STATUS = {
   ERROR: 'error'
 }
 
+const SOURCES = {
+  BROWSER_EXTENSION: 'browser-extension',
+  NIP05: 'nip05',
+  RELAY: 'relay'
+}
+
 /*
 
 Handles data for the logged-in users relays.
@@ -53,6 +59,7 @@ export default {
   loadStatus: STATUS.NOT_INITIALIZED, // busy, done, error
   eventData: null,
   relayIds: null,
+  source: null,
 
   init() {
     const sessionStore = useSessionStore()
@@ -119,6 +126,9 @@ export default {
 
           if(relayIds.length > 0) {
             this.relayIds = relayIds
+            this.source = SOURCES.NIP05
+
+            this.broadcastStatus(STATUS.LOADED)
 
             // Tell the contacts service to start looking for contact lists
             sessionContactsService.init(relayIds)
@@ -162,6 +172,9 @@ export default {
 
       if(relayIds.length > 0) {
         this.relayIds = relayIds
+        this.source = SOURCES.BROWSER_EXTENSION
+
+        this.broadcastStatus(STATUS.LOADED)
 
         // Let's search those relays for contact info
         sessionContactsService.init(relayIds)
@@ -236,6 +249,7 @@ export default {
 
       if(relayIds.length > 0) {
         this.relayIds = relayIds
+        this.source = SOURCES.RELAY
       }
     } else {
       this.relayIds = null
@@ -251,6 +265,7 @@ export default {
   // Tell the world about our status.
   broadcastStatus(status) {
     this.loadStatus = status
+    console.log('sessionRelayService.broadcastStatus', status)
     
     window.emitter.emit('session-relays', {
       status: this.loadStatus,
@@ -305,5 +320,6 @@ export default {
     this.checkedUserStore = false
     this.checkedExtension = false
     this.checkedPopularRelays = false
+    this.source = null
   }
 }

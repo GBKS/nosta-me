@@ -24,6 +24,10 @@ const sessionStore = useSessionStore()
 const relayStore = useRelayStore()
 const router = useRouter()
 
+definePageMeta({
+  layout: "edit"
+})
+
 const log = false
 let service = null
 let publisher = null
@@ -151,10 +155,12 @@ function saveChanges() {
 
   if(log) {
     console.log('EditProfile.saveChanges', editContent)
+
   }
 
   // Publish it
   publisher = metaPublisher()
+  publisher.showNotifications = true
   publisher.init()
   publisher.publish(publishResult, content, relayIds.value)
 
@@ -285,113 +291,112 @@ onMounted(() => {
 
 <template>
   <div class="edit-profile-page">
-    <div class="modal">
-      <div class="content">
-        <div class="copy">
-          <h1>Update your profile</h1>
-          <p>Edit your basic information.</p>
-
-          <p v-if="profileVersions.dates.length > 1">{{ profileVersions.dates.length }} versions of your profile were found across {{ profileVersions.relays.length }} relays. Saving via this page will make them consistent.</p>
-        </div>
-        <div class="fields">
-          <div class="field-set">
-            <label>Name</label>
-            <UiInput
-              placeholder="Enter your handle..."
-              size="small"
-              v-model="name"
-            />
-          </div>
-          <div class="field-set">
-            <label>About</label>
-            <UiInput
-              placeholder="Enter your about..."
-              size="small"
-              multiline="true"
-              v-model="about"
-            />
-          </div>
-          <div class="field-set">
-            <label>Website</label>
-            <UiInput
-              placeholder="Enter your website..."
-              size="small"
-              v-model="website"
-            />
-          </div>
-          <div class="field-set">
-            <label>Handle</label>
-            <UiInput
-              placeholder="Enter your handle..."
-              size="small"
-              v-model="handle"
-            />
-          </div>
-          <div class="field-set">
-            <div class="top">
-              <label>Bitcoin lightning address</label>
-              <UiTip
-                v-if="false"
-                text="Looks like an email, but for receiving bitcoin."
-                link="https://lightningaddress.com"
-              />
-            </div>
-            <UiInput
-              placeholder="Enter your bitcoin..."
-              size="small"
-              v-model="bitcoin"
-            />
-          </div>
-          <div class="field-set-wrap">
-            <div class="field-set">
-              <label>Profile picture</label>
-              <UiInput
-                placeholder="Enter your picture URL..."
-                size="small"
-                v-model="picture"
-              />
-            </div>
-            <div
-              :class="picturePreviewClass"
-              :style="picturePreviewStyle"
-            />
-          </div>
-          <div class="field-set-wrap">
-            <div class="field-set">
-              <label>Profile banner</label>
-              <UiInput
-                placeholder="Enter your banner URL..."
-                size="small"
-                v-model="banner"
-              />
-            </div>
-            <div
-              :class="bannerPreviewClass"
-              :style="bannerPreviewStyle"
-            />
-          </div>
-        </div>
-        <div class="relays">
-          <h2>Relays</h2>
-          <p v-if="relayIds.length == 0 && !timedOut">Looking for your profile data...</p>
-          <p v-if="relayIds.length == 0 && timedOut">Could not find any profile data for you. Saving changes will blast it out to many relays, so others can find you easily.</p>
-          <p v-if="relayIds.length > 0">Your profile was found on these relays. Saving changes will update them, and many more relays, so others can find you easily.</p>
-          <RelaySaveList
-            :active="isSaving"
-            :relayIds="relayIds"
+    <div class="content">
+      {{ relayIds }}
+      <div 
+        v-if="profileVersions.dates.length > 1"
+        class="copy" 
+      >
+        <p>{{ profileVersions.dates.length }} versions of your profile were found across {{ profileVersions.relays.length }} relays. Saving via this page will make them consistent.</p>
+      </div>
+      <div class="fields">
+        <div class="field-set">
+          <label>Name</label>
+          <UiInput
+            placeholder="Enter your handle..."
+            size="small"
+            v-model="name"
           />
         </div>
-        <div class="options">
-          <UiButton
+        <div class="field-set">
+          <label>About</label>
+          <UiInput
+            placeholder="Enter your about..."
             size="small"
-            @click="cancelChanges" 
-          >Cancel</UiButton>
-          <UiButton 
-            size="small"
-            :disabled="!hasFormChanged"
-            @click="saveChanges" 
-          >Save changes</UiButton>
+            multiline="true"
+            v-model="about"
+          />
         </div>
+        <div class="field-set">
+          <label>Website</label>
+          <UiInput
+            placeholder="Enter your website..."
+            size="small"
+            v-model="website"
+          />
+        </div>
+        <div class="field-set">
+          <label>Handle</label>
+          <UiInput
+            placeholder="Enter your handle..."
+            size="small"
+            v-model="handle"
+          />
+        </div>
+        <div class="field-set">
+          <div class="top">
+            <label>Bitcoin lightning address</label>
+            <UiTip
+              v-if="false"
+              text="Looks like an email, but for receiving bitcoin."
+              link="https://lightningaddress.com"
+            />
+          </div>
+          <UiInput
+            placeholder="Enter your bitcoin..."
+            size="small"
+            v-model="bitcoin"
+          />
+        </div>
+        <div class="field-set-wrap">
+          <div class="field-set">
+            <label>Profile picture</label>
+            <UiInput
+              placeholder="Enter your picture URL..."
+              size="small"
+              v-model="picture"
+            />
+          </div>
+          <div
+            :class="picturePreviewClass"
+            :style="picturePreviewStyle"
+          />
+        </div>
+        <div class="field-set-wrap">
+          <div class="field-set">
+            <label>Profile banner</label>
+            <UiInput
+              placeholder="Enter your banner URL..."
+              size="small"
+              v-model="banner"
+            />
+          </div>
+          <div
+            :class="bannerPreviewClass"
+            :style="bannerPreviewStyle"
+          />
+        </div>
+      </div>
+      <div class="relays" v-if="false">
+        <h2>Relays</h2>
+        <p v-if="relayIds.length == 0 && !timedOut">Looking for your profile data...</p>
+        <p v-if="relayIds.length == 0 && timedOut">Could not find any profile data for you. Saving changes will post it to these relays.</p>
+        <p v-if="relayIds.length > 0">Your profile was found on these relays. Saving changes will update them.</p>
+        <RelaySaveList
+          :active="isSaving"
+          :relayIds="relayIds"
+        />
+      </div>
+      <div class="options">
+        <UiButton
+          size="small"
+          @click="cancelChanges" 
+        >Cancel</UiButton>
+        <UiButton 
+          size="small"
+          :disabled="!hasFormChanged"
+          @click="saveChanges" 
+        >Save changes</UiButton>
       </div>
     </div>
   </div>
@@ -401,119 +406,109 @@ onMounted(() => {
 
 .edit-profile-page {
   display: flex;
-  justify-content: center;
-  padding-left: 15px;
-  padding-right: 15px;
-  min-height: 100vh;
+  flex-direction: column;
+  justify-content: stretch;
+  // padding-left: 15px;
+  // padding-right: 15px;
+  // min-height: 100vh;
   box-sizing: border-box;
 
-  .modal {
-    background-color: white;
-    border-radius: 25px;
-    position: relative;
+  .content {
     display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    // max-width: 700px;
+    // width: 100%;
+    // @include r('padding-left', 20, 60);
+    // @include r('padding-right', 20, 60);
+    // @include r('padding-top', 20, 40);
+    // @include r('padding-bottom', 20, 40);
+    // @include r('gap', 20, 40);
 
-    .content {
+    .copy {
       display: flex;
       flex-direction: column;
-      box-sizing: border-box;
-      max-width: 700px;
-      width: 100%;
-      @include r('padding-left', 20, 60);
-      @include r('padding-right', 20, 60);
-      @include r('padding-top', 20, 40);
-      @include r('padding-bottom', 20, 40);
-      @include r('gap', 10, 20);
+      gap: 10px;
+      @include r('margin-top', 10, 20);
 
-      .copy {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-
-        h1 {
-          @include r('font-size', 32, 48);
-        }
-
-        p {
-
-        }
+      h1 {
+        @include r('font-size', 32, 48);
       }
 
-      .fields {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
+      p {
 
-        .field-set-wrap {
-          display: flex;
-          gap: 30px;
-
-          .field-set {
-            flex-grow: 1;
-          }
-        }
-
-        .field-set {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-
-          label {
-            font-weight: 500;
-          }
-
-          .top {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-          }
-        }
-
-        .banner-preview ,
-        .picture-preview {
-          background-color: #f4f4f4;
-          background-size: cover;
-          background-position: center center;
-        }
-
-        .banner-preview {
-          border-radius: 5px;  
-          width: 250px;
-          height: 80px;        
-        }
-
-        .picture-preview {
-          border-radius: 100px;
-          width: 70px;
-          height: 70px;
-        }
-      }
-
-      .relays {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-
-        h2 {
-          @include r('font-size', 16, 18);
-          font-weight: 500;
-        }
-      }
-
-      .options {
-        display: flex;
-        gap: 20px;
-        justify-content: space-between;
       }
     }
-  }
 
-  @include media-query(medium-down) {
-    padding: 0 15px 15px 15px;
-  }
+    .fields {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      @include r('margin-top', 10, 20);
 
-  @include media-query(large) {
-    padding: 50px;
+      .field-set-wrap {
+        display: flex;
+        gap: 30px;
+
+        .field-set {
+          flex-grow: 1;
+        }
+      }
+
+      .field-set {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        label {
+          font-weight: 500;
+        }
+
+        .top {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+        }
+      }
+
+      .banner-preview ,
+      .picture-preview {
+        background-color: #f4f4f4;
+        background-size: cover;
+        background-position: center center;
+      }
+
+      .banner-preview {
+        border-radius: 5px;  
+        width: 250px;
+        height: 80px;        
+      }
+
+      .picture-preview {
+        border-radius: 100px;
+        width: 70px;
+        height: 70px;
+      }
+    }
+
+    .relays {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      @include r('margin-top', 20, 40);
+
+      h2 {
+        @include r('font-size', 16, 24);
+        font-weight: 500;
+      }
+    }
+
+    .options {
+      display: flex;
+      gap: 20px;
+      justify-content: space-between;
+      @include r('margin-top', 20, 40);
+    }
   }
 }
 

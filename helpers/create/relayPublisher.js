@@ -8,6 +8,7 @@ export default function relayPublisher () {
     store: null,
     callback: null,
     relayId: null,
+    showNotifications: false,
     status: {
       status: 'default',
       request: null
@@ -48,6 +49,7 @@ export default function relayPublisher () {
 
       const signedEvent = this.signEvent(event)
       const request = relayPublishRequest()
+      request.showNotification = this.showNotifications
 
       this.status.status = 'saving'
       this.status.request = request
@@ -123,6 +125,7 @@ export default function relayPublisher () {
 
       const signedEvent = this.signEvent(event)
       const request = relayPublishRequest()
+      request.showNotification = this.showNotifications
 
       this.status.status = 'saving'
       this.status.request = request
