@@ -210,6 +210,7 @@ function close() {
 
           <ProfileDataOverlayRelays
             v-if="activeNavOptionId == 'relays'"
+            :isOwner="isOwner"
             :info="relayData"
           />
 
