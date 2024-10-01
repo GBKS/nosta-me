@@ -49,7 +49,7 @@ To find the relays we:
  */
 
 export default {
-  log: false,
+  logEnabled: !false,
   initialized: false,
   checkedUserStore: false,
   checkedExtension: false,
@@ -64,7 +64,7 @@ export default {
   init() {
     const sessionStore = useSessionStore()
 
-    console.log('sessionRelayService.init')
+    this.logger('init')
 
     if(!this.initialized && sessionStore.isLoggedIn) {
       this.broadcastStatus(STATUS.INITIALIZED)
@@ -88,7 +88,7 @@ export default {
   },
 
   giveUp() {  
-    console.log('sessionRelayService.giveUp - cannot find relays for the user')
+    this.logger('giveUp - cannot find relays for the user')
   },
 
   checkUserStore() {
@@ -97,7 +97,7 @@ export default {
     const userStore = useUserStore()
     const result = userStore.getUser(publicKey)
 
-    console.log('sessionRelayService.checkUserStore', result)
+    this.logger('checkUserStore', result)
 
     if(result) {
       // Need to figure out what we have here
@@ -117,7 +117,7 @@ export default {
     try {
       let data = await window.NostrTools.nip05.queryProfile(nip05)
 
-      console.log('loadNip05', nip05, data)
+      this.logger('loadNip05', nip05, data)
 
       if(data && data.pubkey) {
         // Register found relays and create a list of IDs
@@ -129,6 +129,9 @@ export default {
             this.source = SOURCES.NIP05
 
             this.broadcastStatus(STATUS.LOADED)
+
+            // We're still going to search those relays for more current data
+            this.load(relayIds)
 
             // Tell the contacts service to start looking for contact lists
             sessionContactsService.init(relayIds)
@@ -165,7 +168,7 @@ export default {
   }
   */
   onCheckExtension(relayData) {  
-    console.log('sessionRelayService.onCheckExtension', relayData, Object.keys(relayData))
+    this.logger('onCheckExtension', relayData, Object.keys(relayData))
 
     if(relayData && Object.keys(relayData).length > 0) {
       const relayIds = Object.keys(relayData).map(url => relayManager.addRelayByUrl(url)).filter(Boolean)
@@ -175,6 +178,9 @@ export default {
         this.source = SOURCES.BROWSER_EXTENSION
 
         this.broadcastStatus(STATUS.LOADED)
+
+        // We're still going to search those relays for more current data
+        this.load(relayIds)
 
         // Let's search those relays for contact info
         sessionContactsService.init(relayIds)
@@ -187,13 +193,13 @@ export default {
   },
 
   onCheckExtensionError(result) {
-    console.log('sessionRelayService.onCheckExtension', result)
+    this.logger('onCheckExtension', result)
     this.checkPopularRelays()
   },
 
   // We don't have leads - check our default/popular relays.
   checkPopularRelays() {
-    console.log('sessionRelayService.checkPopularRelays')
+    this.logger('checkPopularRelays')
     const relayStore = useRelayStore()
     this.relayIds = relayStore.getAll
     this.load(this.relayIds)
@@ -205,7 +211,7 @@ export default {
     const sessionStore = useSessionStore()
     const publicKey = sessionStore.publicKey
     
-    console.log('sessionRelayService.load', publicKey)
+    this.logger('load', publicKey)
 
     const filter = {
       kinds: [10002],
@@ -224,7 +230,7 @@ export default {
   onLoad(data) {
     this.broadcastStatus(STATUS.LOADED)
     
-    console.log('sessionRelayService.onLoad', data)
+    this.logger('onLoad', data)
 
     if(data && data.tags) {
       if(!this.eventData) this.eventData = []
@@ -242,22 +248,24 @@ export default {
   },
 
   updateRelayIdsFromLatestEvent() {
+    this.logger('updateRelayIdsFromLatestEvent', this.eventData)
     if(this.eventData) {
       const latestEvent = this.eventData.reduce((a, b) => (a.created_at > b.created_at ? a : b), {})
       const tags = latestEvent.tags.filter(tag => tag[0] == 'r')
       const relayIds = tags.map(tag => relayManager.addRelayByUrl(tag[1])).filter(Boolean)
+      this.logger('fhdskj', tags, relayIds)
 
       if(relayIds.length > 0) {
         this.relayIds = relayIds
         this.source = SOURCES.RELAY
       }
-    } else {
-      this.relayIds = null
+    // } else {
+    //   this.relayIds = null
     }
   },
 
   onLoadError(error) {
-    console.log('sessionRelayService.onLoadError', error)
+    this.logger('onLoadError', error)
 
     this.broadcastStatus(STATUS.ERROR)
   },
@@ -265,7 +273,7 @@ export default {
   // Tell the world about our status.
   broadcastStatus(status) {
     this.loadStatus = status
-    console.log('sessionRelayService.broadcastStatus', status)
+    this.logger('broadcastStatus', status)
     
     window.emitter.emit('session-relays', {
       status: this.loadStatus,
@@ -299,7 +307,7 @@ export default {
 
   // Check if a relay is also used by the logged-in user
   isUsing(relayId) {
-    console.log('isFollowing', relayId)
+    this.logger('isFollowing', relayId)
 
     if(this.isReady()) {
       const latestEvent = this.eventData.reduce((a, b) => (a.created_at > b.created_at ? a : b), {})
@@ -321,5 +329,11 @@ export default {
     this.checkedExtension = false
     this.checkedPopularRelays = false
     this.source = null
+  },
+
+  logger(...args) {
+    if(this.logEnabled) {
+      console.log('SessionRelayService', ...args)
+    }
   }
 }

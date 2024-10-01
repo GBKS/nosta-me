@@ -18,6 +18,7 @@ import { useProfileStore } from '@/stores/profile'
 import { useRelayStore } from '@/stores/relays'
 import multiRelayRequest from '@/helpers/multiRelayRequest.js'
 import metaPublisher from '@/helpers/create/metaPublisher.js'
+import sessionRelayService from '@/helpers/sessionRelayService.js'
 
 const profileStore = useProfileStore()
 const sessionStore = useSessionStore()
@@ -177,7 +178,10 @@ function loadData() {
     service.init(onDataLoaded)
   }
 
-  const relaysToCheck = relayStore.getAll
+  let relaysToCheck = sessionRelayService.relayIds
+  if(!relayIds || relayIds.length == 0) {
+    relaysToCheck = relayStore.getAll
+  }
 
   service.start(relaysToCheck, [{
       kinds: [0, 2],
@@ -292,7 +296,6 @@ onMounted(() => {
 <template>
   <div class="edit-profile-page">
     <div class="content">
-      {{ relayIds }}
       <div 
         v-if="profileVersions.dates.length > 1"
         class="copy" 
@@ -377,19 +380,10 @@ onMounted(() => {
           />
         </div>
       </div>
-      <div class="relays" v-if="false">
-        <h2>Relays</h2>
-        <p v-if="relayIds.length == 0 && !timedOut">Looking for your profile data...</p>
-        <p v-if="relayIds.length == 0 && timedOut">Could not find any profile data for you. Saving changes will post it to these relays.</p>
-        <p v-if="relayIds.length > 0">Your profile was found on these relays. Saving changes will update them.</p>
-        <RelaySaveList
-          :active="isSaving"
-          :relayIds="relayIds"
-        />
-      </div>
       <div class="options">
         <UiButton
           size="small"
+          look="outline"
           @click="cancelChanges" 
         >Cancel</UiButton>
         <UiButton 

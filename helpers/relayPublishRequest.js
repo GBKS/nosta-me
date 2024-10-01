@@ -93,6 +93,8 @@ export default function relayPublishRequest () {
     onSuccess() {
       this.logger('onSuccess', this)
 
+      clearTimeout(this.timeout)
+
       this.updateNotification(NOTIFICATION_STATUS.SUCCESS)
 
       this.callback({

@@ -10,6 +10,7 @@ definePageMeta({
   layout: "edit"
 })
 
+const logEnabled = false
 const sessionStore = useSessionStore()
 const relayStore = useRelayStore()
 const isSaving = ref(false)
@@ -18,12 +19,15 @@ const relayIdsToRemove = ref([])
 const relayUrlsToAdd = ref([])
 
 function onSessionRelays(relays) {
+  logger('onSessionRelays', relays)
   relayIds.value = sessionRelayService.relayIds
 }
 
-const canEdit = computed(() => {
-  return sessionRelayService.source == 'relay'
-})
+function logger(...args) {
+  if(logEnabled) {
+    console.log('EditRelays', ...args)
+  }
+}
 
 const saveEnabled = computed(() => {
   return relayIdsToRemove.value.length > 0 || relayUrlsToAdd.value.length > 0
@@ -213,15 +217,15 @@ onBeforeMount(() => {
       <div class="options">
         <UiButton
           size="tiny"
-          :disabled="!saveEnabled"
-          @click="saveChanges"
-        >{{ saveChangesLabel }}</UiButton>
-        <UiButton
-          size="tiny"
           look="outline"
           :disabled="!saveEnabled"
           @click="clearChanges"
         >Clear</UiButton>
+        <UiButton
+          size="tiny"
+          :disabled="!saveEnabled"
+          @click="saveChanges"
+        >{{ saveChangesLabel }}</UiButton>
       </div>
     </div>
   </div>
@@ -242,7 +246,8 @@ onBeforeMount(() => {
 
   .options {
     display: flex;
-    gap: 15px;
+    gap: 20px;
+    justify-content: space-between;
   }
 }
 
