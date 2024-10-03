@@ -3,7 +3,8 @@ import { useRelayStore } from '@/stores/relays'
 
 const props = defineProps([
   'publicKey',
-  'info'
+  'info',
+  'isOwner'
 ])
 
 const relayStore = useRelayStore()
@@ -36,7 +37,11 @@ const nprofile = computed(() => {
   <div class="profile-data-overlay-profile">
     <h3>Profile</h3>
     <p>Name, about, profile image, and other basics (<a href="https://github.com/nostr-protocol/nips/blob/master/01.md#basic-event-kinds" target="_blank" rel="nofollow noopener noreferrer">NIP 01</a>).</p>
-    <ProfileDataOverlayEventBrowser v-if="info" :events="sortedInfo" />
+    <ProfileDataOverlayEventBrowser 
+      v-if="info" 
+      :events="sortedInfo"
+      :isOwner="isOwner"
+    />
     <p v-if="!info">No info found on this profile.</p>
 
     <template v-if="info">

@@ -3,6 +3,7 @@ import Icons from '@/helpers/icons'
 import { useRelayStore } from '@/stores/relays'
 
 const props = defineProps([
+  'isOwner',
   'info',
   'infoEvents',
   'publicKey',
@@ -196,17 +197,20 @@ function close() {
 
           <ProfileDataOverlayMeta
             v-if="activeNavOptionId == 'profile'"
+            :isOwner="isOwner"
             :publicKey="publicKey"
             :info="infoEvents"
           />
 
           <ProfileDataOverlayFollowing
             v-if="activeNavOptionId == 'following'"
+            :isOwner="isOwner"
             :info="followDataEvents"
           />
 
           <ProfileDataOverlayRelays
             v-if="activeNavOptionId == 'relays'"
+            :isOwner="isOwner"
             :info="relayData"
           />
 

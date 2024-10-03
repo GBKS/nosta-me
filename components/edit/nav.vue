@@ -11,10 +11,10 @@ const store = useProfileStore()
 
 <template>
   <nav>
-    <NuxtLink to="/edit/info">Info</NuxtLink>
+    <NuxtLink to="/edit/profile">Info</NuxtLink>
     <NuxtLink to="/edit/relays">Relays</NuxtLink>
-    <NuxtLink to="/edit/follow">Follow</NuxtLink>
-    <NuxtLink :to="profileLink">View profile</NuxtLink>
+    <NuxtLink v-if="false" to="/edit/follow">Follow</NuxtLink>
+    <NuxtLink v-if="false" :to="profileLink">Back to profile</NuxtLink>
   </nav>
 </template>
 
@@ -22,7 +22,23 @@ const store = useProfileStore()
 
 nav {
   display: flex;
-  flex-direction: column;
+  gap: 10px;
+
+  a {
+    display: block;
+    text-decoration: none;
+    background-color: rgba(var(--front-rgb), 0.075);
+    color: var(--front);
+    border-radius: 100px;
+    padding: 3px 15px;
+    min-width: 100px;
+    text-align: center;
+    
+    &.router-link-exact-active {
+      background-color: var(--front);
+      color: var(--back);
+    }
+  }
 }
 
 </style>

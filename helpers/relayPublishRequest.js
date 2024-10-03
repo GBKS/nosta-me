@@ -7,14 +7,26 @@ Posts an event to a single relay.
 
  */
 
+const NOTIFICATION_STATUS = {
+  PUBLISHING: 'publishing',
+  RECONNECTING: 'reconnecting',
+  NO_CONNECTION: 'no-connection',
+  ERROR: 'error',
+  SUCCESS: 'success',
+  TIMEOUT: 'timeout'
+}
+
 export default function relayPublishRequest () { 
   return {
-    log: false,
+    logEnabled: !false,
     initialized: false,
     relayId: null,
     callback: null,
     relayStore: null,
     connectCallback: null,
+    showNotification: false,
+    timeout: null,
+    id: 'rpl-'+Math.round(Math.random()*1000000000),
 
     init() {
       if(!this.initialized) {
@@ -25,9 +37,7 @@ export default function relayPublishRequest () {
     },
 
     publish(relayId, event, callback) {
-      if(this.log) {
-        console.log('relayPublishRequest.publish', relayId, event, callback)
-      }
+      this.logger('publish', relayId, event, callback)
 
       this.init()
 
@@ -37,24 +47,28 @@ export default function relayPublishRequest () {
 
       const relay = this.relayStore.getRelay(this.relayId)
       const connection = this.relayStore.getRelayConnection(this.relayId)
-      console.log('relay', relay)
+      this.logger('relay', relay)
+
+      if(this.timeout) clearTimeout(this.timeout)
+      this.timeout = setTimeout(this.onTimeout.bind(this), 10000)
 
       if(relay.status == 'connected') {
         if(connection) {
-          if(this.log) {
-            console.log('publishing now')
-          }
+          this.logger('publishing now')
+
+          this.updateNotification(NOTIFICATION_STATUS.PUBLISHING)
 
           const request = connection.publish(event)
           request.on('ok', this.onSuccess.bind(this))
           request.on('failed', this.onError.bind(this))
         } else {
-          console.log('No connection')
+          this.logger('No connection')
+          this.updateNotification(NOTIFICATION_STATUS.NO_CONNECTION)
         }
       } else {
-        if(this.log) {
-          console.log('subscribe connection not found with relayId: ' + this.relayId)
-        }
+        this.logger('subscribe connection not found with relayId: ' + this.relayId)
+
+        this.updateNotification(NOTIFICATION_STATUS.RECONNECTING)
 
         if(!connection) {
           relayManager.connectToRelay(this.relayId)
@@ -68,9 +82,7 @@ export default function relayPublishRequest () {
     },
 
     onRelayConnect() {
-      if(this.log) {
-        console.log('relayPublishRequest.onRelayConnect', this.relayId)
-      }
+      this.logger('onRelayConnect', this.relayId)
 
       window.emitter.off('relay-connect-'+this.relayId, this.connectCallback)
       this.connectCallback = null
@@ -79,11 +91,14 @@ export default function relayPublishRequest () {
     },
 
     onSuccess() {
-      if(this.log) {
-        console.log('relayPublishRequest.onSuccess', this)
-      }
+      this.logger('onSuccess', this)
+
+      clearTimeout(this.timeout)
+
+      this.updateNotification(NOTIFICATION_STATUS.SUCCESS)
 
       this.callback({
+        id: this.id,
         status: 'success',
         event: this.event,
         relayId: this.relayId
@@ -91,16 +106,86 @@ export default function relayPublishRequest () {
     },
 
     onError(error) {
-      if(this.log) {
-        console.log('relayPublishRequest.onError', error, this)
-      }
+      this.logger('relayPublishRequest.onError', error, this)
+
+      this.updateNotification(NOTIFICATION_STATUS.ERROR)
 
       this.callback({
+        id: this.id,
         status: 'error',
-        reason: reason,
+        reason: error,
         event: this.event,
         relayId: this.relayId
       })
+    },
+
+    onTimeout() { 
+      this.logger('onTimeout', this.relayId)
+
+      this.updateNotification(NOTIFICATION_STATUS.TIMEOUT)
+
+      this.callback({
+        id: this.id,
+        status: 'timeout',
+        event: this.event,
+        relayId: this.relayId
+      })
+    },
+
+    updateNotification(status) {
+      if(!this.showNotification) return
+
+      let theme = 'progress'
+      let title = null
+      let description = 'To ' + this.relayId
+      let expiration = null
+      // const detail = 'Kind ' + this.event.kind + ', ' + this.relayId
+
+      console.log('updateNotification', status)
+
+      switch(status) {
+        case NOTIFICATION_STATUS.PUBLISHING:
+          title = 'Publishing event'
+          break
+        case NOTIFICATION_STATUS.RECONNECTING:
+          title = 'Reconnecting'
+          break
+        case NOTIFICATION_STATUS.NO_CONNECTION:
+          theme = 'error'
+          title = 'Publish error'
+          description += ', could not connect'
+          break
+        case NOTIFICATION_STATUS.ERROR:
+          theme = 'error'
+          title = 'Publish error'
+          break
+        case NOTIFICATION_STATUS.SUCCESS:
+          theme = 'success'
+          title = 'Event published'
+          expiration = 5000
+          break
+        case NOTIFICATION_STATUS.TIMEOUT:
+          theme = 'error'
+          title = 'Publish error'
+          description += ', could not connect'
+          break
+      }
+
+      description += '.'
+
+      window.emitter.emit('show-notification', {
+        id: this.id,
+        theme,
+        title,
+        description,
+        expiration
+      })
+    },
+    
+    logger(...args) {
+      if(this.logEnabled) {
+        console.log('relayPublishRequest', ...args)
+      }
     }
   }
 }

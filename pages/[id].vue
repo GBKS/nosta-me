@@ -980,6 +980,7 @@ onMounted(() => {
     </div>
     <ProfileDataOverlayModal
       v-if="showDataOverlay"
+      :isOwner="isOwner"
       :info="profileData"
       :infoEvents="profileDataEvents"
       :publicKey="publicKey"

@@ -89,6 +89,7 @@ updateFromRoute()
       <ModalHandler />
       <ModalZapMain />
       <ModalQr />
+      <NotificationDrawer />
     </client-only>
     <Header />
     <div class="site-content">

@@ -12,13 +12,13 @@ Creates a relayConnector for every relay we connect to.
  */
 
 export default {
-  log: false,
+  logEnabled: false,
   initialized: false,
   relayStore: null,
   connectors: {},
 
   init() {
-    console.log('relayManager.init')
+    this.logger('init')
     if(!this.initialized) {
       this.initialized = true
 
@@ -50,7 +50,7 @@ export default {
     // console.log('addRelayByUrl', this.relayStore, url)
 
     if(!url) {
-      console.log('relayManager.addRelayByUrl: No url provided', url)
+      this.logger('addRelayByUrl: No url provided', url)
       return
     }
 
@@ -69,9 +69,7 @@ export default {
         bits = url.split('//')
       }
 
-      if(this.log) {
-        console.log('addRelayByUrl', url, bits)
-      }
+      this.logger('addRelayByUrl', url, bits)
 
       if(bits.length > 0) {
         let idBit = bits[0]
@@ -92,9 +90,7 @@ export default {
           status: null
         }
 
-        if(this.log) {
-          console.log('addRelayByUrl', url, data)
-        }
+        this.logger('addRelayByUrl', url, data)
 
         this.relayStore.addRelay(data)
 
@@ -139,8 +135,12 @@ export default {
     return result
   },
 
+  getConnector(relayId) {
+    return this.connectors[relayId]
+  },
+
   connectToAllRelays() {
-    console.log('connectToRelays')
+    this.logger('connectToAllRelays')
     const relays = this.relayStore.getAll
     for(let relayId in relays) {
       this.connectToRelay(relayId)
@@ -148,12 +148,12 @@ export default {
   },
 
   connectToRelay(relayId) {
+    // TODO: Check if already connected, maybe delete the old one first?
+
     const connector = relayConnector()
     connector.init(relayId)
 
-    if(this.log) {
-      console.log('connectToRelay', relayId, connector)
-    }
+    this.logger('connectToRelay', relayId, connector)
     
     this.connectors[relayId] = connector
   },
@@ -179,6 +179,12 @@ export default {
   publish(event) {
     for(let relayId in this.connectors) {
       this.connectors[relayId].publish(event)
+    }
+  },
+
+  logger(...args) {
+    if(this.logEnabled) {
+      console.log('RelayManager', ...args)
     }
   }
 }

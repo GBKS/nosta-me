@@ -2,19 +2,7 @@
 import { useProfileStore } from '@/stores/profile'
 
 definePageMeta({
-  layout: "edit",
-  pageTransition: {
-    name: 'slide-right'
-  },
-  middleware (to, from) {
-    if(to.name == 'create-info' && from.name == 'create-relays') {
-      to.meta.pageTransition.name = 'slide-left'
-      from.meta.pageTransition.name = 'slide-left'
-    } else {
-      to.meta.pageTransition.name = 'slide-right'
-      from.meta.pageTransition.name = 'slide-right'
-    }
-  }
+  layout: "edit"
 })
 
 const store = useProfileStore()
