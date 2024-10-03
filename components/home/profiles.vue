@@ -20,11 +20,6 @@ onMounted(() => {
       relayIds: relayIds,
       theme: 'space'
     }, 
-    { // Bolt fun
-      publicKey: '4f260791d78a93d13e09f1965f4ba1e1f96d1fcb812123a26d95737c9d54802b', 
-      relayIds: relayIds,
-      theme: 'bubbles'
-    },
     { // GBKS
       publicKey: 'b731e7fbde5c192d793ff520a6ec91f6965f5d8fa1b64e12171089a65e540525',
       relayIds: relayIds,
