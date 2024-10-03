@@ -55,7 +55,7 @@ onMounted(() => {
 
 <template>
   <div :class="classObject">
-    <TransitionGroup name="notification-drawer-list" tag="ol">
+    <TransitionGroup name="notification-drawer-list" tag="div" class="list">
       <NotificationItem
         v-for="item in items"
         :key="item.id"
@@ -64,6 +64,8 @@ onMounted(() => {
         :description="item.description"
         :icon="item.icon"
         :theme="item.theme"
+        :to="item.url"
+        :url="item.url"
         @hide="hideItem"
       />
     </TransitionGroup>
@@ -83,11 +85,8 @@ onMounted(() => {
   box-sizing: border-box;
   pointer-events: none;
 
-  :deep(ol) {
+  .list {
     position: relative;
-    list-style: none;
-    padding: 0;
-    margin: 0;
 
     > * + * {
       margin-top: 5px;

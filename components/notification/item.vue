@@ -6,7 +6,9 @@ const props = defineProps([
   'title',
   'description',
   'icon',
-  'theme'
+  'theme',
+  'to',
+  'url'
 ])
 
 const emit = defineEmits(['hide'])
@@ -36,13 +38,23 @@ const icon = computed(() => {
   return result
 })
 
+const tag = computed(() => {
+  let result = 'div'
+  if(props.to) {
+    result = 'NuxtLink'
+  } else if(props.url) {
+    result = 'a'
+  }
+  return result
+})
+
 function hide() {
   emit('hide', props.id)
 }
 </script>
 
 <template>
-  <li :class="classObject">
+  <component :is="tag" :class="classObject">
     <div class="top">
       <div v-if="icon" v-html="icon" />
       <h4 v-if="title">{{ title }}</h4>
@@ -53,7 +65,7 @@ function hide() {
       />
     </div>
     <p v-if="description">{{ description }}</p>
-  </li>
+  </component>
 </template>
 
 <style scoped lang="scss">
@@ -68,6 +80,7 @@ function hide() {
   width: 100%;
   box-sizing: border-box;
   position: relative;
+  text-decoration: none;
 
   .top {
     display: flex;

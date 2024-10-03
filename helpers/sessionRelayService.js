@@ -76,6 +76,7 @@ export default {
   },
 
   nextCheck() {
+    this.logger('nextCheck', this.checkedUserStore, this.checkedExtension, this.checkedPopularRelays)
     if (!this.checkedUserStore) {
       this.checkUserStore()
     } else if (!this.checkedExtension) {
@@ -114,6 +115,7 @@ export default {
   },
 
   async checkWellKnown(nip05) {
+    this.logger('checkWellKnown', nip05)
     try {
       let data = await window.NostrTools.nip05.queryProfile(nip05)
 
@@ -148,6 +150,7 @@ export default {
 
   // See if we're connected to an extension that we can get the relays from
   checkExtension() {
+    this.logger('checkExtension')
     browserHelper.getNostrRelays(this.onCheckExtensionError.bind(this))
       .then(this.onCheckExtension.bind(this))
       .catch(this.onCheckExtensionError.bind(this))
@@ -168,7 +171,9 @@ export default {
   }
   */
   onCheckExtension(relayData) {  
-    this.logger('onCheckExtension', relayData, Object.keys(relayData))
+    this.logger('onCheckExtension', relayData)
+
+    this.checkedExtension = true
 
     if(relayData && Object.keys(relayData).length > 0) {
       const relayIds = Object.keys(relayData).map(url => relayManager.addRelayByUrl(url)).filter(Boolean)
@@ -193,8 +198,9 @@ export default {
   },
 
   onCheckExtensionError(result) {
-    this.logger('onCheckExtension', result)
-    this.checkPopularRelays()
+    this.logger('onCheckExtensionError', result)
+    this.checkedExtension = true
+    this.nextCheck()
   },
 
   // We don't have leads - check our default/popular relays.
@@ -211,7 +217,7 @@ export default {
     const sessionStore = useSessionStore()
     const publicKey = sessionStore.publicKey
     
-    this.logger('load', publicKey)
+    this.logger('load', relayIds, publicKey)
 
     const filter = {
       kinds: [10002],

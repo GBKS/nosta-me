@@ -10,7 +10,7 @@ definePageMeta({
   layout: "edit"
 })
 
-const logEnabled = false
+const logEnabled = !false
 const sessionStore = useSessionStore()
 const relayStore = useRelayStore()
 const isSaving = ref(false)
@@ -44,7 +44,7 @@ const saveChangesLabel = computed(() => {
 })
 
 function addRelayUrl(url) {
-  console.log('addrelayUrl', url)  
+  logger('addRelayUrl', url)  
   relayUrlsToAdd.value.push(url)
 }
 
@@ -69,7 +69,7 @@ function cancelRemoveRelay(relayId) {
 }
 
 function saveChanges() {
-  console.log('saveChanges')
+  logger('saveChanges')
   publish()
 }
 
@@ -89,7 +89,7 @@ async function publish() {
     content: ''
   }
 
-  console.log('EditRelays.publish', relayIds, relayIds.value)
+  logger('publish', relayIds, relayIds.value)
 
   const newRelayIds = []
 
@@ -102,12 +102,14 @@ async function publish() {
       newRelayIds.push(relayId)
     }
   }
+  logger('1')
 
   for(i=0; i<relayUrlsToAdd.value.length; i++) {
     relayUrl = relayUrlsToAdd.value[i]
     relayId = relayManager.addRelayByUrl(relayUrl)
     newRelayIds.push(relayId)
   }
+  logger('2')
 
   for(i=0; i<newRelayIds.length; i++) {
     relayId = newRelayIds[i]
@@ -115,9 +117,11 @@ async function publish() {
 
     event.tags.push(['r', relay.url, 'write'])
   }
+  logger('3')
 
   event.id = window.NostrTools.getEventHash(event)
 
+  logger('4', sessionStore.loginType)
   let signedEvent
   switch(sessionStore.loginType) {
     case LOGIN_TYPE.PRIVATE_KEY:
@@ -126,6 +130,8 @@ async function publish() {
       break
     case LOGIN_TYPE.BROWSER:
       signedEvent = await browserHelper.signNostrEvent(event)
+      logger('event', event)
+      logger('signedEvent', signedEvent)
       if(!signedEvent) {
         // The user did not sign the event
         return null
@@ -133,9 +139,9 @@ async function publish() {
       break
   }
 
-  console.log('EditRelays.publish', signedEvent)
+  logger('event', signedEvent)
 
-  console.log('EditRelays.relayIds', sessionRelayService.relayIds)
+  logger('relayIds', sessionRelayService.relayIds)
   let request
   for(i=0; i<newRelayIds.length; i++) {
     relayId = newRelayIds[i]
@@ -143,7 +149,7 @@ async function publish() {
     request = relayPublishRequest()
     request.showNotification = true
 
-    console.log('Publishing to', relayId)
+    logger('publishing to', relayId)
 
     request.publish(
       relayId,
@@ -154,13 +160,14 @@ async function publish() {
 
   // Update the session relay list
   sessionRelayService.relayIds = newRelayIds
+  relayIds.value = newRelayIds
 
   // Clear the form.
   clearChanges()
 }
 
 function onPublishResult(data) {
-  console.log('Relays.onPublishResult', data)
+  logger('onPublishResult', data)
 }
 
 function clearChanges() {
@@ -191,7 +198,7 @@ const description = computed(() => {
 onBeforeMount(() => {
   window.emitter.on('session-relays', onSessionRelays)
 
-  console.log('onbeforemount', relayIds.value, sessionRelayService.relayIds)
+  logger('onBeforeMount', relayIds.value, sessionRelayService.relayIds)
 })
 </script>
 
