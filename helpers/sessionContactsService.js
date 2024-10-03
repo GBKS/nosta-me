@@ -6,6 +6,7 @@ import browserHelper from '@/helpers/browserHelper.js'
 import sessionRelayService from '@/helpers/sessionRelayService.js'
 import { useUserStore } from "@/stores/users.js"
 import { sign } from '@noble/secp256k1'
+import { finalizeEvent, getEventHash } from 'nostr-tools/pure'
 
 const RELOAD_DELTA = 3600 * 1000 // 1 hour in milliseconds
 
@@ -228,13 +229,10 @@ export default {
     delete event.id
     delete event.sig
 
-    event.id = window.NostrTools.getEventHash(event)
-
     let signedEvent
     switch(this.sessionStore.loginType) {
       case LOGIN_TYPE.PRIVATE_KEY:
-        event.sig = window.NostrTools.signEvent(event, this.sessionStore.privateKey)
-        signedEvent = event
+        signedEvent = finalizeEvent(event, this.sessionStore.privateKey)
         break
       case LOGIN_TYPE.BROWSER:
         signedEvent = await browserHelper.signNostrEvent(event)

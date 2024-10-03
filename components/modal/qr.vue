@@ -5,6 +5,7 @@ import Icons from '@/helpers/icons'
 import QRCodeStyling from "qr-code-styling";
 import ToolBox from '@/helpers/toolBox'
 import useAssets from  '@/composables/useAssets.js'
+import { nprofileEncode } from 'nostr-tools/nip19'
 
 const sessionStore = useSessionStore()
 const relayStore = useRelayStore()
@@ -44,7 +45,7 @@ async function renderCode() {
   const image = await useAssets('/assets/images/nosta-qr.jpg')
 
   const relay = relayStore.getRelay(profileEvent.value.relay)
-  const nprofile = window.NostrTools.nip19.nprofileEncode({
+  const nprofile = nprofileEncode({
     pubkey: profileEvent.value.pubkey,
     relays: [relay.url]
   })

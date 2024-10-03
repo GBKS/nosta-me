@@ -3,6 +3,8 @@ import { useSessionStore } from '@/stores/session'
 const sessionStore = useSessionStore()
 const router = useRouter()
 
+import { npubEncode } from 'nostr-tools/nip19'
+import { getPublicKey } from 'nostr-tools/pure'
 import { wordlist } from '@scure/bip39/wordlists/english.js'
 import * as secp256k1 from '@noble/secp256k1'
 import { mnemonicToSeedSync, validateMnemonic } from '@scure/bip39'
@@ -49,8 +51,8 @@ function evaluate() {
   }
   
   if(privateKey) {
-    const publicKey = window.NostrTools.getPublicKey(privateKey)
-    const npub = window.NostrTools.nip19.npubEncode(publicKey)
+    const publicKey = getPublicKey(privateKey)
+    const npub = npubEncode(publicKey)
 
     // Store for later.
     sessionStore.setLoginType('privatekey')

@@ -4,6 +4,7 @@ import { useRelayStore } from '@/stores/relays'
 import userService from '@/helpers/userService.js'
 import ToolBox from '@/helpers/toolBox'
 import relayManager from '@/helpers/relayManager.js'
+import { nprofileEncode } from 'nostr-tools/nip19'
 
 const userStore = useUserStore()
 const relayStore = useRelayStore()
@@ -65,12 +66,12 @@ const profileLink = computed(() => {
   let result = ''
 
   // Create an nprofile
-  // let {type, data} = window.NostrTools.nip19.decode(nprofile)
+  // let {type, data} = nip19.decode(nprofile)
   if(profileData.value && profileData.value.relay) {
     const relay = relayStore.getRelay(profileData.value.relay)
     // result += '?r=' + encodeURIComponent(relay.url)
 
-    const nprofile = window.NostrTools.nip19.nprofileEncode({
+    const nprofile = nprofileEncode({
       pubkey: props.publicKey,
       relays: [relay.url]
     })

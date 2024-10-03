@@ -5,6 +5,8 @@ import themes from '@/data/themes.json'
 import { useUserStore } from '@/stores/users'
 import { useSessionStore } from '@/stores/session'
 import ToolBox from '@/helpers/toolBox'
+import * as nip19 from 'nostr-tools/nip19'
+import { queryProfile } from 'nostr-tools/nip05'
 
 const route = useRoute()
 const router = useRouter()
@@ -163,7 +165,7 @@ function loadFromRouteId() {
 
 function loadNpub(npub, queryRelayIds) {
   try {
-    let {type, data} = window.NostrTools.nip19.decode(npub)
+    let {type, data} = nip19.decode(npub)
 
     status.value = {state: 'loading', npub: npub}
 
@@ -182,7 +184,7 @@ function loadNpub(npub, queryRelayIds) {
 
 function loadNprofile(nprofile) {
   try {
-    let {type, data} = window.NostrTools.nip19.decode(nprofile)
+    let {type, data} = nip19.decode(nprofile)
 
     status.value = {state: 'loading', nprofile: nprofile}
 
@@ -250,7 +252,7 @@ async function loadNip05(profileId, queryRelayIds) {
     cleanProfileId = '_'+cleanProfileId
   }
 
-  let data = await window.NostrTools.nip05.queryProfile(cleanProfileId)
+  let data = await queryProfile(cleanProfileId)
 
   console.log('loadNip05', cleanProfileId, data)
 

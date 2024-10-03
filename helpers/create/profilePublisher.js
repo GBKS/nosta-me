@@ -4,6 +4,8 @@ import relayManager from '@/helpers/relayManager.js'
 import metaPublisher from '@/helpers/create/metaPublisher.js'
 import relayPublisher from '@/helpers/create/relayPublisher.js'
 import followPublisher from '@/helpers/create/followPublisher.js'
+import { sign } from '@noble/secp256k1'
+import { finalizeEvent } from 'nostr-tools/pure'
 
 /*
 
@@ -102,10 +104,8 @@ export default function profilePublisher () {
     },
 
     signEvent(event) {
-      event.id = window.NostrTools.getEventHash(event)
-      event.sig = window.NostrTools.signEvent(event, this.store.privateKey)
-
-      return event
+      const signedEvent = finalizeEvent(event, this.store.privateKey)
+      return signedEvent
     },
 
     // Tests

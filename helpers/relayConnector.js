@@ -2,6 +2,7 @@
 import relayManager from '@/helpers/relayManager.js'
 import { useEventStore } from "@/stores/events.js"
 import { useRelayStore } from "@/stores/relays.js"
+import { Relay } from 'nostr-tools/relay'
 
 /*
 
@@ -20,7 +21,7 @@ export const RelayConnectorStatus = {
 
 export default function relayConnector () { 
   return {
-    logEnabled: false,
+    logEnabled: !false,
     relayId: null,
     relayData: null,
     initialized: false,
@@ -57,27 +58,41 @@ export default function relayConnector () {
 
     async connect() {
       this.logger('connect', this.relayId)
-      
-      const connection = window.NostrTools.relayInit(this.relayData.url)
-
-      this.setRelayStatus(this.relayId, RelayConnectorStatus.CONNECTING)
-      this.relayStore.setRelayConnection(this.relayId, connection)
 
       this.stats.connectionAttempts++
 
       try {
-        await connection.connect()
+        const connection = await Relay.connect(this.relayData.url)
+        // console.log('relayUrl', this.relayData.url)
+        // console.log('connection', connection)
+        // console.log('connection.connect', connection.connect)
+        // console.log('connection.connected', connection.connected)
+        // console.log('connection.subscribe', connection.subscribe)
+
+        this.setRelayStatus(this.relayId, RelayConnectorStatus.CONNECTING)
+        this.relayStore.setRelayConnection(this.relayId, connection)
+
+        // await connection.connect()
         
-        connection.on('connect', this.onConnect.bind(this))
-        connection.on('disconnect', this.onDisconnect.bind(this))
-        connection.on('error', this.onError.bind(this))
-        connection.on('notice', this.onNotice.bind(this))
-      } catch(e) {
+        // connection.ws.onopen = this.onConnect.bind(this)
+        // connection.ws.onclose = this.onDisconnect.bind(this)
+        // connection.ws.onerror = this.onError.bind(this)
+        // connection.ws.onmessage = this.onNotice.bind(this)
+
+        if(connection.connected) {
+          this.onConnect()
+        }
+
+        // connection.on('connect', this.onConnect.bind(this))
+        // connection.on('disconnect', this.onDisconnect.bind(this))
+        // connection.on('error', this.onError.bind(this))
+        // connection.on('notice', this.onNotice.bind(this))
+      } catch(error) {
         // 0 Connecting
         // 1 Open
         // 2 Closing
         // 3 Closed
-        this.logger('could not connect', this.relayId, connection.status)
+        this.logger('could not connect', error, this.relayId)
 
         this.stats.connectionFailures++
 

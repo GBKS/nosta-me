@@ -5,6 +5,7 @@ import relayManager from '@/helpers/relayManager.js'
 import { useRelayStore } from '@/stores/relays'
 import { useSessionStore, LOGIN_TYPE } from '@/stores/session'
 import browserHelper from '@/helpers/browserHelper.js'
+import { finalizeEvent } from 'nostr-tools'
 
 definePageMeta({
   layout: "edit"
@@ -119,14 +120,11 @@ async function publish() {
   }
   logger('3')
 
-  event.id = window.NostrTools.getEventHash(event)
-
   logger('4', sessionStore.loginType)
   let signedEvent
   switch(sessionStore.loginType) {
     case LOGIN_TYPE.PRIVATE_KEY:
-      event.sig = window.NostrTools.signEvent(event, sessionStore.privateKey)
-      signedEvent = event
+      signedEvent = finalizeEvent(event, sessionStore.privateKey)
       break
     case LOGIN_TYPE.BROWSER:
       signedEvent = await browserHelper.signNostrEvent(event)

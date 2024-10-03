@@ -8,11 +8,6 @@ import { wordlist } from '@scure/bip39/wordlists/english.js'
 import { generateMnemonic, mnemonicToSeedSync, validateMnemonic } from '@scure/bip39'
 import { HDKey } from '@scure/bip32'
 
-// import { generatePrivateKey, getPublicKey } from 'nostr-tools'
-
-// import nostrTools from 'nostr-tools';
-// const { generatePrivateKey, getPublicKey } = nostrTools;
-
 definePageMeta({
   layout: "create",
   pageTransition: {

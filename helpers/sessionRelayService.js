@@ -5,6 +5,7 @@ import browserHelper from '@/helpers/browserHelper.js'
 import sessionContactsService from './sessionContactsService'
 import multiRelayRequest from '@/helpers/multiRelayRequest.js'
 import relayManager from '@/helpers/relayManager.js'
+import { queryProfile } from 'nostr-tools/nip05'
 
 const RELOAD_DELTA = 3600 // Seconds after which data is considered stale
 
@@ -49,7 +50,7 @@ To find the relays we:
  */
 
 export default {
-  logEnabled: !false,
+  logEnabled: false,
   initialized: false,
   checkedUserStore: false,
   checkedExtension: false,
@@ -117,7 +118,7 @@ export default {
   async checkWellKnown(nip05) {
     this.logger('checkWellKnown', nip05)
     try {
-      let data = await window.NostrTools.nip05.queryProfile(nip05)
+      let data = await queryProfile(nip05)
 
       this.logger('loadNip05', nip05, data)
 

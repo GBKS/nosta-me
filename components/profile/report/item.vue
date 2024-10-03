@@ -2,6 +2,7 @@
 import multiRelayRequest from '@/helpers/multiRelayRequest.js'
 import ToolBox from '@/helpers/toolBox'
 import { useRelayStore } from '@/stores/relays'
+import { nprofileEncode } from 'nostr-tools/nip19'
 
 const props = defineProps([
   'info'
@@ -87,7 +88,7 @@ const userLink = computed(() => {
 
   if(userData.value) {
     const relay = relayStore.getRelay(userData.value.relay)
-    const nprofile = window.NostrTools.nip19.nprofileEncode({
+    const nprofile = nprofileEncode({
       pubkey: userData.value.pubkey,
       relays: [relay.url]
     })

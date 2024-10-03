@@ -1,5 +1,6 @@
 <script setup>
 import { useRelayStore } from '@/stores/relays'
+import { nprofileEncode } from 'nostr-tools/nip19'
 
 const props = defineProps([
   'publicKey',
@@ -26,7 +27,7 @@ const relayUrl = computed(() => {
 })
 
 const nprofile = computed(() => {
-  return window.NostrTools.nip19.nprofileEncode({
+  return nprofileEncode({
     pubkey: props.publicKey,
     relays: [relayUrl.value]
   })

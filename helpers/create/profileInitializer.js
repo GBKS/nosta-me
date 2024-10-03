@@ -2,6 +2,8 @@ import { useProfileStore } from '@/stores/profile'
 import sampleRelays from '@/data/sample-relays.json'
 import sampleFollows from '@/data/sample-follows.json'
 
+import { npubEncode } from 'nostr-tools/nip19'
+import { getPublicKey } from 'nostr-tools/pure'
 import * as secp256k1 from '@noble/secp256k1'
 import { wordlist } from '@scure/bip39/wordlists/english.js'
 import { generateMnemonic, mnemonicToSeedSync, validateMnemonic } from '@scure/bip39'
@@ -39,8 +41,8 @@ export default {
       if (!privateKeyTemp) throw new Error('could not derive private key')
       const privateKey =  secp256k1.utils.bytesToHex(privateKeyTemp)
 
-      const publicKey = window.NostrTools.getPublicKey(privateKey)
-      const npub = window.NostrTools.nip19.npubEncode(publicKey)
+      const publicKey = getPublicKey(privateKey)
+      const npub = npubEncode(publicKey)
 
       if(this.log) {
         console.log('Profile store.initKeys', mnemonic, privateKey, publicKey, npub)

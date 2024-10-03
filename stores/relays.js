@@ -13,7 +13,7 @@ export const useRelayStore = defineStore({
   state: () => {
     return {
       relays: {}, // Objects created by relayManager.addRelayByUrl()
-      connections: {}, // Connections are created via NostrTools.relayInit()
+      connections: {}, // Connections are created via Relay.connect()
       info: {} // Relay info document, NIP-11
     }
   },

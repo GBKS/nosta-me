@@ -1,5 +1,6 @@
 <script setup>
 import { useProfileStore } from '@/stores/profile'
+import { queryProfile } from 'nostr-tools/nip05'
 
 const store = useProfileStore()
 const handleCheckStatus = ref(null)
@@ -88,7 +89,7 @@ async function loadNip05(handle) {
   }
 
   try {
-    const data = await window.NostrTools.nip05.queryProfile(cleanHandle)
+    const data = await queryProfile(cleanHandle)
 
     if(data) {
       handleCheckStatus.value = 'valid'

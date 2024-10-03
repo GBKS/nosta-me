@@ -1,5 +1,5 @@
 <script setup>
-import Icons from '@/helpers/icons'
+import { nprofileEncode, npubEncode } from 'nostr-tools/nip19'
 
 const props = defineProps([
   'info',
@@ -13,7 +13,7 @@ const canShare = ref(false)
 const emit = defineEmits(['close', 'showDataOverlay'])
 
 const npub = computed(() => {
-  return  window.NostrTools.nip19.npubEncode(props.publicKey)
+  return  nip19.npubEncode(props.publicKey)
 })
 
 const shareUrl = computed(() => {
@@ -72,7 +72,7 @@ const astralUrl = computed(() => {
 })
 
 const nprofile = computed(() => {
-  const result = window.NostrTools.nip19.nprofileEncode({
+  const result = nprofileEncode({
     pubkey: props.publicKey,
     relays: [props.relayData.content]
   })

@@ -90,9 +90,7 @@ export default {
       event.tags.push(['e', list.id])
     }
 
-    event.id = window.NostrTools.getEventHash(event)
     if(this.log) console.log('ListsService.event', relayId, event)
-    // event.sig = window.NostrTools.signEvent(event, this.store.privateKey)
 
     // Sign the event via the browser
 

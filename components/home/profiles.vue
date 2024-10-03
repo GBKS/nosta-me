@@ -6,8 +6,8 @@ const users = ref(null)
 onMounted(() => {
   const damusId = relayManager.addRelayByUrl('wss://relay.damus.io')
   const snortId = relayManager.addRelayByUrl('wss://relay.snort.socal')
-  const nosId = relayManager.addRelayByUrl('wss://nos.lol')
-  const relayIds = [damusId, snortId, nosId]
+  const primalId = relayManager.addRelayByUrl('wss://relay.primal.net')
+  const relayIds = [damusId, snortId, primalId]
   
   users.value = [
     { // Nosta

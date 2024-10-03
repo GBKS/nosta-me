@@ -1,6 +1,7 @@
 <script setup>
 import { useRelayStore } from '@/stores/relays'
 import ToolBox from '@/helpers/toolBox'
+import { npubEncode } from 'nostr-tools/nip19'
 
 const relayStore = useRelayStore()
 
@@ -40,7 +41,7 @@ const link = computed(() => {
 
   const titleTag = props.info.tags.find(tag => tag[0] == 'd')
   if(titleTag) {
-    const npub = window.NostrTools.nip19.npubEncode(props.info.pubkey)
+    const npub = npubEncode(props.info.pubkey)
     result = 'https://pinstr.app/p/'+npub+'/'+encodeURIComponent(titleTag[1])
   }
 

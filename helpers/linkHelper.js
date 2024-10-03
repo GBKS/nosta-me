@@ -24,6 +24,7 @@ Information example:
 
 import { useRelayStore } from '@/stores/relays'
 import { useHandlerStore } from '@/stores/handlers'
+import { naddrEncode, neventEncode } from 'nostr-tools/nip19'
 
 export default { 
   log: false,
@@ -65,7 +66,7 @@ export default {
 
     if(this.log) console.log('event', eventId, authorPubkey, eventKind, eventRelay, handlers)
 
-    const bech = window.NostrTools.nip19.naddrEncode({
+    const bech = naddrEncode({
       kind: eventKind+'',
       identifier: eventId,
       pubkey: authorPubkey,
@@ -92,7 +93,7 @@ export default {
 
     if(this.log) console.log('event', eventId, eventRelay, eventKind, handlers)
 
-    const bech = window.NostrTools.nip19.neventEncode({
+    const bech = neventEncode({
       id: eventId,
       relays: eventRelay ? [eventRelay] : null,
       kind: eventKind

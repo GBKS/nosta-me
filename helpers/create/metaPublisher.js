@@ -3,6 +3,7 @@ import { useProfileStore } from '@/stores/profile'
 import relayManager from '@/helpers/relayManager.js'
 import { useSessionStore } from '@/stores/session'
 import { useUserStore } from "@/stores/users.js"
+import { finalizeEvent } from 'nostr-tools/pure'
 
 export default function metaPublisher () { 
   return {
@@ -200,10 +201,9 @@ export default function metaPublisher () {
       this.logger('signEvent', privateKey)
 
       if(privateKey) {
-        event.id = window.NostrTools.getEventHash(event)
-        event.sig = window.NostrTools.signEvent(event, privateKey)
+        const signedEvent = finalizeEvent(event, privateKey)
 
-        this.onSignEvent(event)
+        this.onSignEvent(signedEvent)
       }
     },
 
