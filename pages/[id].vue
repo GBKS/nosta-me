@@ -8,6 +8,7 @@ import ToolBox from '@/helpers/toolBox'
 import * as nip19 from 'nostr-tools/nip19'
 import { queryProfile } from 'nostr-tools/nip05'
 
+const logEnabled = !false
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
@@ -188,7 +189,7 @@ function loadNprofile(nprofile) {
 
     status.value = {state: 'loading', nprofile: nprofile}
 
-    console.log('loadNprofile', nprofile, type, data)
+    logger('loadNprofile', nprofile, type, data)
 
     if(data) {
       let relayIds = null
@@ -254,7 +255,7 @@ async function loadNip05(profileId, queryRelayIds) {
 
   let data = await queryProfile(cleanProfileId)
 
-  console.log('loadNip05', cleanProfileId, data)
+  logger('loadNip05', cleanProfileId, data)
 
   if(data && data.pubkey) {
     nip05Data = data
@@ -286,7 +287,7 @@ function loadPublicKey(newPublicKey, relayIds) {
 
   publicKey.value = newPublicKey
 
-  console.log('loadPublicKey', newPublicKey, relayIds)
+  logger('loadPublicKey', newPublicKey, relayIds)
 
   profileService.findProfile(newPublicKey, relayIds, onLoadProfileEvent, onEndProfileEvents)
 
@@ -298,7 +299,7 @@ function loadPublicKey(newPublicKey, relayIds) {
 }
 
 function onLoadProfileEvent(data) {
-  // console.log('onLoadProfile', data.kind, data)
+  logger('onLoadProfile', data.kind, data)
 
   switch(data.kind) {
     case 0:
@@ -407,7 +408,7 @@ function onLoadProfileEvent(data) {
 }
 
 function onEndProfileEvents() {
-  console.log('onEndProfileEvents')
+  logger('onEndProfileEvents')
 }
 
 function handleLoadedContactList(data) {
@@ -424,7 +425,7 @@ function handleLoadedContactList(data) {
 }
 
 function handleLoadedRecommendedRelay(data) {
-  // console.log('handleLoadedRecommendedRelay', data)
+  logger('handleLoadedRecommendedRelay', data)
 
   if(!relayData.value) {
     relayData.value = []
@@ -438,7 +439,7 @@ function handleLoadedRecommendedRelay(data) {
 }
 
 function handleLoadedRelayList(data) {
-  // console.log('handleLoadedRelayList', data)
+  logger('handleLoadedRelayList', data)
 
   const newEvent = storeEvent(relayDataEvents, data)
 
@@ -708,14 +709,20 @@ function listenToLightningPayments() {
 }
 
 function onLightningPayment(event) {
-  console.log('onLightningPayment')
-  console.log(event.type)
-  console.log(event.detail)
-  console.log(event.detail.preimage)
+  logger('onLightningPayment')
+  logger(event.type)
+  logger(event.detail)
+  logger(event.detail.preimage)
 }
 
 function onShowDataOverlay() { showDataOverlay.value = true }
 function closeDataOverlay() { showDataOverlay.value = false }
+
+function logger(...args) {
+  if(logEnabled) {
+    console.log('[id]]', ...args)
+  }
+}
 
 onMounted(() => {
   if(process.client) {

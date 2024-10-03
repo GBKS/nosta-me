@@ -63,6 +63,7 @@ export default function relayConnector () {
 
       try {
         const connection = await Relay.connect(this.relayData.url)
+        console.log('-------------------------------- CREATING A CONNECTION', this.relayData.url, connection)
         // console.log('relayUrl', this.relayData.url)
         // console.log('connection', connection)
         // console.log('connection.connect', connection.connect)
@@ -81,6 +82,8 @@ export default function relayConnector () {
 
         if(connection.connected) {
           this.onConnect()
+        } else {
+          this.onError()
         }
 
         // connection.on('connect', this.onConnect.bind(this))

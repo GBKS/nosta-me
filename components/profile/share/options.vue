@@ -13,7 +13,7 @@ const canShare = ref(false)
 const emit = defineEmits(['close', 'showDataOverlay'])
 
 const npub = computed(() => {
-  return  nip19.npubEncode(props.publicKey)
+  return  npubEncode(props.publicKey)
 })
 
 const shareUrl = computed(() => {

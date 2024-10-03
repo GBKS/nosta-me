@@ -13,7 +13,7 @@ Connects to multiple relays at once to find data.
 
 export default function multiRelayRequest () { 
   return {
-    log: !true,
+    logEnabled: false,
     initialized: false,
     relayIds: null,
     filters: null,
@@ -74,9 +74,7 @@ export default function multiRelayRequest () {
     },
 
     subscribeToRelay(relayId) {
-      if(this.log) {
-        console.log('subscribe', relayId)
-      }
+      this.logger('subscribe', relayId)
 
       const relay = this.relayStore.getRelay(relayId)
       const connection = this.relayStore.getRelayConnection(relayId)
@@ -89,7 +87,7 @@ export default function multiRelayRequest () {
           const subscription = connection.subscribe(
             this.filters,
             {
-              onevent: (event) => { this.onEvent(event, relayId) },
+              onevent: (event) => { this.onEvent(relayId, event) },
               oneose: () => { this.onEndOfEvents(relayId) }
             }
           )
@@ -119,9 +117,7 @@ export default function multiRelayRequest () {
     },
 
     onRelayConnect(data) {
-      if(this.log) {
-        console.log('onRelayConnect', publicKey, this.relaysWaitingForConnection, data)
-      }
+      this.logger('onRelayConnect', this.relaysWaitingForConnection, data)
 
       const index = this.relaysWaitingForConnection.indexOf(data.relayId)
       if(index !== -1) {
@@ -147,9 +143,7 @@ export default function multiRelayRequest () {
     },
 
     onEvent(relayId, event) {
-      if(this.log) {
-        console.log('onEvent', relayId, event)
-      }
+      this.logger('onEvent', relayId, event)
 
       const connection = relayManager.getConnector(relayId)
       connection.stats.events++
@@ -170,14 +164,18 @@ export default function multiRelayRequest () {
     },
 
     onEndOfEvents(relayId) {
-      if(this.log) {
-        console.log('onEndOfEvents', relayId)
-      }
+      this.logger('onEndOfEvents', relayId)
 
       this.unsubscribeFromRelay(relayId)
 
       if(this.endCallback) {
         this.endCallback()
+      }
+    },
+
+    logger(...args) {
+      if(this.logEnabled) {
+        console.log('multiRelayRequest', ...args)
       }
     }
   }

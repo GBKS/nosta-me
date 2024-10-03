@@ -1,7 +1,6 @@
 
 import { useRelayStore } from "@/stores/relays.js"
 
-import relayConnector from '@/helpers/relayConnector.js'
 import relayManager from '@/helpers/relayManager.js'
 import findRelayRequest from '@/helpers/findRelayRequest.js'
 import multiRelayRequest from '@/helpers/multiRelayRequest.js'
@@ -22,7 +21,7 @@ in the future. It's on the Pinstr dev to-do list.
  */
 
 export default {
-  log: false,
+  logEnabled: false,
   initialized: false,
   publicKey: null,
   relaysToCheck: null, // Array of relayIds
@@ -38,9 +37,7 @@ export default {
   contactList: null,
 
   findProfile(publicKey, relaysToCheck, findCallback, endCallback) {
-    if(this.log) {
-      console.log('profileService.findProfile', publicKey, relaysToCheck, findCallback)
-    }
+    this.logger('findProfile', publicKey, relaysToCheck, findCallback)
     
     this.reset()
 
@@ -59,6 +56,7 @@ export default {
     // Ensure we check 3 or more relays.
     if(!relaysToCheck || relaysToCheck.length < 3) {
       const relayStore = useRelayStore()
+      this.logger('relaysToCheck', relaysToCheck)
       relaysToCheck = relayStore.getRelayIds
     }
 
@@ -91,9 +89,7 @@ export default {
     this.internalEndCallback = this.onEndOfEvents.bind(this)
     this.service.init(this.loadCallback, this.endCallback)
 
-    if(this.log) {
-      console.log('profileService.checkCurrentRelay', this.searchType, this.publicKey, this.relaysToCheck)
-    }
+    this.logger('checkCurrentRelay', this.searchType, this.publicKey, this.relaysToCheck)
 
     const createdContentKinds = [
       1984, // Reports
@@ -229,9 +225,7 @@ export default {
     const url = 'wss://nos.lol/'
     const relayId = relayManager.addRelayByUrl(url)
 
-    if(this.log) {
-      console.log('checkPinstr', relayId, filter)
-    }
+    this.logger('checkPinstr', relayId, filter)
 
     this.pinstrService = relayRequest()
     this.pinstrService.init(this.loadCallback, true)
@@ -239,9 +233,7 @@ export default {
   },
 
   onEvent(data) {
-    if(this.log) {
-      console.log('profileService.onEvent', data)
-    }
+    this.logger('onEvent', data)
 
     let tag
     if(data.kind === 0) {
@@ -327,9 +319,7 @@ export default {
   },
 
   addRelay(relayId) {
-    if(this.log) {
-      console.log('profileService.addRelay', relayId)
-    }
+    this.logger('addRelay', relayId)
 
     if(this.service && this.service.addRelay) {
       this.service.addRelay(relayId)
@@ -359,9 +349,7 @@ export default {
 
   // Contact list
   loadContactList(data) {
-    if(this.log) {
-      console.log('profileService.loadContactList', data)
-    }
+    this.logger('loadContactList', data)
 
     if(!data && this.contactList) {
       data = this.contactList
@@ -374,18 +362,20 @@ export default {
   },
 
   onContactsEvent(data) {
-    if(this.log) {
-      console.log('profileService.onContactsEvent', data)
-    }
+    this.logger('onContactsEvent', data)
   },
 
   loadContactsPage(page) {
-    if(this.log) {
-      console.log('profileService.loadContactsPage', page)
-    }
+    this.logger('loadContactsPage', page)
 
     if(this.contactsService) {
       this.contactsService.loadPage(page)
+    }
+  },
+
+  logger(...args) {
+    if(this.logEnabled) {
+      console.log('profileService', ...args)
     }
   }
 }
