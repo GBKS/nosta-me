@@ -5,8 +5,8 @@ import sampleFollows from '@/data/sample-follows.json'
 import { npubEncode } from 'nostr-tools/nip19'
 import { getPublicKey } from 'nostr-tools/pure'
 import * as secp256k1 from '@noble/secp256k1'
-import { wordlist } from '@scure/bip39/wordlists/english.js'
-import { generateMnemonic, mnemonicToSeedSync, validateMnemonic } from '@scure/bip39'
+import { wordlist } from '@scure/bip39/wordlists/english'
+import { generateMnemonic, mnemonicToSeedSync } from '@scure/bip39'
 import { HDKey } from '@scure/bip32'
 
 /*

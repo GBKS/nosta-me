@@ -4,8 +4,7 @@ import { useProfileStore } from '@/stores/profile'
 import profileInitializer from '@/helpers/create/profileInitializer.js'
 
 import * as secp256k1 from '@noble/secp256k1'
-import { wordlist } from '@scure/bip39/wordlists/english.js'
-import { generateMnemonic, mnemonicToSeedSync, validateMnemonic } from '@scure/bip39'
+import { mnemonicToSeedSync } from '@scure/bip39'
 import { HDKey } from '@scure/bip32'
 
 definePageMeta({
