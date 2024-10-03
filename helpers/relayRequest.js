@@ -13,7 +13,7 @@ Checks a single relay for data.
 
 export default function relayRequest () { 
   return {
-    log: false,
+    logEnabled: false,
     initialized: false,
     autoClose: true,
     relayId: null,
@@ -58,32 +58,28 @@ export default function relayRequest () {
     },
 
     subscribe() {
-      if(this.log) {
-        console.log('subscribe', this.relayId)
-      }
+      this.logger('subscribe', this.relayId)
 
       const relay = this.relayStore.getRelay(this.relayId)
 
       if(!relay) {
-        console.log('relayRequest.subscribe: No relay found with relayId: ' + this.relayId)
+        this.logger('subscribe: No relay found with relayId: ' + this.relayId)
         return
       }
 
       const connection = this.relayStore.getRelayConnection(this.relayId)
-      if(this.log) {
-        console.log('relay', relay, connection)
-      }
+      this.logger('relay', relay, connection)
 
       if(relay.status == 'connected') {
         if(connection) {
-          this.subscription = connection.sub(this.filters)
-
-          if(this.log) {
-            console.log('subbing now', this.subscription, this.relayId, this.filters)
-          }
-
-          this.subscription.on('event', this.onEvent.bind(this))
-          this.subscription.on('eose', this.onEndOfEvents.bind(this))
+          this.logger('subbing now', this.subscription, this.relayId, this.filters, connection)
+          this.subscription = connection.subscribe(
+            this.filters,
+            {
+              onevent: (event) => { this.onEvent(event) },
+              oneose: () => { this.onEndOfEvents() }
+            }
+          )
         } else {
           console.log('No connection')
         }
@@ -102,9 +98,7 @@ export default function relayRequest () {
     },
 
     onRelayConnect(data) {
-      if(this.log) {
-        console.log('onRelayConnect', data)
-      }
+      this.logger('onRelayConnect', data)
 
       window.emitter.off('relay-connect-'+this.relayId, this.connectCallback)
       this.connectCallback = null
@@ -114,16 +108,14 @@ export default function relayRequest () {
 
     unsubscribe() {
       if(this.subscription) {
-        this.subscription.unsub()
+        this.subscription.close()
 
         this.subscription = null
       }
     },
 
     onEvent(event) {
-      if(this.log) {
-        console.log('onEvent', this.relayId, event)
-      }
+      this.logger('onEvent', this.relayId, event)
 
       const connection = relayManager.getConnector(this.relayId)
       connection.stats.events++
@@ -144,9 +136,7 @@ export default function relayRequest () {
     },
 
     onEndOfEvents() {
-      if(this.log) {
-        console.log('onEndOfEvents', this.relayId, this.autoClose)
-      }
+      this.logger('onEndOfEvents', this.relayId, this.autoClose)
 
       if(this.autoClose) {
         this.unsubscribe()
@@ -154,6 +144,12 @@ export default function relayRequest () {
         this.callback({
           type: 'end'
         })
+      }
+    },
+
+    logger(...args) {
+      if(this.logEnabled) {
+        console.log('RelayRequest', ...args)
       }
     }
   }

@@ -1,6 +1,7 @@
 import relayPublishRequest from '@/helpers/relayPublishRequest.js'
 import { useProfileStore } from '@/stores/profile'
 import relayManager from '@/helpers/relayManager.js'
+import { finalizeEvent } from 'nostr-tools/pure'
 
 export default function relayPublisher () { 
   return {
@@ -94,10 +95,7 @@ export default function relayPublisher () {
     },
 
     signEvent(event) {
-      event.id = window.NostrTools.getEventHash(event)
-      event.sig = window.NostrTools.signEvent(event, this.store.privateKey)
-
-      return event
+      return finalizeEvent(event, this.store.privateKey)
     },
 
     // Tests

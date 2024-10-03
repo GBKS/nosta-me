@@ -3,6 +3,7 @@ import ToolBox from '@/helpers/toolBox'
 import linkHelper from '@/helpers/linkHelper.js'
 import { useRelayStore } from '@/stores/relays'
 import useAssets from  '@/composables/useAssets.js'
+import { npubEncode } from 'nostr-tools/nip19'
 
 const relayStore = useRelayStore()
 
@@ -214,7 +215,7 @@ const classObject = computed(() => {
 const link = computed(() => {
   const tag = props.info.tags.find(tag => tag[0] == 'd')
   const relay = relayStore.getRelay(props.info.relay)
-  const npub = window.NostrTools.nip19.npubEncode(props.info.pubkey)
+  const npub = npubEncode(props.info.pubkey)
 
   return linkHelper.address(
     tag[1],

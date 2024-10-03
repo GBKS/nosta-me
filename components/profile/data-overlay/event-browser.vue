@@ -4,6 +4,7 @@ import ToolBox from '@/helpers/toolBox'
 import { useRelayStore } from '@/stores/relays'
 import sessionRelayService from '@/helpers/sessionRelayService.js'
 import relayPublishRequest from '@/helpers/relayPublishRequest.js'
+import { getEventHash } from 'nostr-tools/pure'
 
 const props = defineProps([
   'events',
@@ -84,7 +85,7 @@ function republish() {
     // const oldSig = newEvent.sig
     // delete newEvent.id
     // delete newEvent.sig
-    const newId = window.NostrTools.getEventHash(newEvent)
+    const newId = getEventHash(newEvent)
     if(newId != oldId) {
       console.error('Event id mismatch', oldId, newId)
       console.error('newEvent', newEvent)

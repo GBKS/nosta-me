@@ -5,9 +5,9 @@ const users = ref(null)
 
 onMounted(() => {
   const damusId = relayManager.addRelayByUrl('wss://relay.damus.io')
-  const snortId = relayManager.addRelayByUrl('wss://relay.snort.socal')
-  const nosId = relayManager.addRelayByUrl('wss://nos.lol')
-  const relayIds = [damusId, snortId, nosId]
+  const snortId = relayManager.addRelayByUrl('wss://relay.snort.social')
+  const primalId = relayManager.addRelayByUrl('wss://relay.primal.net')
+  const relayIds = [damusId, snortId, primalId]
   
   users.value = [
     { // Nosta
@@ -20,11 +20,6 @@ onMounted(() => {
       relayIds: relayIds,
       theme: 'space'
     }, 
-    { // Bolt fun
-      publicKey: '4f260791d78a93d13e09f1965f4ba1e1f96d1fcb812123a26d95737c9d54802b', 
-      relayIds: relayIds,
-      theme: 'bubbles'
-    },
     { // GBKS
       publicKey: 'b731e7fbde5c192d793ff520a6ec91f6965f5d8fa1b64e12171089a65e540525',
       relayIds: relayIds,

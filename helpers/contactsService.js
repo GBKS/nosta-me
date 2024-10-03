@@ -2,10 +2,7 @@
 import { useRelayStore } from "@/stores/relays.js"
 import { useUserStore } from "@/stores/users.js"
 
-import relayList from '@/helpers/relayList.js'
-import relayConnector from '@/helpers/relayConnector.js'
 import relayManager from '@/helpers/relayManager.js'
-import findRelayRequest from '@/helpers/findRelayRequest.js'
 import multiRelayRequest from '@/helpers/multiRelayRequest.js'
 
 /*
@@ -20,7 +17,7 @@ Uses pagination to not load hundreds of profiles at once.
 
 export default function contactsService () { 
   return {
-    log: false,
+    logEnabled: false,
     eventData: null,
     relayIds: null,
     publicKeys: null,
@@ -84,9 +81,7 @@ export default function contactsService () {
 
       const keysToLoad = this.publicKeys.slice(this.activePage*this.perPage, (this.activePage + 1)*this.perPage)
 
-      if(this.log) {
-        console.log('contactsService.refreshRequest', this.activePage, keysToLoad)
-      }
+      this.logger('refreshRequest', this.activePage, keysToLoad)
 
       this.request = multiRelayRequest()
       this.request.init(this.loadCallback)
@@ -100,9 +95,7 @@ export default function contactsService () {
     },
 
     onEvent(data, relayId) {
-      if(this.log) {
-        console.log('contactsService.onEvent', data, relayId)
-      }
+      this.logger('onEvent', data, relayId)
       
       if(data.kind === 0) {
         this.userStore.addUser(data.pubkey, data)
@@ -117,6 +110,12 @@ export default function contactsService () {
       if(this.request) {
         this.request.kill()
         this.request = null
+      }
+    },
+
+    logger(...args) {
+      if(this.logEnabled) {
+        console.log('contactsService', ...args)
       }
     }
   }

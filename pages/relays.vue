@@ -1,7 +1,5 @@
 <script setup>
 import relayList from '@/data/relays.json'
-import relayConnector from '@/helpers/relayRequest.js'
-import relayManager from '@/helpers/relayManager.js'
 
 const currentRelay = ref('')
 const currentRelayId = ref('')

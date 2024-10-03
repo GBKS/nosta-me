@@ -5,6 +5,7 @@ import UiUsername from '@/components/ui/username'
 import relayManager from '@/helpers/relayManager.js'
 import ToolBox from '@/helpers/toolBox'
 import Icons from '@/helpers/icons'
+import * as nip19 from 'nostr-tools/nip19'
 
 const copyElement = ref(null)
 
@@ -26,7 +27,7 @@ const ContentNode = () => {
 
     if(token.t == 'url') {
       if(token.v.indexOf('nostr:npub') === 0) {
-        const publicKey = window.NostrTools.nip19.decode(token.v.split(':')[1]).data;
+        const publicKey = nip19.decode(token.v.split(':')[1]).data;
         children.push(h(UiUsername, { publicKey }))
       } else if(token.v.indexOf('nostr:nprofile') === 0) {
         children.push(turnNProfileToNode(token.v))
@@ -108,7 +109,7 @@ function turnUrlToNode(url) {
 }
 
 function turnNProfileToNode(text) {
-  const { pubkey, relays } = window.NostrTools.nip19.decode(text.split(':')[1]).data;
+  const { pubkey, relays } = nip19.decode(text.split(':')[1]).data;
   const relayIds = []
   if(relays) {
     let i=0, relayId
@@ -151,7 +152,7 @@ function turnImageToNode(text) {
 }
 
 function turnNRelayToNode(text) {
-  const data = window.NostrTools.nip19.decode(text.split(':')[1]).data;
+  const data = nip19.decode(text.split(':')[1]).data;
 
   return h('a', {
     href: token.v,
@@ -163,7 +164,7 @@ function turnNRelayToNode(text) {
 }
 
 function turnNAddrToNode(text) {
-  const data = window.NostrTools.nip19.decode(text.split(':')[1]).data;
+  const data = nip19.decode(text.split(':')[1]).data;
 
   return h('a', {
     href: token.v,

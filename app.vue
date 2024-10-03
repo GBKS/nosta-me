@@ -5,7 +5,6 @@ import { useSessionStore } from '@/stores/session'
 import sessionRelayService from '@/helpers/sessionRelayService.js'
 import themes from '@/data/themes.json'
 import * as linkify from "linkifyjs"
-
 import mitt from 'mitt'
 
 const route = useRoute()

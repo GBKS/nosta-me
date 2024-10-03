@@ -1,5 +1,6 @@
 <script setup>
 import { useProfileStore } from '@/stores/profile'
+import { nprofileEncode } from 'nostr-tools/nip19'
 
 definePageMeta({
   layout: "create",
@@ -48,7 +49,7 @@ const nprofile = computed(() => {
   }
 
   if(relays.length > 0) {
-    result = window.NostrTools.nip19.nprofileEncode({
+    result = nprofileEncode({
       pubkey: store.publicKey,
       relays: relays
     })

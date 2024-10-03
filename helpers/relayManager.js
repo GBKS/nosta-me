@@ -148,10 +148,12 @@ export default {
   },
 
   connectToRelay(relayId) {
-    // TODO: Check if already connected, maybe delete the old one first?
+    let connector = this.connectors[relayId]
 
-    const connector = relayConnector()
-    connector.init(relayId)
+    if(!connector) {
+      connector = relayConnector()
+      connector.init(relayId)
+    }
 
     this.logger('connectToRelay', relayId, connector)
     

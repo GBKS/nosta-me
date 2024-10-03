@@ -1,6 +1,7 @@
 <script setup>
 import Icons from '@/helpers/icons'
 import ToolBox from '@/helpers/toolBox'
+import { npubEncode } from 'nostr-tools/nip19'
 
 const props = defineProps([
   'publicKey'
@@ -9,7 +10,7 @@ const props = defineProps([
 const isCopied = ref(false)
 
 const npub = computed(() => {
-  return window.NostrTools.nip19.npubEncode(props.publicKey)
+  return npubEncode(props.publicKey)
 })
 
 const formattedKey = computed(() => {

@@ -1,5 +1,7 @@
 import browserHelper from '@/helpers/browserHelper.js'
 import multiRelayRequest from '@/helpers/multiRelayRequest.js'
+import { getZapEndpoint, makeZapRequest } from 'nostr-tools/nip57'
+import * as nip19 from 'nostr-tools/nip19'
 
 /*
 
@@ -28,7 +30,7 @@ export default function zapHelper () {
         rawEvent.content = JSON.stringify(rawEvent.content)
 
         // Fetch the zap endpoint.
-        const zapEndpoint = await window.NostrTools.nip57.getZapEndpoint(rawEvent)
+        const zapEndpoint = await getZapEndpoint(rawEvent)
 
         // We need to fetch an invoice.
         if(zapEndpoint) {
@@ -119,7 +121,7 @@ export default function zapHelper () {
     async fetchInvoice(zapEndpoint, amount, comment, authorId, noteId, relays) {
       const zapEvent = await this.makeZapEvent(
         authorId,
-        noteId ? window.NostrTools.nip19.decode(noteId).data : undefined,
+        noteId ? nip19.decode(noteId).data : undefined,
         amount,
         relays,
         comment || '',
@@ -147,7 +149,7 @@ export default function zapHelper () {
 
     async makeZapEvent(profile, event, amount, relays, comment) {
       try {
-        const zapEvent = window.NostrTools.nip57.makeZapRequest({
+        const zapEvent = makeZapRequest({
           profile,
           event,
           amount,

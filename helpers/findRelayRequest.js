@@ -68,13 +68,21 @@ export default function findRelayRequest () {
 
       if(relay.status == 'connected') {
         if(connection) {
-          const subscription = connection.sub(this.filters)
+          // const subscription = connection.sub(this.filters)
+
+          const subscription = connection.subscribe(
+            this.filters,
+            {
+              onevent: (event) => { this.onEvent(event, relayId) },
+              oneose: () => { this.onEndOfEvents(relayId) }
+            }
+          )
 
           this.subscriptions[relayId] = subscription
 
           // console.log('subbing now', subscription, relayId, this.filters)
-          subscription.on('event', this.onEvent.bind(this, relayId))
-          subscription.on('eose', this.onEndOfEvents.bind(this, relayId))
+          // subscription.on('event', this.onEvent.bind(this, relayId))
+          // subscription.on('eose', this.onEndOfEvents.bind(this, relayId))
         } else {
           console.log('No connection')
         }
@@ -114,7 +122,7 @@ export default function findRelayRequest () {
       const subscription = this.subscriptions[relayId]
 
       if(subscription) {
-        subscription.unsub()
+        subscription.close()
 
         this.subscriptions[relayId] = null
       }
