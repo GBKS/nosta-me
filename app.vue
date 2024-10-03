@@ -9,13 +9,16 @@ import mitt from 'mitt'
 
 const route = useRoute()
 const sessionStore = useSessionStore()
-
 const isMounted = ref(false)
+const showTheme = ref(false)
+
+watch(() => route.query, (newValue, oldValue) => updateFromRoute(newValue, oldValue))
+watch(() => route.path, (newValue, oldValue) => updateFromRoutePath(newValue, oldValue))
 
 const wrapStyle = computed(() => {
   const result = {}
 
-  if(theme.value) {
+  if(showTheme.value && theme.value) {
     result.backgroundColor = theme.value.color
   }
 
@@ -37,9 +40,11 @@ const classObject = computed(() => {
     c.push('-create')
   }
 
-  if(theme.value && isMounted.value) {
+  if(showTheme.value && theme.value && isMounted.value) {
     c.push('-theme-'+activeThemeId.value)
     c.push('-brightness-'+theme.value.brightness)
+  } else if(!showTheme.value) {
+    c.push('-brightness-light')
   }
 
   return c.join(' ')
@@ -47,12 +52,15 @@ const classObject = computed(() => {
 
 relayManager.init()
 
-watch(() => route.query, () => updateFromRoute)
-
 function updateFromRoute() {
   if(route.query.t && themes[route.query.t]) {
     sessionStore.setTheme(route.query.t)
   }
+}
+
+function updateFromRoutePath() {
+  const noThemePages = ['/', '/about']
+  showTheme.value = noThemePages.indexOf(route.path) === -1
 }
 
 onBeforeMount(() => {
@@ -60,6 +68,7 @@ onBeforeMount(() => {
   window.emitter = emitter
 
   updateFromRoute()
+  updateFromRoutePath()
 })
 
 onMounted(() => {
@@ -73,12 +82,14 @@ onMounted(() => {
 })
 
 updateFromRoute()
+updateFromRoutePath()
 </script>
 
 <template>
   <div :class="classObject" :style="wrapStyle">
     <client-only>
       <SiteBackground
+        v-if="showTheme"
         :themeId="activeThemeId"
         :theme="theme"
       />

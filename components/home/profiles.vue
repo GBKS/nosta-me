@@ -52,17 +52,18 @@ onMounted(() => {
     >
       <h3>Check out a few profiles</h3>
       <div class="list">
-        <UiUsername
-          v-for="(item, index) in users"
-          :key="item.publicKey"
-          :publicKey="item.publicKey"
-          :relayIds="item.relayIds"
-          :theme="item.theme"
-          :showAvatar="true"
-          avatarSize="big"
-          avatarStyle="shadow"
-          layout="vertical"
-        />
+        <div class="profile" v-for="(item, index) in users">
+          <UiUsername
+            :key="item.publicKey"
+            :publicKey="item.publicKey"
+            :relayIds="item.relayIds"
+            :theme="item.theme"
+            :showAvatar="true"
+            avatarSize="big"
+            avatarStyle="shadow"
+            layout="vertical"
+          />
+        </div>
       </div>
     </div>
 </template>
@@ -79,24 +80,27 @@ onMounted(() => {
   h3 {
     @include r('font-size', 18, 21);
     font-weight: 500;
-    color: var(--theme-front);
+    color: #000000;
   }
 
   .list {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    @include r('gap', 10, 30);
+    @include r('gap', 5, 10);
 
-    .username {
-      flex-basis: 5%;
+    .profile {
+      flex-basis: 150px;
       flex-grow: 1;
+      background-color: #f8f8f8;
+      border-radius: 15px;
+      padding: 35px 15px 30px 15px;
     }
   }
 
   @include media-query(small) {
     .list {
-      .username {
+      .profile {
         flex-basis: 26%;
       }
     }

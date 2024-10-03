@@ -91,13 +91,13 @@ onMounted(() => {
     .details {
       p {
         margin: 0;
-        color: var(--theme-front);
+        color: rgba(var(--theme-front-rgb), 0.5);
         text-align: center;
         font-weight: 600;
         max-width: 600px;
 
         a {
-          color: var(--theme-front);
+          color: rgba(var(--theme-front-rgb), 0.75);
           text-decoration: underline;
         }
 
@@ -119,11 +119,12 @@ onMounted(() => {
 
       h1 {
         @include r('font-size', 80, 80);
-        font-family: 'Moonrocks';
+        font-family: 'PoetsenOne';
         color: var(--theme-front);
       }
 
       p {
+        margin-top: 10px;
         @include r('font-size', 27, 27);
         text-wrap: balance;
       }
@@ -138,7 +139,7 @@ onMounted(() => {
         a:last-child {
           @include r('font-size', 24, 24);
           font-weight: 500;
-          color: var(--theme-front);
+          color: rgba(var(--theme-front-rgb), 0.75);
           text-decoration: none;
 
           &:hover {
@@ -162,7 +163,7 @@ onMounted(() => {
 
       p {
         @include r('margin-top', 10, 20);
-        @include r('font-size', 15, 21);
+        @include r('font-size', 19, 21);
         text-wrap: balance;
       }
     }

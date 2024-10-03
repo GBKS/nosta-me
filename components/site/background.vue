@@ -9,6 +9,7 @@ const props = defineProps([
 const imageLoaded = ref(false)
 const image = ref()
 const retinaImage = ref()
+const isVisible = ref(true)
 
 watch(() => props.themeId, () => {
   imageLoaded.value = false
@@ -47,7 +48,7 @@ onBeforeMount(() => {
 <template>
   <Transition name="fade" mode="out-in" appear>
     <img
-      v-if="image && retinaImage"
+      v-if="isVisible && image && retinaImage"
       :key="themeId"
       :class="classObject"
       :src="imageSource"

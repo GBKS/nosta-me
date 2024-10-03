@@ -8,7 +8,7 @@ import ToolBox from '@/helpers/toolBox'
 import * as nip19 from 'nostr-tools/nip19'
 import { queryProfile } from 'nostr-tools/nip05'
 
-const logEnabled = !false
+const logEnabled = false
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
