@@ -237,7 +237,7 @@ function showDataOverlay() {
     flex-direction: column;
 
     h1 {
-      font-family: 'Moonrocks';
+      font-family: 'PoetsenOne';
       @include r('font-size', 40, 64);
       color: var(--theme-text-bright);
       word-break: break-word;

@@ -33,7 +33,7 @@ import options from '@/data/directory.json'
   padding: 50px 20px;
 
   h1 {
-    font-family: 'Moonrocks';
+    font-family: 'PoetsenOne';
     color: var(--theme-front);
     @include r('font-size', 64, 120);
     text-align: center;

@@ -21,7 +21,7 @@ export const RelayConnectorStatus = {
 
 export default function relayConnector () { 
   return {
-    logEnabled: !false,
+    logEnabled: false,
     relayId: null,
     relayData: null,
     initialized: false,
@@ -63,7 +63,6 @@ export default function relayConnector () {
 
       try {
         const connection = await Relay.connect(this.relayData.url)
-        console.log('-------------------------------- CREATING A CONNECTION', this.relayData.url, connection)
         // console.log('relayUrl', this.relayData.url)
         // console.log('connection', connection)
         // console.log('connection.connect', connection.connect)

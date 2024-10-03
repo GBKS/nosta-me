@@ -8,10 +8,10 @@
 @import "_themes";
 
 @font-face {
-  font-family: 'Moonrocks';
+  font-family: 'PoetsenOne';
   font-style: normal;
   font-weight: 400;
-  src: url('~/static/fonts/RubikMoonrocks-Regular.ttf');
+  src: url('~/static/fonts/PoetsenOne-Regular.ttf');
 }
 
 html {
@@ -71,7 +71,7 @@ h6,
 
 h1, 
 .-h1 {
-  font-family: 'Moonrocks';
+  font-family: 'PoetsenOne';
 	@include r('font-size', 64, 64);
 }
 
