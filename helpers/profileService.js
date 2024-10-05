@@ -54,10 +54,10 @@ export default {
     }
 
     // Ensure we check 3 or more relays.
-    if(!relaysToCheck || relaysToCheck.length < 3) {
+    if(!this.relaysToCheck || this.relaysToCheck.length < 3) {
       const relayStore = useRelayStore()
-      this.logger('relaysToCheck', relaysToCheck)
-      relaysToCheck = relayStore.getRelayIds
+      this.logger('ensuring 3+ relays', this.relaysToCheck, relayStore.getRelayIds)
+      this.relaysToCheck = relayStore.getRelayIds
     }
 
     this.currentRelay = 0
@@ -71,6 +71,9 @@ export default {
       }
     }
 
+
+    this.logger('relaysToCheck', this.relaysToCheck)
+
     this.checkCurrentRelay(includePinstr)
 
     if(!includePinstr) {
@@ -79,11 +82,11 @@ export default {
   },
 
   checkCurrentRelay(includePinstr) {
-    if(this.searchType == 'relays-known') {
+    // if(this.searchType == 'relays-known') {
       this.service = multiRelayRequest()
-    } else {
-      this.service = findRelayRequest()
-    }
+    // } else {
+    //   this.service = findRelayRequest()
+    // }
 
     this.loadCallback = this.onEvent.bind(this)
     this.internalEndCallback = this.onEndOfEvents.bind(this)
@@ -124,6 +127,8 @@ export default {
       31924, // Calendar
       31989, // Handler recommendation
       31990, // Handler information
+
+      37375 // Cashu wallet
     ]
 
     // If it's nos.lol, also check for Pinstr boards
@@ -297,6 +302,8 @@ export default {
       // console.log('!!! Seeing a handler information', data)
     } else if(data.kind == 33889) {
       // console.log('!!! Seeing a Pinstr board', data)
+    } else if(data.kind == 37375) {
+      console.log('!!! Seeing a Cashu wallet', data)
     } else if(data.type == 'end') {
       // this.checkNextRelay()
     }
