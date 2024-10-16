@@ -13,12 +13,9 @@ const visibleItems =  computed(() => {
 })
 
 const mintUrls = computed(() => {
-  // const result = props.info.filter(item => item.tags.some(tag => tag[0] == 'mint'))
-  console.log('props.infoa', props.info) 
   const result = props.info?.flatMap(obj => 
     obj.tags.filter(tag => tag[0] === 'mint')
   )
-  console.log('mintUrls a', result) 
   return result
 })
 
@@ -30,10 +27,6 @@ const titleCopy = computed(() => {
   }
 
   return result
-})
-
-onMounted(() => {
-  console.log('visibleItems', mintUrls.value)
 })
 
 function navigate() {
