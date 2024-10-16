@@ -42,6 +42,7 @@ const fileData = ref(null)
 const labelData = ref(null)
 const listsData = ref(null)
 const pinstrData = ref(null)
+const cashuData = ref(null)
 const status = ref(null)
 let nip05Data = null
 let loadCallback = null
@@ -388,6 +389,9 @@ function onLoadProfileEvent(data) {
     case 33889:
       storeEvent(pinstrData, data)
       break
+    case 37375:
+      storeEvent(cashuData, data)
+      break
   }
 
   // Track event
@@ -674,6 +678,7 @@ function reset() {
   eventsData.value = null
   calendarData.value = null
   classifiedsData.value = null
+  cashuData.value = null
 }
 
 function updateHistory() {
@@ -848,6 +853,11 @@ onMounted(() => {
               <ProfileHandlerSummary
                 :info="handlerData"
                 :count="handlerData ? handlerData.length : null"
+                @navigate="selectTab"
+              />
+              <ProfileCashuSummary
+                :info="cashuData"
+                :count="cashuData ? cashuData.length : null"
                 @navigate="selectTab"
               />
               <ProfileRelaySummary

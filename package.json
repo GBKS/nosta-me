@@ -14,6 +14,7 @@
   "dependencies": {
     "@noble/secp256k1": "^1.7.1",
     "@pinia/nuxt": "^0.4.6",
+    "@scure/base": "^1.1.9",
     "@scure/bip32": "^1.5.0",
     "@scure/bip39": "^1.4.0",
     "@vueuse/nuxt": "^9.10.0",
