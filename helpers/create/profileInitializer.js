@@ -39,7 +39,7 @@ export default {
       const root = HDKey.fromMasterSeed(mnemonicToSeedSync(mnemonic, null))
       const privateKeyTemp = root.derive(`m/44'/1237'/0'/0/0`).privateKey
       if (!privateKeyTemp) throw new Error('could not derive private key')
-      const privateKey =  secp256k1.utils.bytesToHex(privateKeyTemp)
+      const privateKey = secp256k1.utils.bytesToHex(privateKeyTemp)
 
       const publicKey = getPublicKey(privateKey)
       const npub = npubEncode(publicKey)
