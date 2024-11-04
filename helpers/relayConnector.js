@@ -146,27 +146,51 @@ export default function relayConnector () {
       this.connection.close()
     },
 
-    publish(event) {
+    async publish(event) {
       this.logger('publish', event, this.connection.url)
-
-      let pub = this.connection.publish(event)
 
       this.stats.publishAttempts++
 
-      pub.on('ok', () => {
-        console.log(`${this.connection.url} has accepted our event`)
-        this.stats.publishSuccesses++
+      const subscription = this.connection.subscribe([
+        { ids: [event.id] },
+      ], {
+        onevent: (event) => {
+          this.logger('we got the event we wanted:', event)
+          this.stats.publishSuccesses++
+          this.stats.publishSeens++
+        },
+        oneose() {
+          this.logger('closing subscription')
+          subscription.close()
+        }
       })
+      this.logger('subscription', subscription)
 
-      pub.on('seen', () => {
-        console.log(`we saw the event on ${this.connection.url}`)
-        this.stats.publishSeens++
-      })
-
-      pub.on('failed', reason => {
-        console.log(`failed to publish to ${this.connection.url}: ${reason}`)
+      try {
+        const request = await connection.publish(event)
+        this.logger('request', request)
+      } catch(error) {
+        this.logger('error', error)
         this.stats.publishErrors++
-      })
+        this.onError(error)
+      }
+
+      // let pub = this.connection.publish(event)
+      // 
+      // pub.on('ok', () => {
+      //   console.log(`${this.connection.url} has accepted our event`)
+      //   this.stats.publishSuccesses++
+      // })
+
+      // pub.on('seen', () => {
+      //   console.log(`we saw the event on ${this.connection.url}`)
+      //   this.stats.publishSeens++
+      // })
+
+      // pub.on('failed', reason => {
+      //   console.log(`failed to publish to ${this.connection.url}: ${reason}`)
+      //   this.stats.publishErrors++
+      // })
     },
 
     setRelayStatus(relayId, status) {

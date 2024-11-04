@@ -5,7 +5,6 @@ export default defineEventHandler((event) => {
 
   const defaultRelays = [
     "wss://brb.io",
-    "wss://eden.nostr.land",
     "wss://nos.lol",
     "wss://nostr-pub.wellorder.net",
     "wss://nostr.bitcoiner.social",

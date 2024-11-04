@@ -11,11 +11,6 @@ export default {
     primary: true
   },
 
-  'nostr-land': { // Finland
-    name: 'Nostr land',
-    url: 'wss://eden.nostr.land'
-  },
-
   'wellorder-net': { // Germany
     name: 'Wellorder',
     url: 'wss://nostr-pub.wellorder.net'
