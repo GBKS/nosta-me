@@ -2,21 +2,16 @@ import { useProfileStore } from '@/stores/profile'
 import sampleRelays from '@/data/sample-relays.json'
 import sampleFollows from '@/data/sample-follows.json'
 
-import { npubEncode } from 'nostr-tools/nip19'
-import { getPublicKey } from 'nostr-tools/pure'
-import * as secp256k1 from '@noble/secp256k1'
 import { wordlist } from '@scure/bip39/wordlists/english'
-import { generateMnemonic, mnemonicToSeedSync } from '@scure/bip39'
-import { HDKey } from '@scure/bip32'
+import { generateMnemonic } from '@scure/bip39'
+import { accountFromSeedWords } from 'nostr-tools/nip06'
+import { npubEncode, nsecEncode } from 'nostr-tools/nip19'
+import { bytesToHex } from '@noble/hashes/utils'
 
-/*
-
-Sets up default values for a profile in the create flow
-
- */
+// Sets up default values for a profile in the create flow
 
 export default {
-  log: false,
+  logEnabled: !false,
   store: null,
 
   init() {
@@ -31,25 +26,31 @@ export default {
 
   initKeys() {
     if(!this.store.mnemonic) {
+      this.logger('initKeys')
+
       const mnemonic = generateMnemonic(wordlist)
+      this.logger('mnemonic', mnemonic)
 
       // A mnemonic with the same word twice, for testing.
       // const mnemonic = 'cute whip blossom wedding arm arrange runway arrange oven jazz rival accuse'
+      
+      const passphrase = null // optional
+      const accountIndex = 0
+      const { privateKey, publicKey } = accountFromSeedWords(mnemonic, passphrase, accountIndex)
+      this.logger('privateKey', privateKey)
+      this.logger('publicKey', publicKey)
 
-      const root = HDKey.fromMasterSeed(mnemonicToSeedSync(mnemonic, null))
-      const privateKeyTemp = root.derive(`m/44'/1237'/0'/0/0`).privateKey
-      if (!privateKeyTemp) throw new Error('could not derive private key')
-      const privateKey =  secp256k1.utils.bytesToHex(privateKeyTemp)
+      const privateKeyHex = bytesToHex(privateKey)
+      this.logger('privateKeyHex', privateKeyHex)
 
-      const publicKey = getPublicKey(privateKey)
+      const nsec = nsecEncode(privateKey)
+      this.logger('nsec', nsec)
+
       const npub = npubEncode(publicKey)
-
-      if(this.log) {
-        console.log('Profile store.initKeys', mnemonic, privateKey, publicKey, npub)
-      }
+      this.logger('npub', npub)
 
       this.store.mnemonic = mnemonic
-      this.store.privateKey = privateKey
+      this.store.privateKey = privateKeyHex
       this.store.publicKey = publicKey
       this.store.npub = npub
     }
@@ -74,9 +75,7 @@ export default {
         this.store.addRelay(item)
       }
       
-      if(this.log) {
-        console.log('profileInitializer.initRelays', this.store.relays, sampleRelays)
-      }
+      this.logger('initRelays', this.store.relays, sampleRelays)
     }
   },
 
@@ -89,9 +88,13 @@ export default {
         this.store.addFollow(item)
       }
   
-      if(this.log) {
-        console.log('profileInitializer.initFollows', this.store.follows)
-      }
+      this.logger('initFollows', this.store.follows)
+    }
+  },
+
+  logger(...args) {
+    if(this.logEnabled) {
+      console.log('profileInitializer', ...args)
     }
   }
 }

@@ -36,7 +36,7 @@ export default function relayPublishRequest () {
       }
     },
 
-    publish(relayId, event, callback) {
+    async publish(relayId, event, callback) {
       this.logger('publish', relayId, event, callback)
 
       this.init()
@@ -57,10 +57,32 @@ export default function relayPublishRequest () {
           this.logger('publishing now')
 
           this.updateNotification(NOTIFICATION_STATUS.PUBLISHING)
+          this.logger('AAAAAAAAAAAAAAA', connection)
 
-          const request = connection.publish(event)
-          request.on('ok', this.onSuccess.bind(this))
-          request.on('failed', this.onError.bind(this))
+          const subscription = connection.subscribe([
+            { ids: [event.id] },
+          ], {
+            onevent: (event) => {
+              this.logger('we got the event we wanted:', event)
+              this.onSuccess()
+            },
+            oneose() {
+              this.logger('closing subscription')
+              subscription.close()
+            }
+          })
+          this.logger('subscription', subscription)
+
+          try {
+            const request = await connection.publish(event)
+            this.logger('request', request)
+          } catch(error) {
+            this.logger('error', error)
+            this.onError(error)
+          }
+          
+          // request.on('ok', this.onSuccess.bind(this))
+          // request.on('failed', this.onError.bind(this))
         } else {
           this.logger('No connection')
           this.updateNotification(NOTIFICATION_STATUS.NO_CONNECTION)

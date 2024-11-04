@@ -3,15 +3,18 @@ import { useSessionStore } from '@/stores/session'
 const sessionStore = useSessionStore()
 const router = useRouter()
 
-import { npubEncode } from 'nostr-tools/nip19'
+import { npubEncode, NostrTypeGuard } from 'nostr-tools/nip19'
 import { getPublicKey } from 'nostr-tools/pure'
 import { wordlist } from '@scure/bip39/wordlists/english'
-import * as secp256k1 from '@noble/secp256k1'
-import { mnemonicToSeedSync, validateMnemonic } from '@scure/bip39'
-import { HDKey } from '@scure/bip32'
+import { privateKeyFromSeedWords } from 'nostr-tools/nip06'
+import { validateMnemonic } from '@scure/bip39'
+import { bytesToHex } from '@noble/hashes/utils'
+import { decode } from 'nostr-tools/nip19'
 
+const logEnabled = !false
 const privateKeyModel = ref('')
 
+// Allow for either a private key (hex or nsec) or a mnemonic.
 const inputValid = computed(() => {
   let result = false
 
@@ -21,9 +24,13 @@ const inputValid = computed(() => {
     if(validMnemonic) {
       result = true
     } else {
+      const isNsec = NostrTypeGuard.isNSec(privateKeyModel.value)
       const validPrivateKey = privateKeyModel.value.match(/[a-f0-9]{64}/)
 
-      if(validPrivateKey) {
+      console.log('inputValid.isNsec', isNsec)
+      console.log('inputValid.validPrivateKey', validPrivateKey)
+
+      if(isNsec || validPrivateKey) {
         result = true
       }
     }
@@ -36,16 +43,36 @@ function evaluate() {
   let privateKey
 
   const isValidMnemonic = validateMnemonic(privateKeyModel.value, wordlist)
+
+  logger('evaluate', privateKeyModel.value)
+
   if(isValidMnemonic) {
     // Get private key from mnemonic
-    const root = HDKey.fromMasterSeed(mnemonicToSeedSync(privateKeyModel.value, null))
-    const privateKeyTemp = root.derive(`m/44'/1237'/0'/0/0`).privateKey
-    if (!privateKeyTemp) throw new Error('could not derive private key')
-    privateKey =  secp256k1.utils.bytesToHex(privateKeyTemp)
+    const passphrase = null // optional
+    const accountIndex = 0
+    const privateKeyFromMnemonic = privateKeyFromSeedWords(privateKeyModel.value, passphrase, accountIndex)
+    privateKey = bytesToHex(privateKeyFromMnemonic)
+    logger('evaluate privateKeyFromMnemonic', privateKeyFromMnemonic)
+    logger('evaluate privateKey', privateKey)
+
+    privateKey = privateKeyFromMnemonic
   } else {
+    const isNsec = NostrTypeGuard.isNSec(privateKeyModel.value)
     const isValidPrivateKey = privateKeyModel.value.match(/[a-f0-9]{64}/)
 
-    if(isValidPrivateKey) {
+    logger('isNsec', isNsec)
+    logger('isValidPrivateKey', isValidPrivateKey)
+
+    if(isNsec) {
+      let { type, data: decodedPrivateKey } = decode(privateKeyModel.value)
+      logger('type', type)
+      logger('decodedPrivateKey', decodedPrivateKey)
+
+      privateKey = bytesToHex(decodedPrivateKey)
+      logger('privateKey', privateKey)
+
+      privateKey = decodedPrivateKey
+    } else if(isValidPrivateKey) {
       privateKey = privateKeyModel.value
     }
   }
@@ -63,6 +90,12 @@ function evaluate() {
     router.push('/'+npub)
 
     // console.log('evaluate', privateKeyModel.value, validMnemonic, validPrivateKey)
+  }
+}
+
+function logger(...args) {
+  if(logEnabled) {
+    console.log('LoginPrivateKey', ...args)
   }
 }
 

@@ -7,11 +7,6 @@
             "primary": true
         },
         {
-            "id": "nostr-land",
-            "name": "Nostr.land",
-            "url": "wss://eden.nostr.land"
-        },
-        {
             "id": "nostr-wine",
             "name": "Nostr.wine",
             "url": "wss://nostr.wine"
