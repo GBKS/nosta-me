@@ -1,6 +1,8 @@
 <script setup>
 import { useProfileStore } from '@/stores/profile'
 import profileInitializer from '@/helpers/create/profileInitializer.js'
+import { hexToBytes } from '@noble/hashes/utils'
+import { nsecEncode } from 'nostr-tools/nip19'
 
 definePageMeta({
   layout: "create",
@@ -25,6 +27,11 @@ function onCopy() {
   isCopied.value = true
 }
 
+const nsec = computed(() => {
+  const privateKeyBytes = hexToBytes(store.privateKey)
+  return nsecEncode(privateKeyBytes)
+})
+
 onMounted(() => {
   store = useProfileStore()
 
@@ -44,7 +51,7 @@ onMounted(() => {
     <div class="options">
       <client-only>
         <UiCopyBox
-          :code="store.privateKey"
+          :code="nsec"
           @copy="onCopy"
         />
       </client-only>

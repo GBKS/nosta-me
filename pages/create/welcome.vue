@@ -1,11 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useProfileStore } from '@/stores/profile'
 import profileInitializer from '@/helpers/create/profileInitializer.js'
-
-import * as secp256k1 from '@noble/secp256k1'
-import { mnemonicToSeedSync } from '@scure/bip39'
-import { HDKey } from '@scure/bip32'
 
 definePageMeta({
   layout: "create",
@@ -13,9 +8,6 @@ definePageMeta({
     name: 'slide-right'
   },
   middleware (to, from) {
-    // console.log('welcome.from', from.name)
-    // console.log('welcome.to', to.name)
-
     if(to.name == 'create-welcome' && from.name == 'create-info') {
       to.meta.pageTransition.name = 'slide-left'
 
@@ -31,19 +23,11 @@ definePageMeta({
         from.meta.pageTransition.name = 'slide-right'
       }
     }
-    // to.meta.pageTransition.name = from.name == 'create-private-key' ? 'slide-left' : 'slide-right'
   }
 })
 
 const image = ref()
 const retinaImage = ref()
-
-function privateKeyFromSeedWords(mnemonic, passphrase) {
-  let root = HDKey.fromMasterSeed(mnemonicToSeedSync(mnemonic, passphrase))
-  let privateKey = root.derive(`m/44'/1237'/0'/0/0`).privateKey
-  if (!privateKey) throw new Error('could not derive private key')
-  return secp256k1.utils.bytesToHex(privateKey)
-}
 
 async function updateImages() {
   image.value = await useAssets('/assets/images/baby-nostrich.jpg')
@@ -60,11 +44,6 @@ const imageSourceSet = computed(() => {
 
 onMounted(() => {
   updateImages()
-
-  const store = useProfileStore()
-  console.log('mounted', store.privateKey, store.publicKey)  
-  console.log('privateKey', store.privateKey == '')   
-  console.log('publicKey', store.publicKey == '')  
 
   profileInitializer.init()
 })
@@ -123,31 +102,3 @@ onBeforeRouteLeave((to, from) => {
 }
 
 </style>
-
-/*
-
-
-Welcome to priv !--
-
-welcome gets  left-leave
-Priv gets     priv-left-enter
-
-
-Priv to welcome --!
-
-priv gets     priv-left-leave
-welcome gets  left-enter
-
-
-priv to pub !--
-
-priv gets     priv-left-leave
-pub gets      pub-left-enter
-
-
-pub to priv --!
-
-pub gets      priv-left-leave
-priv gets     priv-left-enter
-
- */
