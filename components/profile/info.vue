@@ -1,12 +1,9 @@
 <script setup>
 import * as linkify from "linkifyjs"
-import linkifyStr from "linkify-string"
-import Icons from '@/helpers/icons'
 import { useSessionStore } from '@/stores/session'
 import UiUsername from '@/components/ui/username'
 import ToolBox from '@/helpers/toolBox'
 import relayManager from '@/helpers/relayManager.js'
-import sessionContactsService from '@/helpers/sessionContactsService.js'
 import * as nip19 from 'nostr-tools/nip19'
 
 const props = defineProps([
@@ -241,7 +238,6 @@ function showDataOverlay() {
       @include r('font-size', 40, 64);
       color: var(--theme-text-bright);
       word-break: break-word;
-      // white-space: nowrap;
     }
 
     .user-status {
@@ -254,6 +250,8 @@ function showDataOverlay() {
       color: var(--theme-text-medium);
       text-wrap: balance;
       word-wrap: break-word;
+      overflow-wrap: break-word;
+      word-break: break-all;
       white-space: normal;
 
       :deep(a) {
