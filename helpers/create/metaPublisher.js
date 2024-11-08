@@ -12,7 +12,6 @@ export default function metaPublisher () {
     sessionStore: null,
     userStore: null,
     callback: null,
-    relayId: null,
     relayIds: null,
     unsignedEvent: null,
     showNotifications: false,
@@ -26,12 +25,6 @@ export default function metaPublisher () {
       if(!this.store) {
         this.store = useProfileStore()
         this.sessionStore = useSessionStore()
-      }
-
-      if(!this.relayId) {
-        // const relayUrl = "wss://nostr.mutinywallet.com"
-        const relayUrl = 'wss://relay.damus.io'
-        this.relayId = relayManager.addRelayByUrl(relayUrl)
       }
     },
 
@@ -68,7 +61,7 @@ export default function metaPublisher () {
       return this.status
     },
 
-    publishToBlastr(event) {
+    publishToNostaRelay(event) {
       const request = relayPublishRequest()
       request.showNotification = this.showNotifications
 
@@ -77,9 +70,11 @@ export default function metaPublisher () {
 
       this.logger('publishToBlastr', event, this.status)
 
-      // Blast it out
+      const nostaRelayUrl = 'wss://profiles.nosta.me'
+      const nostaRelayId = relayManager.addRelayByUrl(nostaRelayUrl)
+
       request.publish(
-        this.relayId,
+        nostaRelayId,
         event,
         this.onResult.bind(this)
       )
@@ -230,8 +225,8 @@ export default function metaPublisher () {
     onSignEvent(signedEvent) {
       this.logger('onSignEvent', signedEvent)
 
-      // Blast it out
-      this.publishToBlastr(signedEvent)
+      // Save to Nosta relay
+      this.publishToNostaRelay(signedEvent)
 
       // Also directly post to the relays the user added
       this.publishToUserRelays(signedEvent)

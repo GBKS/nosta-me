@@ -21,8 +21,8 @@ export default function relayPublisher () {
       }
 
       if(!this.relayId) {
-        // const relayUrl = "wss://nostr.mutinywallet.com"
-        const relayUrl = 'wss://relay.damus.io'
+        // Fallback to the Nosta relay
+        const relayUrl = 'wss://profiles.nosta.me'
         this.relayId = relayManager.addRelayByUrl(relayUrl)
       }
     },

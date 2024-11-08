@@ -5,6 +5,12 @@ A list of well-established relays.
  */
 export default {
 
+  'nosta': {
+    name: 'Nosta',
+    url: 'wss://profiles.nosta.me',
+    primary: true
+  },
+
   'damus-io': { // Canada
     name: 'Damus',
     url: 'wss://relay.damus.io',

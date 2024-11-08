@@ -137,7 +137,7 @@ function publishResult(status) {
   publishStatus.value = status
 }
 
-// Send to the Blastr relay
+// Send to the relays
 function saveChanges() {
   if(publisher) {
     publisher.kill()

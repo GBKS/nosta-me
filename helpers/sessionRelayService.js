@@ -208,7 +208,7 @@ export default {
   checkPopularRelays() {
     this.logger('checkPopularRelays')
     const relayStore = useRelayStore()
-    this.relayIds = relayStore.getAll
+    this.relayIds = Object.keys(relayStore.getAll)
     this.load(this.relayIds)
   },
 
@@ -224,6 +224,13 @@ export default {
       kinds: [10002],
       'authors': [publicKey],
       limit: 1
+    }
+
+    // Ensure the Nosta relay is included
+    const nostaRelayUrl = 'wss://profiles.nosta.me'
+    const nostaRelayId = relayManager.addRelayByUrl(nostaRelayUrl)
+    if(!relayIds.includes(nostaRelayId)) {
+      relayIds.push(nostaRelayId)
     }
 
     const request = multiRelayRequest()

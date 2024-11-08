@@ -1,6 +1,12 @@
 {
     "relays": [
         {
+            "id": "nosta",
+            "name": "Nosta",
+            "url": "wss://profiles.nosta.me",
+            "primary": true
+        },
+        {
             "id": "damus-io",
             "name": "Damus",
             "url": "wss://relay.damus.io",
