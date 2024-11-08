@@ -162,7 +162,7 @@ export default {
   },
 
   async follow(publicKey) {
-    console.log('follow', publicKey)
+    this.log('follow', publicKey)
 
     const result = {}
 
@@ -199,7 +199,7 @@ export default {
   },
 
   async unfollow(publicKey) {
-    console.log('unfollow', publicKey)
+    this.log('unfollow', publicKey)
 
     const result = {}
 
@@ -243,17 +243,17 @@ export default {
         break
     }
 
-    console.log('sessionContactsService.publish', signedEvent)
+    this.log('Publish', signedEvent)
 
     const relayIds = sessionRelayService.relayIds
-    console.log('sessionRelayService.relayIds', sessionRelayService.relayIds)
+    this.log('RelayIds', sessionRelayService.relayIds)
     let request, relayId
     for(let i=0; i<relayIds.length; i++) {
       relayId = relayIds[i]
 
       request = relayPublishRequest()
 
-      console.log('Publishing to', relayId)
+      this.log('Publishing to', relayId)
 
       request.publish(
         relayId,
@@ -262,20 +262,21 @@ export default {
       )
     }
 
-    return signedEvent
+    // Also post to the Nosta relay
+    const nostaRelayUrl = 'wss://profiles.nosta.me'
+    const nostaRelayId = relayManager.addRelayByUrl(nostaRelayUrl)
+    request = relayPublishRequest()
+    request.publish(
+      nostaRelayId,
+      signedEvent,
+      this.onPublishResult.bind(this)
+    )
 
-    // Also post to the Blastr relay
-    // relayId = relayManager.addRelayByUrl("wss://nostr.mutinywallet.com")
-    // request = relayPublishRequest()
-    // request.publish(
-    //   relayId,
-    //   signedEvent,
-    //   this.onPublishResult.bind(this)
-    // )
+    return signedEvent
   },
 
   onPublishResult(data) {
-    console.log('sessionContactsService.onPublishResult', data, this)
+    this.log('onPublishResult', data, this)
   },
 
   // Called when logging out

@@ -46,6 +46,13 @@ export default function contactsService () {
             relayId = relayManager.addRelayByUrl(relayUrl)
             this.relayIds.push(relayId)
           }
+
+          // Also post to the Nosta relay
+          const nostaRelayUrl = 'wss://profiles.nosta.me'
+          const nostaRelayId = relayManager.addRelayByUrl(nostaRelayUrl)
+          if(!this.relayIds.includes(nostaRelayId)) {
+            this.relayIds.push(nostaRelayId)
+          }
         } catch(error) {
 
         }

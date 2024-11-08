@@ -60,6 +60,14 @@ export default {
       this.relaysToCheck = relayStore.getRelayIds
     }
 
+    // Ensure the Nosta relay is included
+    const nostaRelayUrl = 'wss://profiles.nosta.me'
+    const nostaRelayId = relayManager.addRelayByUrl(nostaRelayUrl)
+    if(!this.relaysToCheck.includes(nostaRelayId)) {
+      console.log('!!! Adding Nosta relay to relaysToCheck', nostaRelayId)
+      this.relaysToCheck.push(nostaRelayId)
+    }
+
     this.currentRelay = 0
 
     // Check if our list of relays already includes nos.lol for Pinstr events
