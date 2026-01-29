@@ -2,3 +2,13 @@
   for = "/.well-known/nostr.json"
     [headers.values]
     Access-Control-Allow-Origin = "*"
+
+[[redirects]]
+  from = "/nprofile*"
+  to = "/nprofile:splat"
+  status = 200
+  force = true
+  [redirects.rate_limit]
+    window_limit = 30
+    window_size = 60
+    aggregate_by = ["ip", "domain"]
