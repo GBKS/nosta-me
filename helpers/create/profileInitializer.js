@@ -2,11 +2,9 @@ import { useProfileStore } from '@/stores/profile'
 import sampleRelays from '@/data/sample-relays.json'
 import sampleFollows from '@/data/sample-follows.json'
 
-import { wordlist } from '@scure/bip39/wordlists/english'
-import { generateMnemonic } from '@scure/bip39'
-import { accountFromSeedWords } from 'nostr-tools/nip06'
+import { accountFromSeedWords, generateSeedWords } from 'nostr-tools/nip06'
 import { npubEncode, nsecEncode } from 'nostr-tools/nip19'
-import { bytesToHex } from '@noble/hashes/utils'
+import { bytesToHex } from 'nostr-tools/utils'
 
 // Sets up default values for a profile in the create flow
 
@@ -28,7 +26,7 @@ export default {
     if(!this.store.mnemonic) {
       this.logger('initKeys')
 
-      const mnemonic = generateMnemonic(wordlist)
+      const mnemonic = generateSeedWords()
 
       // A mnemonic with the same word twice, for testing.
       // const mnemonic = 'cute whip blossom wedding arm arrange runway arrange oven jazz rival accuse'

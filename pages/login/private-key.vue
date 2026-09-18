@@ -5,10 +5,8 @@ const router = useRouter()
 
 import { npubEncode, NostrTypeGuard } from 'nostr-tools/nip19'
 import { getPublicKey } from 'nostr-tools/pure'
-import { wordlist } from '@scure/bip39/wordlists/english'
-import { privateKeyFromSeedWords } from 'nostr-tools/nip06'
-import { validateMnemonic } from '@scure/bip39'
-import { bytesToHex, hexToBytes } from '@noble/hashes/utils'
+import { privateKeyFromSeedWords, validateWords } from 'nostr-tools/nip06'
+import { bytesToHex, hexToBytes } from 'nostr-tools/utils'
 import { decode } from 'nostr-tools/nip19'
 
 const logEnabled = false
@@ -19,7 +17,7 @@ const inputValid = computed(() => {
   let result = false
 
   if(privateKeyModel.value.length > 0) {
-    const validMnemonic = validateMnemonic(privateKeyModel.value, wordlist)
+    const validMnemonic = validateWords(privateKeyModel.value)
 
     if(validMnemonic) {
       result = true
@@ -41,7 +39,7 @@ const inputValid = computed(() => {
 function evaluate() {
   let privateKey
 
-  const isValidMnemonic = validateMnemonic(privateKeyModel.value, wordlist)
+  const isValidMnemonic = validateWords(privateKeyModel.value)
 
 
   if(isValidMnemonic) {

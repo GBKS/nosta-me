@@ -1,7 +1,7 @@
 <script setup>
 import { useProfileStore } from '@/stores/profile'
 import profileInitializer from '@/helpers/create/profileInitializer.js'
-import { hexToBytes } from '@noble/hashes/utils'
+import { hexToBytes } from 'nostr-tools/utils'
 import { nsecEncode } from 'nostr-tools/nip19'
 
 definePageMeta({

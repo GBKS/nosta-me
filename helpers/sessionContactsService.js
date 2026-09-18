@@ -5,7 +5,6 @@ import multiRelayRequest from '@/helpers/multiRelayRequest.js'
 import browserHelper from '@/helpers/browserHelper.js'
 import sessionRelayService from '@/helpers/sessionRelayService.js'
 import { useUserStore } from "@/stores/users.js"
-import { sign } from '@noble/secp256k1'
 import { finalizeEvent, getEventHash } from 'nostr-tools/pure'
 import ToolBox from '@/helpers/toolBox'
 

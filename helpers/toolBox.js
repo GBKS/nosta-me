@@ -1,4 +1,4 @@
-import { hexToBytes } from '@noble/hashes/utils'
+import { hexToBytes } from 'nostr-tools/utils'
 
 /*
 
