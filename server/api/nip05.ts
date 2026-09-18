@@ -1,7 +1,12 @@
 // https://github.com/nostr-protocol/nips/blob/master/05.md
 
 export default defineEventHandler((event) => {
-  event.res.setHeader('content-type', 'application/json')
+  // NIP-05 requires the CORS header so browser-based clients can verify addresses.
+  // It's set here since the header rules in netlify.toml don't apply to functions.
+  setResponseHeaders(event, {
+    'content-type': 'application/json',
+    'access-control-allow-origin': '*'
+  })
 
   const defaultRelays = [
     "wss://brb.io",
