@@ -104,6 +104,11 @@ async function testNip05() {
   check(data && data.names && data.names.gbks === HEX_KEY, 'returns the public key for gbks')
   check(data && data.relays && Array.isArray(data.relays[HEX_KEY]), 'returns relays for that key')
 
+  // The root identifier, _@nosta.me. Relays are keyed by public key, not by name.
+  const root = await (await fetch(BASE + '/.well-known/nostr.json?name=_')).json()
+  const rootKey = root && root.names && root.names['_']
+  check(rootKey && root.relays && Array.isArray(root.relays[rootKey]) && root.relays[rootKey].length > 0, 'returns relays for the root identifier')
+
   const unknown = await (await fetch(BASE + '/.well-known/nostr.json?name=nobody-by-this-name')).json()
   check(unknown && unknown.names && !unknown.names['nobody-by-this-name'], 'has no entry for an unknown name')
 }
