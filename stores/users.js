@@ -7,9 +7,7 @@ Profiles (kind 0) gets loaded a lot, this is a temp storage.
 
  */
 
-export const useUserStore = defineStore({
-  id: 'users',
-
+export const useUserStore = defineStore('users', {
   state: () => {
     return {
       users: {}

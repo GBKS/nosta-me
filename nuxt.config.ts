@@ -11,7 +11,7 @@ export default defineNuxtConfig({
 				{ name: 'description', content: 'Nostr profiles. Nice and easy.' },
 				{ name: 'msapplication-TileColor', content: '#ffffff' },
 				{ name: 'msapplication-TileImage', content: '/ms-icon-144x144.png' },
-				{ name: 'theme-color"', content: '#ffffff' }
+				{ name: 'theme-color', content: '#ffffff' }
 			],
 			link: [
 				{ rel: 'apple-touch-icon', sizes: '57x57', href: '/images/apple-icon-57x57.png' },
@@ -42,6 +42,11 @@ export default defineNuxtConfig({
 		'@pinia/nuxt',
 		'@vueuse/nuxt'
 	],
+	// Stores are imported explicitly everywhere. The auto-import scanner
+	// also misreads `state` in stores/session.js as an export.
+	pinia: {
+		storesDirs: []
+	},
 	serverHandlers: [
   		{ route: '/.well-known/nostr.json', handler: '~/server/api/nip05.ts' }
 	],
@@ -49,7 +54,9 @@ export default defineNuxtConfig({
 		css: {
 			preprocessorOptions: {
 				scss: {
-					additionalData: '@use "@/assets/css/_import.scss" as *;'
+					additionalData: '@use "@/assets/css/_import.scss" as *;',
+					// The stylesheets still use @import, which works until Dart Sass 3.
+					silenceDeprecations: ['import', 'global-builtin']
 				}
 			}
 		}

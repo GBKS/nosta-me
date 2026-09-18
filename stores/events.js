@@ -7,9 +7,7 @@ Stores events (notes) received from relays for later reference.
 
  */
 
-export const useEventStore = defineStore({
-  id: 'events',
-
+export const useEventStore = defineStore('events', {
   state: () => {
     return { 
       events: useStorage('events', {})
