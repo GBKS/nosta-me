@@ -109,12 +109,12 @@ export default function profilePublisher () {
     },
 
     // Tests
+    // A dry run of the publish flow with the keys from the create flow.
 
     testPublish(callback) {
       this.callback = callback
 
       this.init()
-      this.setupTestCalls()
 
       const metaStatus = this.metaPublisher.testPublish(this.metaResult.bind(this))
       const relayStatus = this.relayPublisher.testPublish(this.relayResult.bind(this))
@@ -125,11 +125,6 @@ export default function profilePublisher () {
       this.status.follows = followStatus
 
       return this.status
-    },
-
-    setupTestCalls() {
-      this.store.publicKey = process.env.TEST_PUBLIC_KEY
-      this.store.privateKey = process.env.TEST_PRIVATE_KEY
     },
 
     logger(...args) {
