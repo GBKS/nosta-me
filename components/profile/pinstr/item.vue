@@ -1,7 +1,6 @@
 <script setup>
 import { useRelayStore } from '@/stores/relays'
 import ToolBox from '@/helpers/toolBox'
-import { npubEncode } from 'nostr-tools/nip19'
 
 const relayStore = useRelayStore()
 
@@ -33,18 +32,6 @@ const type = computed(() => {
 
 const image = computed(() => {
   const result = props.info.tags.find(tag => tag[0] == 'image')
-  return result
-})
-
-const link = computed(() => {
-  let result = null
-
-  const titleTag = props.info.tags.find(tag => tag[0] == 'd')
-  if(titleTag) {
-    const npub = npubEncode(props.info.pubkey)
-    result = 'https://pinstr.app/p/'+npub+'/'+encodeURIComponent(titleTag[1])
-  }
-
   return result
 })
 
@@ -80,19 +67,16 @@ function navigate() {
 </script>
 
 <template>
-  <a
-    :class="classObject"
-    :href="link"
-    rel="nofollow noopener noreferrer"
-    target="_blank"
-  >
+  <!-- Boards used to link to pinstr.app. That domain was taken over by an
+       unrelated site, so they are shown without a link. -->
+  <div :class="classObject">
     <UiImage
       :src="image[1]"
     />
     <h5 v-if="title">{{ title }}</h5>
     <p v-if="description">{{ description }}</p>
     <p v-if="meta">{{ meta }}</p>
-  </a>
+  </div>
 </template>
 
 <style scoped lang="scss">
@@ -100,8 +84,6 @@ function navigate() {
 .pinstr-board {
   display: flex;
   flex-direction: column;
-  text-decoration: none;
-  cursor: pointer;
 
   :deep(.image) {
     img {
