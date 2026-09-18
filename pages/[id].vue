@@ -719,7 +719,7 @@ function logger(...args) {
 }
 
 onMounted(() => {
-  if(process.client) {
+  if(import.meta.client) {
     listenToLightningPayments()
   }
 
