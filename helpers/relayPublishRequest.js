@@ -149,7 +149,6 @@ export default function relayPublishRequest () {
       let expiration = null
       // const detail = 'Kind ' + this.event.kind + ', ' + this.relayId
 
-      console.log('updateNotification', status)
 
       switch(status) {
         case NOTIFICATION_STATUS.PUBLISHING:

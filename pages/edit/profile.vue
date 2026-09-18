@@ -131,7 +131,6 @@ function cancelChanges() {
 
 function publishResult(status) {
   if(log) {
-    console.log('EditProfile.metaResult', status)
   }
 
   publishStatus.value = status
@@ -155,7 +154,6 @@ function saveChanges() {
   content.lud16 = bitcoin.value
 
   if(log) {
-    console.log('EditProfile.saveChanges', editContent)
 
   }
 
@@ -170,7 +168,6 @@ function saveChanges() {
 
 function loadData() {
   if(log) {
-    console.log('EditProfile.loadData')
   }
 
   if(!service) {
@@ -191,7 +188,6 @@ function loadData() {
 
 function onDataLoaded(data) {
   if(log) {
-    console.log('EditProfile.onDataLoaded', data)
   }
 
   if(data.kind == 0) {
@@ -226,7 +222,6 @@ const profileVersions = computed(() => {
   }
 
   if(log) {
-    console.log('EditProfile.profileVersions', dates, relays, versions)
   }
 
   return { dates, relays, versions }
@@ -269,7 +264,6 @@ function updateInfoFromFoundProfiles() {
   }
 
   if(log) {
-    console.log('EditProfile.updateInfoFromFoundProfiles', relayIds.value)
   }
 }
 

@@ -94,7 +94,6 @@ const formattedDate = computed(() => {
 function findSection(name) {
   let result = null
 
-  console.log('ZapItem.findSection', name, invoice.value)
 
   let i, section
   const sections = invoice?.value?.sections

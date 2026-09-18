@@ -134,7 +134,6 @@ export default function followPublisher () {
         }
       }
 
-      console.log('follows', this.store.follows)
 
       const signedEvent = this.signEvent(event)
 

@@ -162,7 +162,6 @@ export default {
   },
 
   async follow(publicKey) {
-    console.log('follow', publicKey)
 
     const result = {}
 
@@ -199,7 +198,6 @@ export default {
   },
 
   async unfollow(publicKey) {
-    console.log('unfollow', publicKey)
 
     const result = {}
 
@@ -243,17 +241,14 @@ export default {
         break
     }
 
-    console.log('sessionContactsService.publish', signedEvent)
 
     const relayIds = sessionRelayService.relayIds
-    console.log('sessionRelayService.relayIds', sessionRelayService.relayIds)
     let request, relayId
     for(let i=0; i<relayIds.length; i++) {
       relayId = relayIds[i]
 
       request = relayPublishRequest()
 
-      console.log('Publishing to', relayId)
 
       request.publish(
         relayId,
@@ -275,7 +270,6 @@ export default {
   },
 
   onPublishResult(data) {
-    console.log('sessionContactsService.onPublishResult', data, this)
   },
 
   // Called when logging out

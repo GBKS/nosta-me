@@ -179,7 +179,6 @@ export default function metaPublisher () {
         if(this.sessionStore.loginType == 'browser') {
           // Request from browser.
           if(this.log) {
-            console.log('window.nostr', window.nostr, window.nostr.enabled, window.nostr.enable)
           }
 
           if(!window.nostr.enabled && window.nostr.enable) {

@@ -2,7 +2,6 @@
   
 
 onBeforeMount(() => {
-  console.log('pp.onBeforeMount')
 })
 </script>
 

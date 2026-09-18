@@ -36,7 +36,6 @@ const groupedHandlers = computed(() => {
     }
   }
 
-  console.log('HandlerTab.groupedHandlers', result)
 
   return result
 })

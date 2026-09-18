@@ -120,7 +120,6 @@ export default function relayPublisher () {
         }
       }
 
-      console.log('relays', this.store.relays)
 
       const signedEvent = this.signEvent(event)
       const request = relayPublishRequest()

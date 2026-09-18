@@ -48,7 +48,6 @@ export default {
     }
 
     if(this.log) {
-      console.log('UserService.getProfile', publicKey, relays, this.requests)
     }
 
     return result
@@ -58,7 +57,6 @@ export default {
     const requestsByRelay = this.gatherRequestsByRelay()
 
     if(this.log) {
-      console.log('UserService.onTimer', requestsByRelay)
     }
 
     let relay, publicKeys, request
@@ -104,7 +102,6 @@ export default {
 
   onUserData(data) {
     if(this.log) {
-      console.log('UserService.onUserData', data, this.requests)
     }
 
     if(this.requests[data.pubkey]) {
