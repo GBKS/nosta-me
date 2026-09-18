@@ -1,0 +1,30 @@
+name: Smoke test
+
+# Builds the site and checks that the production server actually works:
+# pages render, the NIP-05 endpoint and the security headers are in place.
+# See scripts/smoke-test.mjs.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run test:smoke
