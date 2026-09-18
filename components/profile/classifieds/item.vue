@@ -78,8 +78,7 @@ const price = computed(() => {
     if(price.length == 2) {
       result = price[1]
     } else {
-      const format = new Intl.NumberFormat(undefined, { style: 'currency', currency: price[2] })
-      result = format.format(price[1])
+      result = ToolBox.formatPrice(price[1], price[2])
       if(price.length > 3) {
         result += ' ' + price[3]
       }

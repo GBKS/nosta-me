@@ -59,17 +59,22 @@ const DescriptionNode = () => {
     token = tokens[i]
 
     if(token.t == 'url') {
-      if(token.v.indexOf('nostr:npub') === 0) {
-        const publicKey = nip19.decode(token.v.split(':')[1]).data;
-        children.push(h(UiUsername, { publicKey }))
-      } else if(token.v.indexOf('nostr:nprofile') === 0) {
-        children.push(turnNProfileToNode(token.v))
-      } else {
-        children.push(h('a', {
-          href: token.v,
-          rel: 'nofollow noopener noreferrer',
-          target: '_blank'
-        }, token.v))
+      // A malformed nostr: link shouldn't break the whole profile.
+      try {
+        if(token.v.indexOf('nostr:npub') === 0) {
+          const publicKey = nip19.decode(token.v.split(':')[1]).data;
+          children.push(h(UiUsername, { publicKey }))
+        } else if(token.v.indexOf('nostr:nprofile') === 0) {
+          children.push(turnNProfileToNode(token.v))
+        } else {
+          children.push(h('a', {
+            href: token.v,
+            rel: 'nofollow noopener noreferrer',
+            target: '_blank'
+          }, token.v))
+        }
+      } catch(error) {
+        children.push(token.v)
       }
     } else {
       children.push(token.v)

@@ -134,7 +134,11 @@ onMounted(() => {
       }
       // console.log('dd', invoice.value)
     } else if(tag[0] == 'description') {
-      targetUserPublicKey = JSON.parse(tag[1]).pubkey
+      try {
+        targetUserPublicKey = JSON.parse(tag[1]).pubkey
+      } catch(error) {
+        console.log('ZapItem could not parse description', tag[1])
+      }
     }
   }
 
