@@ -49,7 +49,7 @@ const url = computed(() => {
     props.info.kind,
     relay.url,
     props.handlers,
-    linkHelper.habla.address
+    linkHelper.primal.article
   )
 })
 

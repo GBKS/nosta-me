@@ -7,9 +7,8 @@ Goal is to have a micro-app that onboards new Nostriches into the ecosystem as a
 Nosta is not a place for posting timely social media content, messaging, etc. The site links out to other apps that specialize in these. It focuses on setting up and displaying static profile information (name, about, follows, badges, lists...), and also showcasing some recent activity like zaps and products listed for sale.
 
 - [nosta.me](https://nosta.me/)
-- [Bolt.fun project page](https://makers.bolt.fun/project/nosta)
 
-This is a for-fun side project by [Christoph](https://nosta.me/gbks@nosta.me). You can read the background story in the [Bolt.fun Nostr hackathon pitch](https://makers.bolt.fun/story/a-bold-pitch-for-nosta--716). You're more than welcome to contribute. Please start by messaging me or opening an issue to discuss your contribution before diving into code.
+This is a for-fun side project by [Christoph](https://nosta.me/gbks@nosta.me). It started as an entry in the Bolt.fun Nostr hackathon. You're more than welcome to contribute. Please start by messaging me or opening an issue to discuss your contribution before diving into code.
 
 ## [NIPs](https://github.com/nostr-protocol/nips) supported
 

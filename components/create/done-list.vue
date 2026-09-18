@@ -9,7 +9,7 @@ const options = [
     name: 'Damus',
     description: 'Social media',
     platform: 'iOS',
-    url: 'https://snort.social/p/{npub}',
+    url: 'https://damus.io/',
     image: 'damus'
   },
   {
@@ -27,14 +27,6 @@ const options = [
     platform: 'Web',
     url: 'https://primal.net/p/{npub}',
     image: 'primal'
-  },
-  {
-    id: 'blogstack',
-    name: 'Blogstack',
-    description: 'Blogging',
-    platform: 'Web',
-    url: 'https://hamstr.to/profile/{npub}',
-    image: 'blogstack'
   }
 ]
 

@@ -59,18 +59,6 @@ const downloadUrl = computed(() => {
   return "data:text/json;charset=utf-8," + encodedData
 })
 
-const snortUrl = computed(() => {
-  return 'https://snort.social/p/' + npub.value
-})
-
-const hamstrUrl = computed(() => {
-  return 'https://hamstr.to/profile/' + npub.value
-})
-
-const astralUrl = computed(() => {
-  return 'https://astral.ninja/' + npub.value
-})
-
 const nprofile = computed(() => {
   const result = nprofileEncode({
     pubkey: props.publicKey,
