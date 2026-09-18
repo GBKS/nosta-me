@@ -1,6 +1,4 @@
 <script setup>
-import bolt11Decoder from 'light-bolt11-decoder'
-
 const props = defineProps([
   'info',
   'count',
@@ -8,96 +6,10 @@ const props = defineProps([
   'direction'
 ])
 
-const zapsParsed = []
-const summaries = ref(null)
-const zappedAmountValue = ref(0)
-
+// Every receipt has a "zap", parsed by zapReceiptHelper when it was loaded.
 const zappedAmount = computed(() => {
-  if(props.info) {
-    let i=0, zap
-    for(; i<props.info.length; i++) {
-      zap = props.info[i]
-
-      if(zapsParsed.indexOf(zap.id) === -1) {
-        parseZap(zap)
-      }
-    }
-  }
-
-  return zappedAmountValue.value
+  return (props.info || []).reduce((total, event) => total + event.zap.sats, 0)
 })
-
-function parseZaps() {
-  if(props.info) {
-    let i=0, zap
-    for(; i<props.info.length; i++) {
-      zap = props.info[i]
-
-      if(zapsParsed.indexOf(zap.id) === -1) {
-        parseZap(zap)
-      }
-    }
-  }
-}
-
-function parseZap(info) {
-  const result = {
-    id: info.id
-  }
-
-  // console.log('parseZap', info)
-
-  let i=0, tag, amountSection
-  for(; i<info.tags.length; i++) {
-    tag = info.tags[i]
-
-    if(tag[0] == 'bolt11') {
-      try {
-        result.invoice = bolt11Decoder.decode(tag[1])
-        amountSection = findSection(result.invoice, 'amount')
-        if(amountSection) {
-          result.amount = amountSection.value
-        }
-      } catch(error) {
-        console.log('ZapItem could not decode', tag[1])
-      }
-      // console.log('dd', invoice.value)
-    } else if(tag[0] == 'description') {
-      try {
-        result.targetUserPublicKey = JSON.parse(tag[1]).pubkey
-      } catch(error) {
-        console.log('ZapSummary.parseZap could not parse JSON', tag[1])
-      }
-    }
-  }
-
-  if(!summaries.value) {
-    summaries.value = []
-  }
-
-  if(result.amount) {
-    zappedAmountValue.value += Math.round(parseInt(result.amount) / 1000)
-  }
-
-  zapsParsed.push(result.id)
-  summaries.value.push(result)
-}
-
-function findSection(invoice, name) {
-  let result = null
-
-  let i, section
-  for(i=0; i<invoice.sections.length; i++) {
-    section = invoice.sections[i]
-
-    if(section.name == name) {
-      result = section
-      break
-    }
-  }
-
-  return result
-}
 
 const zapCount = computed(() => {
   return props.info.length
@@ -149,27 +61,22 @@ const recipientThree = computed(() => {
   return prepRecipientInfo(2)
 })
 
+// The people on the other end of the zaps. The receipt itself is published by
+// the lightning provider, so event.pubkey is not one of them.
 const uniqueRecipientEvents = computed(() => {
   let result
 
-  let publicKeys = [], event, publicKey, descriptionTag
+  let publicKeys = [], event, publicKey
   for(let i=0; i<props.info.length; i++) {
     event = props.info[i]
 
-    publicKey = event.pubkey
+    publicKey = props.direction == 'sent' ? event.zap.recipient : event.zap.sender
 
-    // if(props.direction == 'sent') {
-    //   descriptionTag = ToolBox.findTag(event, 'description')
-    //   publicKey = JSON.parse(descriptionTag[0]).pubkey
-    // } else {
-    //   publicKey = event.pubkey
-    // }
-
-    if(publicKeys.indexOf(event.pubkey) === -1) {
-      publicKeys.push(event.pubkey)
+    if(publicKeys.indexOf(publicKey) === -1) {
+      publicKeys.push(publicKey)
 
       if(!result) result = []
-      result.push(event)
+      result.push({ publicKey, relay: event.relay })
     }
   }
 
@@ -183,11 +90,11 @@ const uniqueRecipientEventCount = computed(() => {
 function prepRecipientInfo(index) {
   let result
 
-  if(uniqueRecipientEvents.value && uniqueRecipientEvents.value.length >= index) {
+  if(uniqueRecipientEvents.value && uniqueRecipientEvents.value.length > index) {
     const event = uniqueRecipientEvents.value[index]
 
     result = {
-      publicKey: event.pubkey,
+      publicKey: event.publicKey,
       relayIds: [event.relay]
     }
   }

@@ -5,6 +5,8 @@ import themes from '@/data/themes.json'
 import { useUserStore } from '@/stores/users'
 import { useSessionStore } from '@/stores/session'
 import ToolBox from '@/helpers/toolBox'
+import zapReceiptHelper from '@/helpers/zapReceiptHelper.js'
+import zapProviderService, { PROVIDER_STATUS } from '@/helpers/zapProviderService.js'
 import * as nip19 from 'nostr-tools/nip19'
 import { queryProfile } from 'nostr-tools/nip05'
 
@@ -29,7 +31,8 @@ const reportedData = ref(null) // The user has been reported
 const shortNotesData = ref(null)
 const longNotesData = ref(null)
 const sentZapsData = ref(null)
-const receivedZapsData = ref(null)
+const receivedZapCandidates = ref(null) // Not checked against the lightning provider yet
+const zapProvider = ref(null) // Result of looking up the key the provider signs zap receipts with
 const zapGoalData = ref(null)
 const userStatusData = ref(null)
 const liveData = ref(null)
@@ -112,6 +115,44 @@ watch(() => route.query, () => updateFromRoute)
 
 onBeforeMount(() => {
   updateFromRoute()
+})
+
+const NO_LIGHTNING_ADDRESS = 'none'
+
+const receivedZapsData = computed(() => {
+  const candidates = receivedZapCandidates.value
+  const provider = zapProvider.value
+
+  if(!candidates || !provider) return null
+
+  let result = candidates
+  if(provider.status == PROVIDER_STATUS.FOUND) {
+    result = candidates.filter(event => zapReceiptHelper.isFromProvider(event.zap, provider.publicKey))
+  } else if(provider.status == PROVIDER_STATUS.NONE) {
+    // The provider doesn't do zaps, so none of these can be real.
+    result = []
+  }
+  // If the provider couldn't be asked, the checks in zapReceiptHelper have to do.
+
+  return result.length > 0 ? result : null
+})
+
+watch(() => {
+  const profile = profileData.value ? profileData.value.profile : null
+  if(!receivedZapCandidates.value || !profile) return null
+
+  return profile.lud16 || NO_LIGHTNING_ADDRESS
+}, (address) => {
+  zapProvider.value = null
+
+  if(address == NO_LIGHTNING_ADDRESS) {
+    // People still get zapped, as clients fall back to services like npub.cash.
+    // There is no provider to check against then. The same goes for profiles
+    // that only have an LNURL (lud06), which we can't look up.
+    zapProvider.value = { status: PROVIDER_STATUS.UNKNOWN }
+  } else if(address) {
+    findZapProvider(address)
+  }
 })
 
 const theme = computed(() => {
@@ -505,29 +546,42 @@ function storeEvent(location, data) {
 function handleLoadedZapEvent(data) {
   // console.log('handleLoadedZapEvent', data)
 
-  const isSender = data.pubkey == publicKey.value
+  // Drops receipts that don't hold up, anyone can publish one.
+  const zap = zapReceiptHelper.parse(data)
+  if(!zap) return
 
-  if(isSender && !sentZapsData.value) {
-    sentZapsData.value = []
+  data.zap = zap
+
+  // The receipt is published by the lightning provider, so who sent and who
+  // received the zap has to be read from the receipt. It can be both.
+  if(zap.sender == publicKey.value) {
+    storeZap(sentZapsData, data)
   }
 
-  if(!isSender && !receivedZapsData.value) {
-    receivedZapsData.value = []
+  if(zap.recipient == publicKey.value) {
+    storeZap(receivedZapCandidates, data)
+  }
+}
+
+function storeZap(location, data) {
+  if(!location.value) {
+    location.value = []
   }
 
-  const zapArray = isSender ? sentZapsData : receivedZapsData
-
-  // Ensure it's not already added.
-  let alreadyAdded = false
-  for(let i=0; i<zapArray.value.length; i++) {
-    if(zapArray.value[i].id == data.id) {
-      alreadyAdded = true
-      break
-    }
+  const zaps = location.value.map(event => event.zap)
+  if(!zapReceiptHelper.isDuplicate(data.zap, zaps)) {
+    location.value.push(data)
   }
-  
-  if(!alreadyAdded) {
-    zapArray.value.push(data)
+}
+
+// Received zaps only count if the receipt was signed by the lightning provider
+// of this profile. We ask the provider for its key once there is a zap to check.
+async function findZapProvider(address) {
+  const result = await zapProviderService.find(address)
+
+  // The visitor may have moved on to another profile in the meantime.
+  if(profileData.value && profileData.value.profile.lud16 == address) {
+    zapProvider.value = result
   }
 }
 
@@ -658,7 +712,8 @@ function reset() {
   reportsData.value = null
   reportedData.value = null
   sentZapsData.value = null
-  receivedZapsData.value = null
+  receivedZapCandidates.value = null
+  zapProvider.value = null
   zapGoalData.value = null
   userStatusData.value = null
   badgeData.value = null

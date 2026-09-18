@@ -185,9 +185,11 @@ export default {
     // TODO: Need to update the profile page copy to reflect that
     const oneMonthAgo = new Date()
     oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
+    // Zap receipts are published by the lightning provider of the recipient.
+    // The sender is in the "P" tag, the recipient in the "p" tag (NIP-57).
     const sentZapsFilter = {
       kinds: [9735],
-      authors: [this.publicKey],
+      '#P': [this.publicKey],
       limit: 10,
       since: Math.round(oneMonthAgo / 1000)
     }
@@ -313,9 +315,9 @@ export default {
     // Not an event, but a message like { type: 'end' }
     if(!data.pubkey) return true
 
-    // Created by this profile, or sent to it (zaps)
+    // Created by this profile, or zaps it sent ("P" tag) or received ("p" tag)
     return data.pubkey == this.publicKey ||
-      (data.tags || []).some(tag => tag[0] == 'p' && tag[1] == this.publicKey)
+      (data.tags || []).some(tag => (tag[0] == 'p' || tag[0] == 'P') && tag[1] == this.publicKey)
   },
 
   onEndOfEvents() {
