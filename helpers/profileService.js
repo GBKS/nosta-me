@@ -2,7 +2,6 @@
 import { useRelayStore } from "@/stores/relays.js"
 
 import relayManager from '@/helpers/relayManager.js'
-import findRelayRequest from '@/helpers/findRelayRequest.js'
 import multiRelayRequest from '@/helpers/multiRelayRequest.js'
 import relayRequest from '@/helpers/relayRequest.js'
 import contactsService from '@/helpers/contactsService.js'
@@ -82,11 +81,7 @@ export default {
   },
 
   checkCurrentRelay(includePinstr) {
-    // if(this.searchType == 'relays-known') {
-      this.service = multiRelayRequest()
-    // } else {
-    //   this.service = findRelayRequest()
-    // }
+    this.service = multiRelayRequest()
 
     this.loadCallback = this.onEvent.bind(this)
     this.internalEndCallback = this.onEndOfEvents.bind(this)

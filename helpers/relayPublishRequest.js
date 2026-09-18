@@ -46,43 +46,27 @@ export default function relayPublishRequest () {
       this.callback = callback
 
       const relay = this.relayStore.getRelay(this.relayId)
-      const connection = this.relayStore.getRelayConnection(this.relayId)
+      const connection = relayManager.getConnection(this.relayId)
       this.logger('relay', relay)
 
       if(this.timeout) clearTimeout(this.timeout)
       this.timeout = setTimeout(this.onTimeout.bind(this), 10000)
 
-      if(relay.status == 'connected') {
+      if(relay.status == 'connected' && relayManager.isConnected(this.relayId)) {
         if(connection) {
           this.logger('publishing now')
 
           this.updateNotification(NOTIFICATION_STATUS.PUBLISHING)
-          this.logger('AAAAAAAAAAAAAAA', connection)
-
-          const subscription = connection.subscribe([
-            { ids: [event.id] },
-          ], {
-            onevent: (event) => {
-              this.logger('we got the event we wanted:', event)
-              this.onSuccess()
-            },
-            oneose() {
-              this.logger('closing subscription')
-              subscription.close()
-            }
-          })
-          this.logger('subscription', subscription)
-
+          // Resolves when the relay confirms with an OK message,
+          // rejects if it refuses the event or doesn't answer.
           try {
             const request = await connection.publish(event)
             this.logger('request', request)
+            this.onSuccess()
           } catch(error) {
             this.logger('error', error)
             this.onError(error)
           }
-          
-          // request.on('ok', this.onSuccess.bind(this))
-          // request.on('failed', this.onError.bind(this))
         } else {
           this.logger('No connection')
           this.updateNotification(NOTIFICATION_STATUS.NO_CONNECTION)
@@ -129,6 +113,8 @@ export default function relayPublishRequest () {
 
     onError(error) {
       this.logger('relayPublishRequest.onError', error, this)
+
+      clearTimeout(this.timeout)
 
       this.updateNotification(NOTIFICATION_STATUS.ERROR)
 

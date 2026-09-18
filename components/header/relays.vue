@@ -34,8 +34,9 @@ function onRelayConnectionStatusChange() {
 
 function updateConnectedRelayCount() {
   let count = 0
-  for(let i in relayStore.connections) {
-    if(relayStore.connections[i].status == 1) {
+  const relays = relayStore.getAll
+  for(let relayId in relays) {
+    if(relays[relayId].status == 'connected') {
       count++
     }
   }

@@ -67,10 +67,10 @@ export default function relayRequest () {
         return
       }
 
-      const connection = this.relayStore.getRelayConnection(this.relayId)
+      const connection = relayManager.getConnection(this.relayId)
       this.logger('relay', relay, connection)
 
-      if(relay.status == 'connected') {
+      if(relay.status == 'connected' && relayManager.isConnected(this.relayId)) {
         if(connection) {
           this.logger('subbing now', this.subscription, this.relayId, this.filters, connection)
           this.subscription = connection.subscribe(
@@ -84,11 +84,10 @@ export default function relayRequest () {
           console.log('No connection')
         }
       } else {
-        console.log('subscribe connection not found with relayId: ' + this.relayId)
+        this.logger('subscribe connection not found with relayId: ' + this.relayId)
 
-        if(!connection) {
-          relayManager.connectToRelay(this.relayId)
-        }
+        // Connects, or retries if an earlier attempt failed.
+        relayManager.connectToRelay(this.relayId)
 
         if(!this.connectCallback) {
           this.connectCallback = this.onRelayConnect.bind(this)
@@ -117,8 +116,8 @@ export default function relayRequest () {
     onEvent(event) {
       this.logger('onEvent', this.relayId, event)
 
-      const connection = relayManager.getConnector(this.relayId)
-      connection.stats.events++
+      const connector = relayManager.getConnector(this.relayId)
+      if(connector) connector.stats.events++
 
       event.relay = this.relayId
 
