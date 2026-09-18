@@ -12,11 +12,15 @@ Creates a relayConnector for every relay we connect to.
 
  */
 
+// How often to check if connections dropped or came back.
+const STATUS_CHECK_INTERVAL = 5000
+
 export default {
   logEnabled: false,
   initialized: false,
   relayStore: null,
   connectors: {},
+  statusTimer: null,
 
   init() {
     this.logger('init')
@@ -158,6 +162,17 @@ export default {
     return this.connectors[relayId]
   },
 
+  // The nostr-tools relay object, if there is one.
+  getConnection(relayId) {
+    const connector = this.connectors[relayId]
+    return connector ? connector.connection : null
+  },
+
+  isConnected(relayId) {
+    const connector = this.connectors[relayId]
+    return !!connector && connector.isConnected()
+  },
+
   connectToAllRelays() {
     this.logger('connectToAllRelays')
     const relays = this.relayStore.getAll
@@ -171,29 +186,38 @@ export default {
 
     if(!connector) {
       connector = relayConnector()
+      this.connectors[relayId] = connector
       connector.init(relayId)
+    } else {
+      connector.reconnectIfNeeded()
     }
 
     this.logger('connectToRelay', relayId, connector)
-    
-    this.connectors[relayId] = connector
+
+    this.startStatusChecks()
+  },
+
+  startStatusChecks() {
+    if(!this.statusTimer && typeof window !== 'undefined') {
+      this.statusTimer = setInterval(() => {
+        for(let relayId in this.connectors) {
+          this.connectors[relayId].checkStatus()
+        }
+      }, STATUS_CHECK_INTERVAL)
+    }
   },
 
   removeRelay(relayUrl) {
-    let relay
-    const relays = this.relayStore.getAll
-    for(let relayId in relays) {
-      relay = relays[relayId]
+    const relay = this.getRelayByUrl(relayUrl)
 
-      if(relay.url == relayUrl) {
-        const connection = this.connectors[relayId]
-        connection.disconnect()
-
-        delete this.connectors[relayId]
-
-        relayStore.removeRelay(relayId)
-        break
+    if(relay) {
+      const connector = this.connectors[relay.id]
+      if(connector) {
+        connector.disconnect()
+        delete this.connectors[relay.id]
       }
+
+      this.relayStore.removeRelay(relay.id)
     }
   },
 

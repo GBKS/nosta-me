@@ -77,10 +77,14 @@ export default function multiRelayRequest () {
       this.logger('subscribe', relayId)
 
       const relay = this.relayStore.getRelay(relayId)
-      const connection = this.relayStore.getRelayConnection(relayId)
-      // console.log('relay', relay, connection)
+      const connection = relayManager.getConnection(relayId)
 
-      if(relay.status == 'connected') {
+      if(!relay) {
+        this.logger('subscribeToRelay: No relay found with relayId: ' + relayId)
+        return
+      }
+
+      if(relay.status == 'connected' && relayManager.isConnected(relayId)) {
         if(connection) {
           // const subscription = connection.sub(this.filters)
 
@@ -103,11 +107,12 @@ export default function multiRelayRequest () {
       } else {
         // console.log('subscribe connection not found with relayId: ' + relayId)
 
-        this.relaysWaitingForConnection.push(relayId)
-
-        if(!connection) {
-          relayManager.connectToRelay(relayId)
+        if(this.relaysWaitingForConnection.indexOf(relayId) === -1) {
+          this.relaysWaitingForConnection.push(relayId)
         }
+
+        // Connects, or retries if an earlier attempt failed.
+        relayManager.connectToRelay(relayId)
 
         if(!this.connectCallback) {
           this.connectCallback = this.onRelayConnect.bind(this)
@@ -145,8 +150,8 @@ export default function multiRelayRequest () {
     onEvent(relayId, event) {
       this.logger('onEvent', relayId, event)
 
-      const connection = relayManager.getConnector(relayId)
-      connection.stats.events++
+      const connector = relayManager.getConnector(relayId)
+      if(connector) connector.stats.events++
 
       event.relay = relayId
 

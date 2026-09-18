@@ -5,13 +5,15 @@ import { defineStore } from 'pinia'
 Relays are used all over the place. We store info about them here and only use
 relayIds elsewhere. Ids are created from the URL.
 
+The connections themselves are not kept here, they don't belong in reactive
+state. Get them with relayManager.getConnection().
+
  */
 
 export const useRelayStore = defineStore('relays', {
   state: () => {
     return {
       relays: {}, // Objects created by relayManager.addRelayByUrl()
-      connections: {}, // Connections are created via Relay.connect()
       info: {} // Relay info document, NIP-11
     }
   },
@@ -41,12 +43,6 @@ export const useRelayStore = defineStore('relays', {
       }
     },
 
-    getRelayConnection: (state) => {
-      return (relayId) => {
-        return state.connections[relayId]
-      }
-    },
-
     getRelayIds: (state) => {
       const result = []
 
@@ -71,15 +67,10 @@ export const useRelayStore = defineStore('relays', {
 
     removeRelay(relayId) {
       delete this.relays[relayId]
-      delete this.connections[relayId]
     },
 
     setRelayStatus(relayId, status) {
       this.relays[relayId].status = status
-    },
-
-    setRelayConnection(relayId, connection) {
-      this.connections[relayId] = connection
     },
 
     setRelayInfo(relayId, info) {

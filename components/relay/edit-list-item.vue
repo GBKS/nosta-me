@@ -9,7 +9,6 @@ const relayStore = useRelayStore()
 
 const expanded = ref(false)
 const relayInfo = ref(null)
-const relayConnection = ref(null)
 const relayStatus = ref(null)
 const relayStats = ref(null)
 
@@ -115,15 +114,12 @@ function cancelRemove() {
 
 onMounted(() => {
   relayInfo.value = relayStore.getRelay(props.relayId)
-  relayConnection.value = relayStore.getRelayConnection(props.relayId)
 
-  relayStatus.value = relayInfo.status
+  relayStatus.value = relayInfo.value?.status
 
   const connector = relayManager.getConnector(props.relayId)
   relayStats.value = connector?.stats
 
-  console.log('edit-list-item', props.relayId, relayConnection, relayInfo, connector)
-  console.log('relayConnection', relayConnection)
   console.log('relayInfo', relayInfo)
   console.log('connector', connector)
   console.log('connector?.stats', connector?.stats)
