@@ -33,10 +33,7 @@ export default {
   primal: {
     profile: 'https://primal.net/p/<bech32>',
     event: 'https://primal.net/e/<bech32>',
-  },
-
-  habla: {
-    address: 'https://habla.news/a/<bech32>'
+    article: 'https://primal.net/a/<bech32>'
   },
 
   flockstr: {

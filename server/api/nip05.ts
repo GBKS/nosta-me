@@ -8,18 +8,22 @@ export default defineEventHandler((event) => {
     'access-control-allow-origin': '*'
   })
 
-  const defaultRelays = [
-    "wss://brb.io",
+  // Relays where each account's profile, contacts and relay list could actually
+  // be found when last checked (September 2026). Clients use these as a hint
+  // for where to look, so dead relays here send them nowhere.
+  const nostaRelays = [
     "wss://nos.lol",
-    "wss://nostr-pub.wellorder.net",
-    "wss://nostr.bitcoiner.social",
-    "wss://nostr.onsats.org",
-    "wss://nostr.orangepill.dev",
-    "wss://nostr.zebedee.cloud",
-    "wss://relay.current.fyi",
-    "wss://relay.damus.io",
-    "wss://relay.nostr.info",
-    "wss://relay.snort.social"
+    "wss://nostr.oxtr.dev",
+    "wss://relay.ditto.pub",
+    "wss://nostr.mom"
+  ]
+
+  const gbksRelays = [
+    "wss://nos.lol",
+    "wss://nostr.oxtr.dev",
+    "wss://relay.ditto.pub",
+    "wss://relay.nos.social",
+    "wss://purplepag.es"
   ]
 
   const allData = {
@@ -28,29 +32,10 @@ export default defineEventHandler((event) => {
       gbks: "b731e7fbde5c192d793ff520a6ec91f6965f5d8fa1b64e12171089a65e540525"
     },
     relays: {
-      "_": defaultRelays,
-      "b731e7fbde5c192d793ff520a6ec91f6965f5d8fa1b64e12171089a65e540525": defaultRelays
+      "128bc05aa6fd421d00c3c3389329f39cfc750b035db6cdad2eb0f983bff5629f": nostaRelays,
+      "b731e7fbde5c192d793ff520a6ec91f6965f5d8fa1b64e12171089a65e540525": gbksRelays
     }
   }
-  
-  // const message = 'Works: ' + query.name
-
-  // const publicKey = 'b0635d6a9851d3aed0cd6c495b282167acf761729078d975fc341b22650b07b9'
-  // const relays = [
-  //   "wss://relay.example.com", 
-  //   "wss://relay2.example.com"
-  // ]
-
-  // const result = {}
-
-  // if(query.name) {
-  //   result.names = {}
-  //   result.names[query.name] = publicKey
-
-  //   result.relays = {}
-  //   result.relays[publicKey] = relays
-  // }
-  
 
   const query = getQuery(event)
   const userName = query.name

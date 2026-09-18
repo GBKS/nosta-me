@@ -34,15 +34,6 @@
       "image": "snort"
     },
     {
-      "id": "astral",
-      "name": "Astral",
-      "description": "Social",
-      "platform": "Web",
-      "url": "https://astral.ninja/",
-      "profileUrl": "https://astral.ninja/{#npub}",
-      "image": "astral"
-    },
-    {
       "id": "hamstr",
       "name": "Hamstr",
       "description": "Social",
@@ -50,15 +41,6 @@
       "url": "https://hamstr.to/",
       "profileUrl": "https://hamstr.to/profile/{#npub}",
       "image": "hamstr"
-    },
-    {
-      "id": "blogstack",
-      "name": "Blogstack",
-      "description": "Blogging",
-      "platform": "Web",
-      "url": "https://hamstr.to/",
-      "profileUrl": "https://hamstr.to/profile/{#npub}",
-      "image": "blogstack"
     },
     {
       "id": "alby",
@@ -69,29 +51,12 @@
       "image": "alby"
     },
     {
-      "id": "bolt-fun",
-      "name": "Bolt Fun",
-      "description": "Community",
-      "platform": "Web",
-      "url": "https://makers.bolt.fun/",
-      "image": "bolt-fun"
-    },
-    {
       "id": "blockcore",
       "name": "Blockcore",
       "description": "Social",
       "platform": "Web",
       "url": "https://notes.blockcore.net/",
       "image": "blockcore"
-    },
-    {
-      "id": "habla",
-      "name": "habla",
-      "description": "Blogging",
-      "platform": "Web",
-      "url": "https://habla.news/",
-      "profileUrl": "https://habla.news/{#npub}",
-      "image": "habla"
     },
     {
       "id": "nostrchat",

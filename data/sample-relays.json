@@ -1,25 +1,44 @@
 {
     "relays": [
         {
-            "id": "damus-io",
-            "name": "Damus",
-            "url": "wss://relay.damus.io",
-            "primary": true
-        },
-        {
-            "id": "nostr-wine",
-            "name": "Nostr.wine",
-            "url": "wss://nostr.wine"
-        },
-        {
             "id": "nos-lol",
-            "name": "NOS",
+            "name": "nos.lol",
             "url": "wss://nos.lol"
         },
         {
-            "id": "fmt-wiz-biz",
-            "name": "Wiz",
-            "url": "wss://nostr.fmt.wiz.biz"
+            "id": "primal",
+            "name": "Primal",
+            "url": "wss://relay.primal.net"
+        },
+        {
+            "id": "damus-io",
+            "name": "Damus",
+            "url": "wss://relay.damus.io"
+        },
+        {
+            "id": "oxtr-dev",
+            "name": "oxtr.dev",
+            "url": "wss://nostr.oxtr.dev"
+        },
+        {
+            "id": "ditto-pub",
+            "name": "Ditto",
+            "url": "wss://relay.ditto.pub"
+        },
+        {
+            "id": "nos-social",
+            "name": "Nos",
+            "url": "wss://relay.nos.social"
+        },
+        {
+            "id": "nostr-mom",
+            "name": "nostr.mom",
+            "url": "wss://nostr.mom"
+        },
+        {
+            "id": "snort-social",
+            "name": "Snort",
+            "url": "wss://relay.snort.social"
         },
         {
             "id": "wellorder-net",
@@ -32,29 +51,9 @@
             "url": "wss://offchain.pub"
         },
         {
-            "id": "snort-social",
-            "name": "Snort",
-            "url": "wss://relay.snort.social"
-        },
-        {
-            "id": "primal",
-            "name": "Primal",
-            "url": "wss://relay.primal.net"
-        },
-        {
             "id": "bitcoiner-social",
             "name": "Bitcoiner Social",
             "url": "wss://nostr.bitcoiner.social"
-        },
-        {
-            "id": "nostr-band",
-            "name": "Nostr.band",
-            "url": "wss://relay.nostr.band"
-        },
-        {
-            "id": "nostr-bg",
-            "name": "Nostr.bg",
-            "url": "wss://relay.nostr.bg"
         }
     ]
 }
