@@ -96,7 +96,7 @@ function updateFromRoute() {
 
   // console.log('updateFromRoute', queryRelayIds, route.query.r)
 
-  if(route.query.t && themes[sessionStore.theme]) {
+  if(route.query.t && themes[route.query.t]) {
     sessionStore.theme = route.query.t
   }
 
@@ -681,10 +681,6 @@ function updateHistory() {
   navigateTo(url, { replace: true })
 }
 
-const activeThemeId = computed(() => {
-  return sessionStore.theme
-})
-
 const isOwner = computed(() => {
   return sessionStore.isLoggedIn && sessionStore.publicKey == publicKey.value
 })
@@ -692,7 +688,6 @@ const isOwner = computed(() => {
 const classObject = computed(() => {
   return [
     'profile-page',
-    '-theme-'+activeThemeId.value,
     hasBanner.value ? '-banner' : '-no-banner'
   ].join(' ')
 })

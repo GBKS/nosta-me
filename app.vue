@@ -25,8 +25,13 @@ const wrapStyle = computed(() => {
   return result
 })
 
+// The stored theme lives in local storage, which the server can't see. Until
+// the app is mounted, both sides use what they can agree on (the theme from
+// the URL, or the default), so the server-rendered page matches on hydration.
+const initialThemeId = route.query.t && themes[route.query.t] ? route.query.t : 'space'
+
 const activeThemeId = computed(() => {
-  return sessionStore.theme || 'space'
+  return isMounted.value ? sessionStore.theme || 'space' : initialThemeId
 })
 
 const theme = computed(() => {
