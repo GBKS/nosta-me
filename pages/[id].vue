@@ -1,12 +1,12 @@
 <script setup>
 import relayManager from '@/helpers/relayManager.js'
 import profileService from '@/helpers/profileService.js'
+import zapReceiptHelper from '@/helpers/zapReceiptHelper.js'
+import zapProviderService, { PROVIDER_STATUS } from '@/helpers/zapProviderService.js'
 import themes from '@/data/themes.json'
 import { useUserStore } from '@/stores/users'
 import { useSessionStore } from '@/stores/session'
 import ToolBox from '@/helpers/toolBox'
-import zapReceiptHelper from '@/helpers/zapReceiptHelper.js'
-import zapProviderService, { PROVIDER_STATUS } from '@/helpers/zapProviderService.js'
 import * as nip19 from 'nostr-tools/nip19'
 import { queryProfile } from 'nostr-tools/nip05'
 
@@ -117,6 +117,19 @@ onBeforeMount(() => {
   updateFromRoute()
 })
 
+const theme = computed(() => {
+  return themes[sessionStore.theme]
+})
+
+const pageTitle = computed(() => {
+  const name = ToolBox.digDeep(profileData.value, ['profile.display_name', 'profile.name', 'profile.displayName', 'profile.username'], null, true)
+  return name ? (name + ' | Nosta') : 'Nosta'
+})
+
+const pageDescription = computed(() => {
+  return ToolBox.dig(profileData.value, 'profile.about', 'Nostr profile', true)
+})
+
 const NO_LIGHTNING_ADDRESS = 'none'
 
 const receivedZapsData = computed(() => {
@@ -153,19 +166,6 @@ watch(() => {
   } else if(address) {
     findZapProvider(address)
   }
-})
-
-const theme = computed(() => {
-  return themes[sessionStore.theme]
-})
-
-const pageTitle = computed(() => {
-  const name = ToolBox.digDeep(profileData.value, ['profile.display_name', 'profile.name', 'profile.displayName', 'profile.username'], null, true)
-  return name ? (name + ' | Nosta') : 'Nosta'
-})
-
-const pageDescription = computed(() => {
-  return ToolBox.dig(profileData.value, 'profile.about', 'Nostr profile', true)
 })
 
 const lightningMetaTag = computed(() => {
