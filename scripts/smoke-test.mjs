@@ -26,7 +26,6 @@ const PAGES = [
   '/',
   '/about',
   '/directory',
-  '/relays',
   '/create/welcome',
   '/create/recovery-phrase',
   '/create/relays',
