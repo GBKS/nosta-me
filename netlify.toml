@@ -1,7 +1,6 @@
-[[headers]]
-  for = "/.well-known/nostr.json"
-    [headers.values]
-    Access-Control-Allow-Origin = "*"
+# Headers for pages and /.well-known/nostr.json are not set here. Those are
+# served by the server function, which Netlify's header rules don't apply to.
+# See nuxt.config.ts (security) and server/api/nip05.ts.
 
 [[redirects]]
   from = "/nprofile*"

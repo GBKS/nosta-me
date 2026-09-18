@@ -13,7 +13,7 @@ Nothing here needs a relay or any other network access.
  */
 
 import { spawn } from 'node:child_process'
-import { existsSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 
 const PORT = process.env.SMOKE_PORT || 4173
 const BASE = 'http://localhost:' + PORT
@@ -143,6 +143,27 @@ async function testThemes() {
   check(invalid === standard, 'an invalid ?t= theme falls back to the default')
 }
 
+async function testStylesheets() {
+  console.log('\nStylesheets')
+
+  // assets/css/_import.scss is added to the styles of every component. If it
+  // ever pulls in something that outputs CSS, every component gets a copy.
+  // That has happened: 195 copies of the :root block, half of all the CSS.
+  const directory = '.output/public/_nuxt/'
+  const files = readdirSync(directory).filter(file => file.endsWith('.css'))
+  const css = files.map(file => readFileSync(directory + file, 'utf8')).join('\n')
+
+  const scopedCopies = (css.match(/\[data-v-[0-9a-f]+\]:root/g) || []).length
+  check(files.length > 0, 'found ' + files.length + ' built stylesheets')
+  check(scopedCopies === 0, 'no global CSS repeated in component styles', scopedCopies + ' copies of :root')
+
+  // The global styles are inlined into the page, once.
+  const html = await (await fetch(BASE + '/about')).text()
+  const inline = (html.match(/<style[^>]*>[\s\S]*?<\/style>/g) || []).join('\n')
+  const definitions = (inline.match(/--back-rgb:/g) || []).length
+  check(definitions === 1, 'the page defines the color variables exactly once', 'found ' + definitions)
+}
+
 async function run() {
   if(!existsSync(SERVER_ENTRY)) {
     console.log('No server build found at ' + SERVER_ENTRY + '. Run `npm run test:smoke`, which builds first.')
@@ -168,6 +189,7 @@ async function run() {
     await testNip05()
     await testSecurityHeaders()
     await testThemes()
+    await testStylesheets()
 
     console.log('\nServer log')
     const errorLines = serverOutput.split('\n').filter(line => line.includes('[request error]'))
