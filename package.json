@@ -6,7 +6,8 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "test:smoke": "NITRO_PRESET=node-server nuxt build && node scripts/smoke-test.mjs"
   },
   "devDependencies": {
     "nuxt": "^3.21.11"

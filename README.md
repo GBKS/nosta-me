@@ -47,13 +47,13 @@ Probably more...
 
 ## Local development
 
-Switch to a node version that might work (requires nvm).
+Switch to the right Node version (requires nvm). The version in `.nvmrc` is also what Netlify builds with.
 
 ```bash
 nvm use
 ```
 
-Install depencencies (requires npm).
+Install dependencies (requires npm).
 
 ```bash
 npm install
@@ -75,4 +75,10 @@ Locally preview production build.
 
 ```bash
 npm run preview
+```
+
+Run the smoke test. It builds the site, starts the production server and checks that pages render, and that the NIP-05 endpoint and security headers are in place. A passing build alone doesn't tell you that. It also runs on every pull request.
+
+```bash
+npm run test:smoke
 ```
