@@ -1,8 +1,8 @@
-name: Smoke test
+name: Tests
 
-# Builds the site and checks that the production server actually works:
-# pages render, the NIP-05 endpoint and the security headers are in place.
-# See scripts/smoke-test.mjs.
+# Unit tests, then a smoke test of the production build: pages render, the
+# NIP-05 endpoint and the security headers are in place.
+# See tests/ and scripts/smoke-test.mjs.
 
 on:
   pull_request:
@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 jobs:
-  smoke-test:
+  tests:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -27,4 +27,8 @@ jobs:
 
       - run: npm ci
 
-      - run: npm run test:smoke
+      - name: Unit tests
+        run: npm test
+
+      - name: Smoke test
+        run: npm run test:smoke
