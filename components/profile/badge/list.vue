@@ -23,7 +23,7 @@ const title = computed(() => {
     <div class="badges">
       <ProfileBadgeItem
         v-for="(item, index) in info"
-        :key="item.id"
+        :key="item.address"
         :info="item"
         :handlers="handlers"
       />

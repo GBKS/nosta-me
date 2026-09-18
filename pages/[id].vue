@@ -5,6 +5,8 @@ import themes from '@/data/themes.json'
 import { useUserStore } from '@/stores/users'
 import { useSessionStore } from '@/stores/session'
 import ToolBox from '@/helpers/toolBox'
+import badgeHelper from '@/helpers/badgeHelper.js'
+import badgeDefinitionService from '@/helpers/badgeDefinitionService.js'
 import * as nip19 from 'nostr-tools/nip19'
 import { queryProfile } from 'nostr-tools/nip05'
 
@@ -23,7 +25,7 @@ const relayDataEvents = ref(null)
 const followData = ref(null)
 const followDataEvents = ref(null)
 const handlerData = ref(null)
-const badgeData = ref(null)
+const badgeData = ref(null) // Profile badges events, there can be old versions among them
 const reportsData = ref(null) // Reports the user has made
 const reportedData = ref(null) // The user has been reported
 const shortNotesData = ref(null)
@@ -112,6 +114,11 @@ watch(() => route.query, () => updateFromRoute)
 
 onBeforeMount(() => {
   updateFromRoute()
+})
+
+// The individual badges the user displays
+const badges = computed(() => {
+  return badgeHelper.profileBadges(badgeData.value)
 })
 
 const theme = computed(() => {
@@ -352,7 +359,8 @@ function onLoadProfileEvent(data) {
     case 10002:
       handleLoadedRelayList(data)
       break
-    case 30008:
+    case 10008: // Profile badges
+    case 30008: // Deprecated profile badges, and badge sets
       storeEvent(badgeData, data)
       break
     case 30017:
@@ -662,6 +670,7 @@ function reset() {
   zapGoalData.value = null
   userStatusData.value = null
   badgeData.value = null
+  badgeDefinitionService.kill()
   listsData.value = null
   profileDataStats.value = null
   liveData.value = null
@@ -818,8 +827,8 @@ onMounted(() => {
                 @navigate="selectTab"
               />
               <ProfileBadgeSummary
-                :info="badgeData"
-                :count="badgeData ? badgeData.length : null"
+                :info="badges"
+                :count="badges.length"
                 :handlers="handlerData"
                 @navigate="selectTab"
               />
@@ -863,7 +872,7 @@ onMounted(() => {
             />
             <ProfileBadgeList
               v-if="activeTabId == 'badges'" 
-              :info="badgeData"
+              :info="badges"
               :profileService="profileService"
               :handlers="handlerData"
               @back="selectTab"
@@ -956,7 +965,7 @@ onMounted(() => {
               :profileData="profileData"
               :relayData="relayDataEvents"
               :followData="followData"
-              :badgeData="badgeData"
+              :badgeData="badges"
               :handlerData="handlerData"
               :listsData="listsData"
               :stallData="stallData"
@@ -1019,7 +1028,7 @@ onMounted(() => {
       :profileData="profileData"
       :relayData="relayDataEvents"
       :followData="followData"
-      :badgeData="badgeData"
+      :badgeData="badges"
       :handlerData="handlerData"
       :listsData="listsData"
       :stallData="stallData"

@@ -1,66 +1,30 @@
 <script setup>
-import relayRequest from '@/helpers/relayRequest.js'
-import multiRelayRequest from '@/helpers/multiRelayRequest.js'
 import { useRelayStore } from '@/stores/relays'
 import linkHelper from '@/helpers/linkHelper.js'
+import badgeDefinitionService from '@/helpers/badgeDefinitionService.js'
 
+// info is a badge as returned by badgeHelper.profileBadges()
 const props = defineProps([
   'info',
   'handlers'
 ])
 
-let rawBadgeData = null
-const badgeData = ref(null)
 const imageStatus = ref(null)
 const relayStore = useRelayStore()
-let badgeTag = null
 
-function loadBadgeData() {
-  // console.log('loadBadgeData', props.info)
-  let tag, i
-  for(i=0; i<props.info.tags.length; i++) {
-    tag = props.info.tags[i]
-    if(tag[0] == 'a') {
-      requestBadgeData(tag[i])
-      break
-    }
-  }
-}
+// The badge definition event (kind 30009)
+const rawBadgeData = computed(() => {
+  return badgeDefinitionService.definitions[props.info.address] || null
+})
 
-function requestBadgeData(tag) {
-  badgeTag = tag
-  const bits = tag.split(':')
+const badgeData = computed(() => {
+  if(!rawBadgeData.value) return null
 
-  const filter = {
-    kinds: [parseInt(bits[0])],
-    'authors': [bits[1]],
-    '#d': [bits[2]],
-    limit: 1
-  }
-
-  // console.log('requestBadgeData', tag, filter)
-
-  const request = multiRelayRequest()
-  request.init(onBadgeData)
-  request.start(relayStore.getAll, [filter])
-
-  // const request = relayRequest()
-  // request.init(onBadgeData, false)
-  // request.start(
-  //   props.info.relay,
-  //   filter
-  // )
-}
-
-function onBadgeData(data) {
-  // console.log('onBadgeData', data)
-
-  rawBadgeData = data
   const refinedData = {
     thumbs: []
   }
 
-  const tags = data.tags
+  const tags = rawBadgeData.value.tags
   let i, tag
   for(i=0; i<tags.length; i++) {
     tag = tags[i]
@@ -72,16 +36,17 @@ function onBadgeData(data) {
       case 'description':
         refinedData.description = tag[1]
         break
+      case 'image':
+        refinedData.image = formatThumbData(tag)
+        break
       case 'thumb':
         refinedData.thumbs.push(formatThumbData(tag))
         break
     }
   }
 
-  // console.log('refinedData', refinedData)
-
-  badgeData.value = refinedData
-}
+  return refinedData
+})
 
 function formatThumbData(tag) {
   const result = {
@@ -105,6 +70,9 @@ const thumb = computed(() => {
 
   if(badgeData.value.thumbs.length > 0) {
     result = badgeData.value.thumbs[0]
+  } else if(badgeData.value.image) {
+    // Thumbnails are optional
+    result = badgeData.value.image
   }
 
   return result
@@ -113,15 +81,13 @@ const thumb = computed(() => {
 const link = computed(() => {
   let result = null
 
-  if(badgeTag && rawBadgeData) {
-    const bits = badgeTag.split(':')
+  const relay = rawBadgeData.value ? relayStore.getRelay(rawBadgeData.value.relay) : null
 
-    const relay = relayStore.getRelay(rawBadgeData.relay)
-
+  if(relay) {
     const url = linkHelper.address(
-      bits[2],
-      bits[1], 
-      bits[0],
+      props.info.identifier,
+      props.info.pubkey,
+      props.info.kind,
       relay.url,
       props.handlers,
       linkHelper.badges.badge
@@ -154,8 +120,7 @@ function imageLoadError() {
 }
 
 onMounted(() => {
-  // console.log('BadgeItem.onMounted', props.info)
-  loadBadgeData()
+  badgeDefinitionService.load(props.info)
 })
 </script>
 
