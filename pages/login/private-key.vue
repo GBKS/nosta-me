@@ -5,10 +5,8 @@ const router = useRouter()
 
 import { npubEncode, NostrTypeGuard } from 'nostr-tools/nip19'
 import { getPublicKey } from 'nostr-tools/pure'
-import { wordlist } from '@scure/bip39/wordlists/english'
-import { privateKeyFromSeedWords } from 'nostr-tools/nip06'
-import { validateMnemonic } from '@scure/bip39'
-import { bytesToHex } from '@noble/hashes/utils'
+import { privateKeyFromSeedWords, validateWords } from 'nostr-tools/nip06'
+import { bytesToHex, hexToBytes } from 'nostr-tools/utils'
 import { decode } from 'nostr-tools/nip19'
 
 const logEnabled = false
@@ -19,7 +17,7 @@ const inputValid = computed(() => {
   let result = false
 
   if(privateKeyModel.value.length > 0) {
-    const validMnemonic = validateMnemonic(privateKeyModel.value, wordlist)
+    const validMnemonic = validateWords(privateKeyModel.value)
 
     if(validMnemonic) {
       result = true
@@ -41,7 +39,7 @@ const inputValid = computed(() => {
 function evaluate() {
   let privateKey
 
-  const isValidMnemonic = validateMnemonic(privateKeyModel.value, wordlist)
+  const isValidMnemonic = validateWords(privateKeyModel.value)
 
 
   if(isValidMnemonic) {
@@ -50,8 +48,6 @@ function evaluate() {
     const accountIndex = 0
     const privateKeyFromMnemonic = privateKeyFromSeedWords(privateKeyModel.value, passphrase, accountIndex)
     privateKey = bytesToHex(privateKeyFromMnemonic)
-
-    privateKey = privateKeyFromMnemonic
   } else {
     const isNsec = NostrTypeGuard.isNSec(privateKeyModel.value)
     const isValidPrivateKey = privateKeyModel.value.match(/[a-f0-9]{64}/)
@@ -63,15 +59,13 @@ function evaluate() {
       logger('type', type)
 
       privateKey = bytesToHex(decodedPrivateKey)
-
-      privateKey = decodedPrivateKey
     } else if(isValidPrivateKey) {
       privateKey = privateKeyModel.value
     }
   }
   
   if(privateKey) {
-    const publicKey = getPublicKey(privateKey)
+    const publicKey = getPublicKey(hexToBytes(privateKey))
     const npub = npubEncode(publicKey)
 
     // Store for later.

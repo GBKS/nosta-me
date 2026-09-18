@@ -1,3 +1,5 @@
+import { hexToBytes } from 'nostr-tools/utils'
+
 /*
 
 Some random utility functions.
@@ -5,6 +7,21 @@ Some random utility functions.
  */
 
 export default {
+
+  // We store private keys as hex strings, nostr-tools wants bytes for signing.
+  // Older nsec and recovery phrase logins were saved to local storage as
+  // comma-separated bytes, so that format is handled as well.
+  privateKeyToBytes(privateKey) {
+    if(typeof privateKey === 'string') {
+      if(privateKey.indexOf(',') !== -1) {
+        return Uint8Array.from(privateKey.split(','), Number)
+      }
+
+      return hexToBytes(privateKey)
+    }
+
+    return privateKey
+  },
 
   formatRelativeDate: function(dateString, includeAgo) {
     const d = new Date(parseInt(dateString)*1000)

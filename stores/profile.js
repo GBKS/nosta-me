@@ -6,9 +6,7 @@ Stores the users own profile in the creation flow and edit page.
 
  */
 
-export const useProfileStore = defineStore({
-  id: 'profile',
-
+export const useProfileStore = defineStore('profile', {
   state: () => {
     return {
       name: ref(''),

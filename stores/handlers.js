@@ -6,9 +6,7 @@ Stores handlers (kind 31990) for the duration of this use
 
  */
 
-export const useHandlerStore = defineStore({
-  id: 'handlers',
-
+export const useHandlerStore = defineStore('handlers', {
   state: () => {
     return {
       handlers: {}

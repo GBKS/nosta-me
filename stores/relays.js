@@ -7,9 +7,7 @@ relayIds elsewhere. Ids are created from the URL.
 
  */
 
-export const useRelayStore = defineStore({
-  id: 'relays',
-
+export const useRelayStore = defineStore('relays', {
   state: () => {
     return {
       relays: {}, // Objects created by relayManager.addRelayByUrl()

@@ -2,6 +2,7 @@ import relayPublishRequest from '@/helpers/relayPublishRequest.js'
 import { useProfileStore } from '@/stores/profile'
 import relayManager from '@/helpers/relayManager.js'
 import { finalizeEvent } from 'nostr-tools/pure'
+import ToolBox from '@/helpers/toolBox'
 
 export default function followPublisher () { 
   return {
@@ -108,7 +109,7 @@ export default function followPublisher () {
     },
 
     signEvent(event) {
-      const signedEvent = finalizeEvent(event, this.store.privateKey)
+      const signedEvent = finalizeEvent(event, ToolBox.privateKeyToBytes(this.store.privateKey))
       return signedEvent
     },
 

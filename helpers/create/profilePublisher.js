@@ -4,8 +4,8 @@ import relayManager from '@/helpers/relayManager.js'
 import metaPublisher from '@/helpers/create/metaPublisher.js'
 import relayPublisher from '@/helpers/create/relayPublisher.js'
 import followPublisher from '@/helpers/create/followPublisher.js'
-import { sign } from '@noble/secp256k1'
 import { finalizeEvent } from 'nostr-tools/pure'
+import ToolBox from '@/helpers/toolBox'
 
 /*
 
@@ -104,7 +104,7 @@ export default function profilePublisher () {
     },
 
     signEvent(event) {
-      const signedEvent = finalizeEvent(event, this.store.privateKey)
+      const signedEvent = finalizeEvent(event, ToolBox.privateKeyToBytes(this.store.privateKey))
       return signedEvent
     },
 
