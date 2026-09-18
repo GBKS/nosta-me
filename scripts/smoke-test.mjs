@@ -52,8 +52,20 @@ function check(ok, label, detail) {
   }
 }
 
-async function waitForServer() {
+async function isPortInUse() {
+  try {
+    await fetch(BASE + '/.well-known/nostr.json')
+    return true
+  } catch(error) {
+    return false
+  }
+}
+
+async function waitForServer(server) {
   for(let i=0; i<50; i++) {
+    // If our server has exited, anything answering is not the build under test.
+    if(server.exitCode !== null) return false
+
     try {
       await fetch(BASE + '/.well-known/nostr.json')
       return true
@@ -157,16 +169,31 @@ async function testStylesheets() {
   check(files.length > 0, 'found ' + files.length + ' built stylesheets')
   check(scopedCopies === 0, 'no global CSS repeated in component styles', scopedCopies + ' copies of :root')
 
-  // The global styles are inlined into the page, once.
+  // The page gets the global styles exactly once. Where from depends on the
+  // Nuxt version: inlined into the HTML (Nuxt 3), or a linked stylesheet (Nuxt 4).
   const html = await (await fetch(BASE + '/about')).text()
-  const inline = (html.match(/<style[^>]*>[\s\S]*?<\/style>/g) || []).join('\n')
-  const definitions = (inline.match(/--back-rgb:/g) || []).length
+  let pageCss = (html.match(/<style[^>]*>[\s\S]*?<\/style>/g) || []).join('\n')
+
+  const links = [...html.matchAll(/<link[^>]*rel="stylesheet"[^>]*href="([^"]+)"/g)].map(match => match[1])
+  for(const href of links) {
+    pageCss += '\n' + await (await fetch(new URL(href, BASE))).text()
+  }
+
+  const definitions = (pageCss.match(/--back-rgb:/g) || []).length
   check(definitions === 1, 'the page defines the color variables exactly once', 'found ' + definitions)
+  check(pageCss.includes('-theme-winter'), 'the page gets the themes')
 }
 
 async function run() {
   if(!existsSync(SERVER_ENTRY)) {
     console.log('No server build found at ' + SERVER_ENTRY + '. Run `npm run test:smoke`, which builds first.')
+    process.exit(1)
+  }
+
+  // Otherwise our server fails to start and the checks would silently
+  // run against whatever is already there, like an older build.
+  if(await isPortInUse()) {
+    console.log('Something is already running on port ' + PORT + '. Stop it, or set SMOKE_PORT to a free port.')
     process.exit(1)
   }
 
@@ -178,7 +205,7 @@ async function run() {
   server.stderr.on('data', data => { serverOutput += data })
 
   try {
-    const isUp = await waitForServer()
+    const isUp = await waitForServer(server)
     if(!isUp) {
       console.log('The server did not start.\n' + serverOutput)
       process.exitCode = 1
@@ -192,6 +219,7 @@ async function run() {
     await testStylesheets()
 
     console.log('\nServer log')
+    check(server.exitCode === null, 'the server under test is still running')
     const errorLines = serverOutput.split('\n').filter(line => line.includes('[request error]'))
     check(errorLines.length === 0, 'no request errors', errorLines[0])
   } catch(error) {
