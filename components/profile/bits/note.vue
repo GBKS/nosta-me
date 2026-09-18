@@ -102,10 +102,9 @@ function turnUrlToNode(url) {
 
   return h('a', {
     href: url,
-    innerHTML: ToolBox.trim(text, 25),
     rel: 'nofollow noopener noreferrer',
     target: '_blank'
-  })
+  }, ToolBox.trim(text, 25))
 }
 
 function turnNProfileToNode(text) {
@@ -155,24 +154,22 @@ function turnNRelayToNode(text) {
   const data = nip19.decode(text.split(':')[1]).data;
 
   return h('a', {
-    href: token.v,
-    innerHTML: token.v,
+    href: text,
     rel: 'nofollow noopener noreferrer',
     target: '_blank',
     class: '-relay'
-  }, token.v)
+  }, text)
 }
 
 function turnNAddrToNode(text) {
   const data = nip19.decode(text.split(':')[1]).data;
 
   return h('a', {
-    href: token.v,
-    innerHTML: token.v,
+    href: text,
     rel: 'nofollow noopener noreferrer',
     target: '_blank',
     class: '-address'
-  }, token.v)
+  }, text)
 }
 
 function turnVideoToNode(text, extension) {

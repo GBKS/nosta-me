@@ -27,7 +27,7 @@ const props = defineProps([
   'publicKey'
 ])
 
-const logEnabled = !false
+const logEnabled = false
 const sessionStore = useSessionStore()
 const { isLoggedIn } = storeToRefs(sessionStore)
 const isLoading = ref(true)

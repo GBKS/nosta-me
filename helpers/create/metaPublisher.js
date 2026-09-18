@@ -7,7 +7,7 @@ import { finalizeEvent } from 'nostr-tools/pure'
 
 export default function metaPublisher () { 
   return {
-    logEnabled: !false,
+    logEnabled: false,
     store: null,
     sessionStore: null,
     userStore: null,
@@ -198,7 +198,6 @@ export default function metaPublisher () {
         privateKey = this.store.privateKey
       }
 
-      this.logger('signEvent', privateKey)
 
       if(privateKey) {
         const signedEvent = finalizeEvent(event, privateKey)

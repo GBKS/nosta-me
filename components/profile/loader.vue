@@ -116,10 +116,20 @@ function displayInfo(info, data) {
     }
 
     for(let i in replace) {
-      copyText = copyText.split('{'+i+'}').join(replace[i])
+      copyText = copyText.split('{'+i+'}').join(escapeHtml(replace[i]))
     }
   }
   copy.value = copyText
+}
+
+// The id comes from the URL and the copy is rendered with v-html.
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
 }
 
 function nextStep() {
