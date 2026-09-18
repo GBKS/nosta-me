@@ -20,6 +20,7 @@
     "linkifyjs": "^4.3.3",
     "mitt": "^3.0.1",
     "nostr-tools": "^2.25.2",
+    "nuxt-security": "^2.6.0",
     "pinia": "^3.0.4",
     "qr-code-styling": "^1.9.2",
     "sass": "^1.104.1"

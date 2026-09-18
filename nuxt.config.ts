@@ -40,8 +40,59 @@ export default defineNuxtConfig({
 	},
 	modules: [
 		'@pinia/nuxt',
-		'@vueuse/nuxt'
+		'@vueuse/nuxt',
+		'nuxt-security'
 	],
+	// https://nuxt-security.vercel.app
+	// Profiles show content from anywhere, which is what the CSP is for:
+	// should a script ever get injected, it won't run. Scripts need the
+	// nonce, inline event handlers are off. Images, media and connections
+	// are left open since they point to whatever users put in their profiles.
+	security: {
+		headers: {
+			contentSecurityPolicy: {
+				'default-src': ["'self'"],
+				'script-src': ["'self'", "'nonce-{{nonce}}'", "'strict-dynamic'"],
+				'script-src-attr': ["'none'"],
+				'style-src': ["'self'", "'unsafe-inline'"],
+				'img-src': ["'self'", 'data:', 'blob:', 'https:'],
+				'media-src': ["'self'", 'data:', 'blob:', 'https:'],
+				'font-src': ["'self'", 'data:'],
+				'connect-src': ["'self'", 'https:', 'wss:'], // Relays, NIP-05, NIP-11, LNURL, analytics
+				'frame-src': ['https://embed.wavlake.com'],
+				'frame-ancestors': ["'none'"],
+				'object-src': ["'none'"],
+				'base-uri': ["'none'"],
+				'form-action': ["'self'"],
+				'manifest-src': ["'self'"],
+				'upgrade-insecure-requests': true
+			},
+			xFrameOptions: 'DENY',
+			referrerPolicy: 'strict-origin-when-cross-origin',
+			// Netlify already sends this, without includeSubDomains.
+			strictTransportSecurity: false,
+			permissionsPolicy: {
+				camera: [],
+				'display-capture': [],
+				fullscreen: ['self'], // For videos in notes
+				geolocation: [],
+				microphone: []
+			},
+			// These break loading profile images and the Wavlake embeds.
+			crossOriginEmbedderPolicy: false,
+			crossOriginResourcePolicy: false,
+			crossOriginOpenerPolicy: false
+		},
+		// /.well-known/nostr.json sets its own CORS header for NIP-05.
+		corsHandler: false,
+		// The rate limiter keeps state in memory, which doesn't work with
+		// serverless functions. Netlify does the rate limiting (netlify.toml).
+		rateLimiter: false,
+		requestSizeLimiter: false,
+		xssValidator: false,
+		removeLoggers: false,
+		sri: false
+	},
 	// Stores are imported explicitly everywhere. The auto-import scanner
 	// also misreads `state` in stores/session.js as an export.
 	pinia: {
