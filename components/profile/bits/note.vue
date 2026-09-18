@@ -26,39 +26,45 @@ const ContentNode = () => {
     token = tokens[i]
 
     if(token.t == 'url') {
-      if(token.v.indexOf('nostr:npub') === 0) {
-        const publicKey = nip19.decode(token.v.split(':')[1]).data;
-        children.push(h(UiUsername, { publicKey }))
-      } else if(token.v.indexOf('nostr:nprofile') === 0) {
-        children.push(turnNProfileToNode(token.v))
-      } else if(token.v.indexOf('nostr:nevent') === 0) {
-        children.push(turnNEventToNode(token.v))
-      } else if(token.v.indexOf('nostr:nrelay') === 0) {
-        children.push(turnNRelayToNode(token.v))
-      } else if(token.v.indexOf('nostr:naddr') === 0) {
-        children.push(turnNAddrToNode(token.v))
-      } else if(token.v.indexOf('nostr:note') === 0) {
-        children.push(turnNoteToNode(token.v))
-      } else if(token.v.indexOf('.webp') !== -1) {
-        images.push(token)
-      } else if(token.v.indexOf('.jpg') !== -1) {
-        images.push(token)
-      } else if(token.v.indexOf('.jpeg') !== -1) {
-        images.push(token)
-      } else if(token.v.indexOf('.png') !== -1) {
-        images.push(token)
-      } else if(token.v.indexOf('.gif') !== -1) {
-        images.push(token)
-      } else if(token.v.indexOf('.mov') !== -1) {
-        children.push(turnVideoToNode(token.v, 'mp4'))
-      } else if(token.v.indexOf('.mp4') !== -1) {
-        children.push(turnVideoToNode(token.v, 'mp4'))
-      } else if(token.v.indexOf('youtube.com/watch?') !== -1) {
-        children.push(turnYoutubeToNode(token.v))
-      } else if(token.v.indexOf('wavlake.com/track') !== -1) {
-        children.push(turnWavlakeToNode(token.v))
-      } else {
-        children.push(turnUrlToNode(token.v))
+      // Content is whatever people posted. A malformed nostr: link or URL
+      // shouldn't break the whole note, so it's shown as plain text instead.
+      try {
+        if(token.v.indexOf('nostr:npub') === 0) {
+          const publicKey = nip19.decode(token.v.split(':')[1]).data;
+          children.push(h(UiUsername, { publicKey }))
+        } else if(token.v.indexOf('nostr:nprofile') === 0) {
+          children.push(turnNProfileToNode(token.v))
+        } else if(token.v.indexOf('nostr:nevent') === 0) {
+          children.push(turnNEventToNode(token.v))
+        } else if(token.v.indexOf('nostr:nrelay') === 0) {
+          children.push(turnNRelayToNode(token.v))
+        } else if(token.v.indexOf('nostr:naddr') === 0) {
+          children.push(turnNAddrToNode(token.v))
+        } else if(token.v.indexOf('nostr:note') === 0) {
+          children.push(turnNoteToNode(token.v))
+        } else if(token.v.indexOf('.webp') !== -1) {
+          images.push(token)
+        } else if(token.v.indexOf('.jpg') !== -1) {
+          images.push(token)
+        } else if(token.v.indexOf('.jpeg') !== -1) {
+          images.push(token)
+        } else if(token.v.indexOf('.png') !== -1) {
+          images.push(token)
+        } else if(token.v.indexOf('.gif') !== -1) {
+          images.push(token)
+        } else if(token.v.indexOf('.mov') !== -1) {
+          children.push(turnVideoToNode(token.v, 'mp4'))
+        } else if(token.v.indexOf('.mp4') !== -1) {
+          children.push(turnVideoToNode(token.v, 'mp4'))
+        } else if(token.v.indexOf('youtube.com/watch?') !== -1) {
+          children.push(turnYoutubeToNode(token.v))
+        } else if(token.v.indexOf('wavlake.com/track') !== -1) {
+          children.push(turnWavlakeToNode(token.v))
+        } else {
+          children.push(turnUrlToNode(token.v))
+        }
+      } catch(error) {
+        children.push(token.v)
       }
     } else if(token.t == 'nl') {
       // No line breaks at the beginning.
