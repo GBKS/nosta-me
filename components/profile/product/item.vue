@@ -101,9 +101,7 @@ const price = computed(() => {
 })
 
 const formattedPrice = computed(() => {
-  const format = new Intl.NumberFormat(undefined, { style: 'currency', currency: currency.value })
-  const result = format.format(price.value)
-  return result
+  return ToolBox.formatPrice(price.value, currency.value)
 })
 
 const quantity = computed(() => {

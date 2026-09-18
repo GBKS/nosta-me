@@ -110,6 +110,26 @@ export default {
     return result
   },
 
+  // Prices come from user-created events. Intl only takes ISO currency
+  // codes and throws for anything else, like "sats", or no currency at all.
+  formatPrice(amount, currency) {
+    const number = Number(amount)
+    const unit = currency ? ('' + currency).toLowerCase() : null
+
+    // Intl accepts BTC and SAT as codes, but rounds to two decimals.
+    if(!isNaN(number) && ['btc', 'sat', 'sats'].indexOf(unit) !== -1) {
+      const formatted = new Intl.NumberFormat(undefined, { maximumFractionDigits: 8 }).format(number)
+      return formatted + ' ' + (unit == 'btc' ? 'BTC' : 'sats')
+    }
+
+    try {
+      return new Intl.NumberFormat(undefined, { style: 'currency', currency }).format(amount)
+    } catch(error) {
+      const formatted = isNaN(number) ? amount : new Intl.NumberFormat().format(number)
+      return currency ? formatted + ' ' + currency : '' + formatted
+    }
+  },
+
   trim(text, maxLength, position) {
     let result = text
 
