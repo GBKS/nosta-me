@@ -609,7 +609,6 @@ function saveProfileInfo(eventData) {
 
   for(let i=0; i<eventData.tags.length; i++) {
     if(eventData.tags[i][0] == 'i') {
-      console.log('Found an external identity', eventData.tags[i])
     }
   }
 

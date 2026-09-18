@@ -77,7 +77,6 @@ const nprofile = computed(() => {
     relays: [props.relayData.content]
   })
   
-  console.log('nprofile', props.relayData)
 
   return result
 })

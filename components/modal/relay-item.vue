@@ -116,7 +116,6 @@ function loadRelayData() {
 }
 
 function onRelayData(data) {
-  console.log('onRelayData', data)
 
   relayStore.setRelayInfo(props.info.id, data)
 
@@ -134,7 +133,6 @@ function onRelayDataError(error) {
 }
 
 function clickStatus(info) {
-  console.log('clickStatus', info)
 
   const statuses = [
     'disconnected',
@@ -146,7 +144,6 @@ function clickStatus(info) {
     if(connection) {
       connection.connect()
     } 
-    console.log('connection', connection)  
   }
 }
 

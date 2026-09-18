@@ -68,7 +68,6 @@ function republish() {
     // Need to figure out which relays to use
     // Ideally get them from the sessionRelayService
     const relayIds = sessionRelayService.relayIds
-    console.log('ProfileDataOvelayEventBrowser.relayIds', sessionRelayService.relayIds)
 
     const newEvent = JSON.parse(JSON.stringify(currentEvent.value))
     if(newEvent.originalContent) {
@@ -99,7 +98,6 @@ function republish() {
       request = relayPublishRequest()
       request.showNotification = true
 
-      console.log('Publishing to', relayId, newEvent)
 
       request.publish(
         relayId,
@@ -111,7 +109,6 @@ function republish() {
 }
 
 function onRepublishEvent(result) {
-  console.log('onRepublishEvent', result)
 }
 </script>
 

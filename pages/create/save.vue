@@ -47,7 +47,6 @@ function pressButton() {
 }
 
 function onPublishStatus(status) {
-  console.log('onPublishStatus', status)
 
   const metaDone = status.meta.status == 'success'
   const relaysDone = status.relays.status == 'success'

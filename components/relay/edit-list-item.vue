@@ -41,14 +41,12 @@ const title = computed(() => {
 })
 
 function onRelayStatusChange(data) {
-  console.log('onRelayStatusChange', data)
   if(data.relayId == props.relayId) {
     relayStatus.value = data.status
 
     const connector = relayManager.getConnector(props.relayId)
     relayStats.value = connector?.stats
 
-    console.log('updating', props.relayId, relayStats.value)
   }
 }
 
@@ -120,9 +118,6 @@ onMounted(() => {
   const connector = relayManager.getConnector(props.relayId)
   relayStats.value = connector?.stats
 
-  console.log('relayInfo', relayInfo)
-  console.log('connector', connector)
-  console.log('connector?.stats', connector?.stats)
 
   window.emitter.on('relay-connection-status-change', onRelayStatusChange)
 })

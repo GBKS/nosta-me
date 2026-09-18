@@ -25,7 +25,6 @@ const inputValid = computed(() => {
       const isNsec = NostrTypeGuard.isNSec(privateKeyModel.value)
       const validPrivateKey = privateKeyModel.value.match(/[a-f0-9]{64}/)
 
-      console.log('inputValid.isNsec', isNsec)
 
       if(isNsec || validPrivateKey) {
         result = true

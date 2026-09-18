@@ -162,7 +162,6 @@ async function send() {
       }
     )
 
-    console.log('ZapModal.send zapResult', zapResult)
 
     if(zapResult.status == 'error') {
       status.value = 'input'

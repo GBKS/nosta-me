@@ -211,7 +211,6 @@ export default function zapHelper () {
       if(this.log) console.log('ZapHelper.onReceipt', event, this.invoice)
 
       if(event.tags.find((t) => t[0] === "bolt11" && t[1] === this.invoice.pr)) {
-        console.log('Done!')
       }
     }
   }

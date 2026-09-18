@@ -23,7 +23,6 @@ const classObject = computed(() => {
 // Looks like some extensions have an enabled variable and an enabled function, 
 // others don't.
 function loginWithBrowser() {
-  console.log('loginWithBrowser', window.nostr)
   
   if(!window.nostr.enabled && window.nostr.enable) {
     enableBrowser()
@@ -64,7 +63,6 @@ function loadPublicKey() {
 }
 
 function onPublicKey(publicKey) {
-  console.log('onPublicKey', publicKey)
 
   if(publicKey) {
     browserLoggedIn.value = true

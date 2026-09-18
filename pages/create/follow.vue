@@ -48,7 +48,6 @@ function loadData() {
 }
 
 function onLoadData(data) {
-  console.log('Follow.onLoadData', data)
 
   if(data && data.profiles && data.profiles.length > 5) {
     prepareLoadedProfiles(data.profiles)
