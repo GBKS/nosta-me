@@ -15,7 +15,7 @@ const sortedInfo = computed(() => {
 <template>
   <div class="profile-data-overlay-pinstr">
     <h3>Pinstr boards</h3>
-    <p>Image collections. (<a href="https://pinstr.app/" target="_blank" rel="nofollow noopener noreferrer">pinstr.app</a>, no NIP yet).</p>
+    <p>Image collections, created with the Pinstr app, which is no longer online (no NIP).</p>
     <ProfileDataOverlayEventBrowser v-if="info" :events="sortedInfo" />
     <p v-if="!info">No Pinstr boards found on this profile.</p>
   </div>

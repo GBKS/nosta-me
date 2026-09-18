@@ -11,11 +11,10 @@ import contactsService from '@/helpers/contactsService.js'
 Provides data to the profile page.
 Main job is to check various relays for info on public keys.
 
-TODO: Pinstr
-Messy here is the Pinstr integration. pinstr.app only looks at nos.lol right now.
-Since we want to link out to that site, we can only recognize board events from the
-nos.lol relay. So we set up a separate relay request for that. This needs to change
-in the future. It's on the Pinstr dev to-do list.
+Pinstr
+Boards (kind 33889) were only ever published to nos.lol, so we make sure that
+relay gets asked for them. The Pinstr app itself is gone and its domain was taken
+over by an unrelated site. We still show the boards, but no longer link there.
 
  */
 
