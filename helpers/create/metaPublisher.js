@@ -4,6 +4,7 @@ import relayManager from '@/helpers/relayManager.js'
 import { useSessionStore } from '@/stores/session'
 import { useUserStore } from "@/stores/users.js"
 import { finalizeEvent } from 'nostr-tools/pure'
+import ToolBox from '@/helpers/toolBox'
 
 export default function metaPublisher () { 
   return {
@@ -200,7 +201,7 @@ export default function metaPublisher () {
 
 
       if(privateKey) {
-        const signedEvent = finalizeEvent(event, privateKey)
+        const signedEvent = finalizeEvent(event, ToolBox.privateKeyToBytes(privateKey))
 
         this.onSignEvent(signedEvent)
       }

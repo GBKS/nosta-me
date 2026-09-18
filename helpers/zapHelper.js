@@ -150,12 +150,16 @@ export default function zapHelper () {
     async makeZapEvent(profile, event, amount, relays, comment) {
       try {
         const zapEvent = makeZapRequest({
-          profile,
-          event,
+          pubkey: profile,
           amount,
           relays,
           comment,
         })
+
+        // makeZapRequest only takes full events now, we just have the id.
+        if(zapEvent && event) {
+          zapEvent.tags.push(['e', event])
+        }
 
         if(zapEvent) {
           const result = await browserHelper.signNostrEvent(zapEvent)

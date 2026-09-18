@@ -7,6 +7,7 @@ import sessionRelayService from '@/helpers/sessionRelayService.js'
 import { useUserStore } from "@/stores/users.js"
 import { sign } from '@noble/secp256k1'
 import { finalizeEvent, getEventHash } from 'nostr-tools/pure'
+import ToolBox from '@/helpers/toolBox'
 
 const RELOAD_DELTA = 3600 * 1000 // 1 hour in milliseconds
 
@@ -232,7 +233,7 @@ export default {
     let signedEvent
     switch(this.sessionStore.loginType) {
       case LOGIN_TYPE.PRIVATE_KEY:
-        signedEvent = finalizeEvent(event, this.sessionStore.privateKey)
+        signedEvent = finalizeEvent(event, ToolBox.privateKeyToBytes(this.sessionStore.privateKey))
         break
       case LOGIN_TYPE.BROWSER:
         signedEvent = await browserHelper.signNostrEvent(event)

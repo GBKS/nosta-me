@@ -6,6 +6,7 @@ import { useRelayStore } from '@/stores/relays'
 import { useSessionStore, LOGIN_TYPE } from '@/stores/session'
 import browserHelper from '@/helpers/browserHelper.js'
 import { finalizeEvent } from 'nostr-tools'
+import ToolBox from '@/helpers/toolBox'
 
 definePageMeta({
   layout: "edit"
@@ -124,7 +125,7 @@ async function publish() {
   let signedEvent
   switch(sessionStore.loginType) {
     case LOGIN_TYPE.PRIVATE_KEY:
-      signedEvent = finalizeEvent(event, sessionStore.privateKey)
+      signedEvent = finalizeEvent(event, ToolBox.privateKeyToBytes(sessionStore.privateKey))
       break
     case LOGIN_TYPE.BROWSER:
       signedEvent = await browserHelper.signNostrEvent(event)
