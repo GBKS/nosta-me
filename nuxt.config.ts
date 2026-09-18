@@ -105,9 +105,7 @@ export default defineNuxtConfig({
 		css: {
 			preprocessorOptions: {
 				scss: {
-					additionalData: '@use "@/assets/css/_import.scss" as *;',
-					// The stylesheets still use @import, which works until Dart Sass 3.
-					silenceDeprecations: ['import', 'global-builtin']
+					additionalData: '@use "@/assets/css/_import.scss" as *;'
 				}
 			}
 		}

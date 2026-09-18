@@ -80,7 +80,7 @@ function onLeave() {
     transition: all 100ms $ease;
     cursor: pointer;
 
-    :deep svg {
+    :deep(svg) {
       width: 10px;
       height: 10px;
       color: var(--theme-front);
