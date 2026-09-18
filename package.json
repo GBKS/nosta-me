@@ -7,10 +7,15 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
+    "test": "vitest run",
     "test:smoke": "NITRO_PRESET=node-server nuxt build && node scripts/smoke-test.mjs"
   },
   "devDependencies": {
-    "nuxt": "^3.21.11"
+    "@nuxt/test-utils": "^4.3.2",
+    "@vue/test-utils": "^2.5.1",
+    "happy-dom": "^20.14.5",
+    "nuxt": "^3.21.11",
+    "vitest": "^5.0.1"
   },
   "dependencies": {
     "@pinia/nuxt": "^0.11.3",

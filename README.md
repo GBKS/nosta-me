@@ -77,7 +77,13 @@ Locally preview production build.
 npm run preview
 ```
 
-Run the smoke test. It builds the site, starts the production server and checks that pages render, and that the NIP-05 endpoint and security headers are in place. A passing build alone doesn't tell you that. It also runs on every pull request.
+Run the unit tests. They cover the parts that handle untrusted content and keys: note rendering, price formatting, key conversion and relay URLs.
+
+```bash
+npm test
+```
+
+Run the smoke test. It builds the site, starts the production server and checks that pages render, and that the NIP-05 endpoint and security headers are in place. A passing build alone doesn't tell you that. Both run on every pull request.
 
 ```bash
 npm run test:smoke
