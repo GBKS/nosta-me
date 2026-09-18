@@ -11,6 +11,9 @@ Checks a single relay for data.
 
  */
 
+// How long to wait for the relay if it hasn't connected yet.
+const MAX_WAIT_FOR_CONNECTION = 15000
+
 export default function relayRequest () { 
   return {
     logEnabled: false,
@@ -25,6 +28,8 @@ export default function relayRequest () {
     userStore: null,
     callback: null,
     connectCallback: null,
+    waitTimeout: null,
+    stopped: false,
 
     init(callback, autoClose) {
       if(!this.initialized) {
@@ -50,7 +55,22 @@ export default function relayRequest () {
     },
 
     stop() {
+      // Without this, the relay connecting later would make this request
+      // subscribe after all, and deliver events nobody is waiting for anymore.
+      this.stopped = true
+      this.stopWaitingForConnection()
+
       this.unsubscribe()
+    },
+
+    stopWaitingForConnection() {
+      clearTimeout(this.waitTimeout)
+      this.waitTimeout = null
+
+      if(this.connectCallback) {
+        window.emitter.off('relay-connect-'+this.relayId, this.connectCallback)
+        this.connectCallback = null
+      }
     },
 
     kill() {
@@ -58,6 +78,8 @@ export default function relayRequest () {
     },
 
     subscribe() {
+      if(this.stopped) return
+
       this.logger('subscribe', this.relayId)
 
       const relay = this.relayStore.getRelay(this.relayId)
@@ -92,6 +114,12 @@ export default function relayRequest () {
         if(!this.connectCallback) {
           this.connectCallback = this.onRelayConnect.bind(this)
           window.emitter.on('relay-connect-'+this.relayId, this.connectCallback)
+
+          // Some relays never connect. Don't wait for them forever.
+          this.waitTimeout = setTimeout(() => {
+            this.logger('gave up waiting for', this.relayId)
+            this.stopWaitingForConnection()
+          }, MAX_WAIT_FOR_CONNECTION)
         }
       }
     },
@@ -99,9 +127,8 @@ export default function relayRequest () {
     onRelayConnect(data) {
       this.logger('onRelayConnect', data)
 
-      window.emitter.off('relay-connect-'+this.relayId, this.connectCallback)
-      this.connectCallback = null
-      
+      this.stopWaitingForConnection()
+
       this.subscribe()
     },
 
@@ -114,6 +141,8 @@ export default function relayRequest () {
     },
 
     onEvent(event) {
+      if(this.stopped) return
+
       this.logger('onEvent', this.relayId, event)
 
       const connector = relayManager.getConnector(this.relayId)

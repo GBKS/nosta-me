@@ -11,6 +11,9 @@ Connects to multiple relays at once to find data.
 
  */
 
+// How long to wait for relays that haven't connected yet.
+const MAX_WAIT_FOR_CONNECTION = 15000
+
 export default function multiRelayRequest () { 
   return {
     logEnabled: false,
@@ -20,6 +23,8 @@ export default function multiRelayRequest () {
     events: {},
     subscriptions: {},
     relaysWaitingForConnection: [],
+    waitTimeout: null,
+    stopped: false,
     relayStore: null,
     eventStore: null,
     userStore: null,
@@ -57,9 +62,25 @@ export default function multiRelayRequest () {
     },
 
     stop() {
-      const relays = this.relayStore.getAll
-      for(let relayId in relays) {
+      // Without this, a relay that connects later would make this request
+      // subscribe after all, and deliver events nobody is waiting for anymore.
+      this.stopped = true
+      this.stopWaitingForConnections()
+
+      for(let relayId in this.subscriptions) {
         this.unsubscribeFromRelay(relayId)
+      }
+    },
+
+    stopWaitingForConnections() {
+      this.relaysWaitingForConnection = []
+
+      clearTimeout(this.waitTimeout)
+      this.waitTimeout = null
+
+      if(this.connectCallback) {
+        window.emitter.off('relay-connect', this.connectCallback)
+        this.connectCallback = null
       }
     },
 
@@ -74,6 +95,8 @@ export default function multiRelayRequest () {
     },
 
     subscribeToRelay(relayId) {
+      if(this.stopped) return
+
       this.logger('subscribe', relayId)
 
       const relay = this.relayStore.getRelay(relayId)
@@ -118,6 +141,14 @@ export default function multiRelayRequest () {
           this.connectCallback = this.onRelayConnect.bind(this)
           window.emitter.on('relay-connect', this.connectCallback)
         }
+
+        // Some relays never connect. Don't wait for them forever.
+        if(!this.waitTimeout) {
+          this.waitTimeout = setTimeout(() => {
+            this.logger('gave up waiting for', this.relaysWaitingForConnection)
+            this.stopWaitingForConnections()
+          }, MAX_WAIT_FOR_CONNECTION)
+        }
       }
     },
 
@@ -129,8 +160,7 @@ export default function multiRelayRequest () {
         this.relaysWaitingForConnection.splice(index, 1)
         
         if(this.relaysWaitingForConnection.length == 0) {
-          window.emitter.off('relay-connect', this.connectCallback)
-          this.connectCallback = null
+          this.stopWaitingForConnections()
         }
 
         this.subscribeToRelay(data.relayId)
@@ -148,6 +178,8 @@ export default function multiRelayRequest () {
     },
 
     onEvent(relayId, event) {
+      if(this.stopped) return
+
       this.logger('onEvent', relayId, event)
 
       const connector = relayManager.getConnector(relayId)

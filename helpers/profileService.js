@@ -235,6 +235,11 @@ export default {
   onEvent(data) {
     this.logger('onEvent', data)
 
+    if(!this.isAboutCurrentProfile(data)) {
+      this.logger('ignoring an event that is not about the current profile', data)
+      return
+    }
+
     let tag
     if(data.kind === 0) {
     } else if(data.kind == 1) {
@@ -250,13 +255,11 @@ export default {
     } else if(data.kind == 1984) {
       // console.log('!!! Seeing a report', data)
     } else if(data.kind == 1985) {
-      console.log('!!! Seeing a label', data)
     } else if(data.kind == 9041) {
       // console.log('!!! Seeing a zap goal', data)
     } else if(data.kind == 9735) {
       // console.log('!!! Seeing a zap', data)
     } else if(data.kind == 9802) {
-      console.log('!!! Seeing a highlight', data)
     } else if(data.kind == 10000) {
       // console.log('!!! Seeing mute list data', data)
     } else if(data.kind == 10001) {
@@ -298,12 +301,22 @@ export default {
     } else if(data.kind == 33889) {
       // console.log('!!! Seeing a Pinstr board', data)
     } else if(data.kind == 37375) {
-      console.log('!!! Seeing a Cashu wallet', data)
     } else if(data.type == 'end') {
       // this.checkNextRelay()
     }
 
     this.findCallback(data)
+  },
+
+  // This service is shared and always reports to the profile page that is open
+  // now. Events from a request for another profile must not end up there.
+  isAboutCurrentProfile(data) {
+    // Not an event, but a message like { type: 'end' }
+    if(!data.pubkey) return true
+
+    // Created by this profile, or sent to it (zaps)
+    return data.pubkey == this.publicKey ||
+      (data.tags || []).some(tag => tag[0] == 'p' && tag[1] == this.publicKey)
   },
 
   onEndOfEvents() {
