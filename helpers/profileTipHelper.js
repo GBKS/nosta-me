@@ -54,7 +54,7 @@ export default {
       result.push({
         title: 'Create and earn badges',
         description: 'Style out your profile.',
-        kind: 30008
+        kind: 10008
       })
     }
 

@@ -109,7 +109,8 @@ export default {
       30015, // Interest sets (NIP 51)
       30030, // Emoji sets (NIP 51)
 
-      30008, // Badges
+      10008, // Profile badges
+      30008, // Profile badges before kind 10008 (deprecated), and badge sets
       30017, // Stall
       30018, // Product
       1063, // Files
@@ -263,6 +264,8 @@ export default {
       // console.log('!!! Seeing mute list data', data)
     } else if(data.kind == 10001) {
       // console.log('!!! Seeing pin list data', data)
+    } else if(data.kind == 10008) {
+      // console.log('!!! Seeing profile badges', data)
     } else if(data.kind == 10002) {
       // console.log('!!! Seeing relay list meta data', data)
     } else if(data.kind == 30000) {

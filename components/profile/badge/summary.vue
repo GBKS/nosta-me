@@ -38,7 +38,7 @@ function navigate() {
     <div class="badges">
       <ProfileBadgeItem
         v-for="(item, index) in visibleBadges"
-        :key="item.id"
+        :key="item.address"
         :info="item"
         :handlers="handlers"
       />
