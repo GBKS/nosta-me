@@ -1,6 +1,8 @@
-@use "sass:math";
+// This file is added to the styles of every component (see nuxt.config.ts),
+// so it must only contain things that don't output any CSS by themselves:
+// variables, easings and mixins. Anything else would be repeated in each
+// component's styles. CSS that should exist once goes in _base.scss.
 
-@import "_variables";
-@import "_animations";
-@import "_colors";
-@import "_mixins";
+@forward "variables";
+@forward "animations";
+@forward "mixins";

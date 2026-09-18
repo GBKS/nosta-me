@@ -81,6 +81,7 @@ defineEmits(['click'])
 </template>
 
 <style scoped lang="scss">
+@use "sass:color";
 
 button {
   appearance: none;
@@ -362,10 +363,10 @@ button {
     }
 
     &:not(:disabled):hover {
-      border-color: darken(#F68A59, 10);
+      border-color: color.adjust(#F68A59, $lightness: -10%);
 
       p {
-        color: darken(#F68A59, 10);
+        color: color.adjust(#F68A59, $lightness: -10%);
       }
     }
   }

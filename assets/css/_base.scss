@@ -1,11 +1,9 @@
-@use "sass:math";
+// Global styles, loaded once. Variables, easings and mixins come
+// from _import.scss, which is added to every stylesheet.
 
-@import "_variables";
-@import "_animations";
-@import "_colors";
-@import "_mixins";
-@import "_normalize";
-@import "_themes";
+@use "colors";
+@use "normalize";
+@use "themes";
 
 @font-face {
   font-family: 'PoetsenOne';
