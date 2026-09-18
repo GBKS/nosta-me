@@ -3,6 +3,7 @@ import { useRelayStore } from "@/stores/relays.js"
 import ToolBox from '@/helpers/toolBox'
 import relayList from '@/helpers/relayList.js'
 import relayConnector from '@/helpers/relayConnector.js'
+import { normalizeURL } from 'nostr-tools/utils'
 
 /*
 
@@ -28,21 +29,27 @@ export default {
     }
   },
 
-  // Connect to 3 random ideas from our initial seed list
+  // Connect to all primary relays and a few random ones from our initial seed list
   addInitialRelays() {
-    const relayIds = []
-    for(let i in relayList) relayIds.push(i)
-    ToolBox.shuffleArray(relayIds)
+    const primaryIds = []
+    const otherIds = []
+    for(let i in relayList) {
+      if(relayList[i].primary) {
+        primaryIds.push(i)
+      } else {
+        otherIds.push(i)
+      }
+    }
+    ToolBox.shuffleArray(otherIds)
 
-    let relaysToAdd = 5, i=0, relayId
+    const relayIds = primaryIds.concat(otherIds.slice(0, 3))
+
+    let relayId
     for(let i=0; i<relayIds.length; i++) {
       relayId = relayIds[i]
       relayList[relayId].id = relayId
 
       this.relayStore.addRelay(relayList[relayId])
-
-      relaysToAdd--
-      if(relaysToAdd < 0) break
     }
   },
 
@@ -54,8 +61,10 @@ export default {
       return
     }
 
+    url = url.trim()
+
     // Check if already added
-    const relay = this.relayStore.getRelayByUrl(url)
+    const relay = this.getRelayByUrl(url)
 
     if(relay) {
       return relay.id
@@ -79,9 +88,9 @@ export default {
 
         let relayId = idBit.replaceAll('.', '-')
 
-        // if(relayId.endsWith('/')) {
-        //   relayId = relayId.substr(0, relayId.length-1)
-        // }
+        if(relayId.endsWith('/')) {
+          relayId = relayId.substr(0, relayId.length-1)
+        }
 
         const data = {
           id: relayId,
@@ -118,15 +127,25 @@ export default {
     return result
   },
 
+  // So that wss://nos.lol and wss://nos.lol/ are seen as the same relay
+  normalizeUrl(url) {
+    try {
+      return normalizeURL(url)
+    } catch(error) {
+      return url
+    }
+  },
+
   getRelayByUrl(url) {
     let result = null
 
+    const normalizedUrl = this.normalizeUrl(url)
     const relays = this.relayStore.getAll
     let relay
     for(let relayId in relays) {
       relay = relays[relayId]
 
-      if(relay.url == url) {
+      if(this.normalizeUrl(relay.url) == normalizedUrl) {
         result = relay
         break
       }
