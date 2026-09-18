@@ -11,7 +11,7 @@ definePageMeta({
   layout: "edit"
 })
 
-const logEnabled = !false
+const logEnabled = false
 const sessionStore = useSessionStore()
 const relayStore = useRelayStore()
 const isSaving = ref(false)

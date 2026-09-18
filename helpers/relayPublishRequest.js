@@ -18,7 +18,7 @@ const NOTIFICATION_STATUS = {
 
 export default function relayPublishRequest () { 
   return {
-    logEnabled: !false,
+    logEnabled: false,
     initialized: false,
     relayId: null,
     callback: null,

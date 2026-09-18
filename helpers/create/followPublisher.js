@@ -5,7 +5,7 @@ import { finalizeEvent } from 'nostr-tools/pure'
 
 export default function followPublisher () { 
   return {
-    logEnabled: !false,
+    logEnabled: false,
     store: null,
     callback: null,
     relayId: null,

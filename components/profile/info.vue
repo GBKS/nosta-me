@@ -67,10 +67,9 @@ const DescriptionNode = () => {
       } else {
         children.push(h('a', {
           href: token.v,
-          innerHTML: token.v,
           rel: 'nofollow noopener noreferrer',
           target: '_blank'
-        }))
+        }, token.v))
       }
     } else {
       children.push(token.v)

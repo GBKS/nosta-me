@@ -11,7 +11,7 @@ import { bytesToHex } from '@noble/hashes/utils'
 // Sets up default values for a profile in the create flow
 
 export default {
-  logEnabled: !false,
+  logEnabled: false,
   store: null,
 
   init() {
@@ -29,7 +29,6 @@ export default {
       this.logger('initKeys')
 
       const mnemonic = generateMnemonic(wordlist)
-      this.logger('mnemonic', mnemonic)
 
       // A mnemonic with the same word twice, for testing.
       // const mnemonic = 'cute whip blossom wedding arm arrange runway arrange oven jazz rival accuse'
@@ -37,14 +36,11 @@ export default {
       const passphrase = null // optional
       const accountIndex = 0
       const { privateKey, publicKey } = accountFromSeedWords(mnemonic, passphrase, accountIndex)
-      this.logger('privateKey', privateKey)
       this.logger('publicKey', publicKey)
 
       const privateKeyHex = bytesToHex(privateKey)
-      this.logger('privateKeyHex', privateKeyHex)
 
       const nsec = nsecEncode(privateKey)
-      this.logger('nsec', nsec)
 
       const npub = npubEncode(publicKey)
       this.logger('npub', npub)

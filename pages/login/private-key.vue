@@ -11,7 +11,7 @@ import { validateMnemonic } from '@scure/bip39'
 import { bytesToHex } from '@noble/hashes/utils'
 import { decode } from 'nostr-tools/nip19'
 
-const logEnabled = !false
+const logEnabled = false
 const privateKeyModel = ref('')
 
 // Allow for either a private key (hex or nsec) or a mnemonic.
@@ -28,7 +28,6 @@ const inputValid = computed(() => {
       const validPrivateKey = privateKeyModel.value.match(/[a-f0-9]{64}/)
 
       console.log('inputValid.isNsec', isNsec)
-      console.log('inputValid.validPrivateKey', validPrivateKey)
 
       if(isNsec || validPrivateKey) {
         result = true
@@ -44,7 +43,6 @@ function evaluate() {
 
   const isValidMnemonic = validateMnemonic(privateKeyModel.value, wordlist)
 
-  logger('evaluate', privateKeyModel.value)
 
   if(isValidMnemonic) {
     // Get private key from mnemonic
@@ -52,8 +50,6 @@ function evaluate() {
     const accountIndex = 0
     const privateKeyFromMnemonic = privateKeyFromSeedWords(privateKeyModel.value, passphrase, accountIndex)
     privateKey = bytesToHex(privateKeyFromMnemonic)
-    logger('evaluate privateKeyFromMnemonic', privateKeyFromMnemonic)
-    logger('evaluate privateKey', privateKey)
 
     privateKey = privateKeyFromMnemonic
   } else {
@@ -61,15 +57,12 @@ function evaluate() {
     const isValidPrivateKey = privateKeyModel.value.match(/[a-f0-9]{64}/)
 
     logger('isNsec', isNsec)
-    logger('isValidPrivateKey', isValidPrivateKey)
 
     if(isNsec) {
       let { type, data: decodedPrivateKey } = decode(privateKeyModel.value)
       logger('type', type)
-      logger('decodedPrivateKey', decodedPrivateKey)
 
       privateKey = bytesToHex(decodedPrivateKey)
-      logger('privateKey', privateKey)
 
       privateKey = decodedPrivateKey
     } else if(isValidPrivateKey) {
