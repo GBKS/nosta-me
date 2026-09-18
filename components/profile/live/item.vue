@@ -12,12 +12,12 @@ const props = defineProps([
 
 const title = computed(() => {
   const tag = ToolBox.findTag(props.info, 'title')
-  return ToolBox.trim(tag[0], 50, 'end')
+  return tag ? ToolBox.trim(tag[0], 50, 'end') : null
 })
 
 const summary = computed(() => {
   const tag = ToolBox.findTag(props.info, 'summary')
-  return ToolBox.trim(tag[0], 50, 'end')
+  return tag ? ToolBox.trim(tag[0], 50, 'end') : null
 })
 
 const participants = computed(() => {
@@ -53,6 +53,8 @@ const status = computed(() => {
 const link = computed(() => {
   const tag = ToolBox.findTag(props.info, 'd')
   const relay = relayStore.getRelay(props.info.relay)
+
+  if(!tag || !relay) return null
 
   return linkHelper.address(
     tag[0], 
