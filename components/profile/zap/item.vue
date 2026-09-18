@@ -1,5 +1,4 @@
 <script setup>
-import bolt11Decoder from 'light-bolt11-decoder'
 import ToolBox from '@/helpers/toolBox'
 import useAssets from  '@/composables/useAssets.js'
 
@@ -8,25 +7,24 @@ const props = defineProps([
   'direction'
 ])
 
-const invoice = ref(null)
 const rankImage = ref()
-let targetUserPublicKey = null
+
+// Parsed by zapReceiptHelper when the receipt was loaded
+const zap = computed(() => {
+  return props.info.zap
+})
 
 const hasContent = computed(() => {
-  return props.info.content.length > 0
+  return zap.value.comment.length > 0
 })
 
 const amount = computed(() => {
-  let result = 0
+  return zap.value.sats
+})
 
-  const section = findSection('amount')
-  if(section) {
-    result = Math.round(parseInt(section.value) / 1000)
-  } else {
-    console.log('ZapItem no amount found', props.info, invoice.value)
-  }
-
-  return result
+// The receipt is published by the lightning provider, so it's not info.pubkey.
+const otherPublicKey = computed(() => {
+  return props.direction == 'sent' ? zap.value.recipient : zap.value.sender
 })
 
 const rank = computed(() => {
@@ -91,26 +89,6 @@ const formattedDate = computed(() => {
   return ToolBox.formatRelativeDate(props.info.created_at)
 })
 
-function findSection(name) {
-  let result = null
-
-
-  let i, section
-  const sections = invoice?.value?.sections
-  if(sections) {
-    for(i=0; i<invoice.value.sections.length; i++) {
-      section = invoice.value.sections[i]
-
-      if(section.name == name) {
-        result = section
-        break
-      }
-    }
-  }
-
-  return result
-}
-
 const classObject = computed(() => {
   return [
     'zap-item',
@@ -120,38 +98,12 @@ const classObject = computed(() => {
 
 onMounted(() => {
   updateRankImage()
-
-  let i, tag
-  for(i=0; i<props.info.tags.length; i++) {
-    tag = props.info.tags[i]
-
-    if(tag[0] == 'bolt11') {
-      try {
-        invoice.value = bolt11Decoder.decode(tag[1])
-      } catch(error) {
-        console.log('ZapItem could not decode', tag[1])
-      }
-      // console.log('dd', invoice.value)
-    } else if(tag[0] == 'description') {
-      try {
-        targetUserPublicKey = JSON.parse(tag[1]).pubkey
-      } catch(error) {
-        console.log('ZapItem could not parse description', tag[1])
-      }
-    }
-  }
-
-  // console.log('ZapItem.mounted', props.info)
-
-  if(!invoice.value) {
-    console.log('ZapItem no invoice found...', props.info)
-  }
 })
 </script>
 
 <template>
   <div
-     v-if="invoice"
+     v-if="zap"
      :class="classObject"
     >
     <div class="icon" :style="rankStyle">
@@ -160,10 +112,10 @@ onMounted(() => {
     <div class="copy">
       <p class="amount">
         {{ direction == 'sent' ? 'To' : 'From' }} <UiUsername
-        :publicKey="targetUserPublicKey"
+        :publicKey="otherPublicKey"
         :relayIds="[info.relay]" 
       /></p>
-      <p v-if="hasContent" class="content">"{{ info.content }}"</p>
+      <p v-if="hasContent" class="content">"{{ zap.comment }}"</p>
       <p class="date">{{ formattedDate }}</p>
     </div>
   </div>
