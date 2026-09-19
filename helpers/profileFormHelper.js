@@ -45,6 +45,28 @@ export default {
     }, null)
   },
 
+  // Whether the form differs from a profile. A field that is missing in the
+  // profile is the same as an empty one in the form.
+  hasChanges(form, content) {
+    for(const field in PROFILE_FORM_FIELDS) {
+      if(text(form[field]) != text((content || {})[PROFILE_FORM_FIELDS[field]])) return true
+    }
+
+    return false
+  },
+
+  // The profile content to publish: everything that was in the profile, with
+  // the fields of the form on top. Does not change what it was given.
+  apply(form, content) {
+    const result = { ...(content || {}) }
+
+    for(const field in PROFILE_FORM_FIELDS) {
+      result[PROFILE_FORM_FIELDS[field]] = text(form[field])
+    }
+
+    return result
+  },
+
   // form: the values in the form now, by form field
   // shownContent: the profile content the form was last filled from, if any
   // newContent: the profile content to show now

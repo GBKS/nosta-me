@@ -50,6 +50,8 @@ const picture = ref('')
 const banner = ref('')
 let editEvent = null // The profile event we're editing, the newest one found
 let editContent = {}
+let pendingContent = null // What is being saved, until a relay confirms it
+const savedContent = ref({}) // The profile the form is compared with, to know if there is something to save
 let editTags = [] // Tags of the profile event we're editing, kept as they are
 
 const isSaving = ref(false)
@@ -114,16 +116,9 @@ const enableForm = computed(() => {
   return loadedProfileEvents.value.length > 0
 })
 
+// Compared with the profile as it was loaded, or as it was last saved.
 const hasFormChanged = computed(() => {
-  return (editContent && (
-    (name.value != editContent.name) || 
-    (about.value != editContent.about) || 
-    (website.value != editContent.website) || 
-    (picture.value != editContent.picture) || 
-    (name.banner != editContent.banner) || 
-    (handle.value != editContent.nip05) || 
-    (bitcoin.value != editContent.lud16)
-  ))
+  return profileFormHelper.hasChanges(formValues(), savedContent.value)
 })
 
 function cancelChanges() {
@@ -137,6 +132,15 @@ function publishResult(status) {
   }
 
   publishStatus.value = status
+
+  // Saved on at least one relay. This is the profile now, and there is nothing
+  // to save until the form changes again. If it failed, the button stays on
+  // so the user can try again.
+  if(status && status.status == 'success' && pendingContent) {
+    editContent = pendingContent
+    savedContent.value = { ...pendingContent }
+    pendingContent = null
+  }
 }
 
 // Send to the Blastr relay
@@ -146,15 +150,9 @@ function saveChanges() {
     publisher = null
   }
 
-  // Get content from profile we're editing to preserve other properties.
-  const content = editContent
-  content.name = name.value
-  content.about = about.value
-  content.website = website.value
-  content.picture = picture.value
-  content.banner = banner.value
-  content.nip05 = handle.value
-  content.lud16 = bitcoin.value
+  // Start from the profile we're editing to preserve its other properties.
+  const content = profileFormHelper.apply(formValues(), editContent)
+  pendingContent = content
 
   ToolBox.migrateDeprecatedProfileFields(content)
 
@@ -265,6 +263,7 @@ function updateInfoFromFoundProfiles() {
     // Store for updating and publishing later.
     editEvent = newestEvent
     editContent = content
+    savedContent.value = content
     editTags = Array.isArray(newestEvent.tags) ? JSON.parse(JSON.stringify(newestEvent.tags)) : []
   }
 

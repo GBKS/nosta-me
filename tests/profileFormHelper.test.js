@@ -44,6 +44,49 @@ describe('profileFormHelper.merge', () => {
   })
 })
 
+describe('profileFormHelper.hasChanges', () => {
+  const content = { name: 'alice', about: 'Hi', display_name: 'Alice' }
+  const form = { ...EMPTY_FORM, name: 'alice', about: 'Hi' }
+
+  it('is false when the form shows the profile, missing fields are empty fields', () => {
+    expect(profileFormHelper.hasChanges(form, content)).toBe(false)
+    expect(profileFormHelper.hasChanges(EMPTY_FORM, {})).toBe(false)
+    expect(profileFormHelper.hasChanges(EMPTY_FORM, null)).toBe(false)
+  })
+
+  it('is true when any field differs, the banner too', () => {
+    expect(profileFormHelper.hasChanges({ ...form, about: 'Hi!' }, content)).toBe(true)
+    expect(profileFormHelper.hasChanges({ ...form, name: '' }, content)).toBe(true)
+    expect(profileFormHelper.hasChanges({ ...form, banner: 'https://example.com/b.jpg' }, content)).toBe(true)
+    expect(profileFormHelper.hasChanges({ ...form, bitcoin: 'alice@getalby.com' }, content)).toBe(true)
+  })
+})
+
+describe('profileFormHelper.apply', () => {
+  it('puts the form on top of the profile, and keeps its other fields', () => {
+    const content = { name: 'alice', display_name: 'Alice', bot: true, lud16: 'old@example.com' }
+    const result = profileFormHelper.apply({ ...EMPTY_FORM, name: 'alice2', bitcoin: 'new@example.com' }, content)
+
+    expect(result).toEqual({
+      name: 'alice2', display_name: 'Alice', bot: true, lud16: 'new@example.com',
+      about: '', website: '', picture: '', banner: '', nip05: ''
+    })
+  })
+
+  it('does not change the profile it was given', () => {
+    const content = { name: 'alice' }
+    profileFormHelper.apply({ ...EMPTY_FORM, name: 'bob' }, content)
+
+    expect(content).toEqual({ name: 'alice' })
+  })
+
+  it('leaves nothing to save once it was applied', () => {
+    const form = { ...EMPTY_FORM, name: 'bob', website: 'https://bob.example.com' }
+
+    expect(profileFormHelper.hasChanges(form, profileFormHelper.apply(form, { name: 'alice' }))).toBe(false)
+  })
+})
+
 describe('profileFormHelper.content', () => {
   it('parses the content, and survives what is not a profile', () => {
     expect(profileFormHelper.content({ content: '{"name":"alice"}' })).toEqual({ name: 'alice' })
