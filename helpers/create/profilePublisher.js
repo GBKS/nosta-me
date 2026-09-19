@@ -1,3 +1,4 @@
+import publishTracker, { OUTCOME } from '@/helpers/create/publishTracker.js'
 import relayPublishRequest from '@/helpers/relayPublishRequest.js'
 import { useProfileStore } from '@/stores/profile'
 import relayManager from '@/helpers/relayManager.js'
@@ -19,6 +20,9 @@ Make connection to Blastr relay and post the profile notes
 
  */
 
+// How long to wait for relays in total, before calling it with what we have.
+const MAX_WAIT = 20000
+
 export default function profilePublisher () { 
   return {
     logEnabled: false,
@@ -28,6 +32,10 @@ export default function profilePublisher () {
     metaPublisher: null,
     relayPublisher: null,
     followPublisher: null,
+    tracker: null,
+    timeout: null,
+    killed: false,
+    started: false,
     status: {
       meta: null,
       relays: null,
@@ -39,6 +47,8 @@ export default function profilePublisher () {
 
       this.init()
 
+      this.tracker = publishTracker()
+
       const metaStatus = this.metaPublisher.publish(this.metaResult.bind(this))
       const relayStatus = this.relayPublisher.publish(this.relayResult.bind(this))
       const followStatus = this.followPublisher.publish(this.followResult.bind(this))
@@ -46,6 +56,17 @@ export default function profilePublisher () {
       this.status.meta = metaStatus
       this.status.relays = relayStatus
       this.status.follows = followStatus
+
+      // Results only count once we know how many relays we're waiting for.
+      this.tracker.expect('meta', metaStatus.relayIds)
+      this.tracker.expect('relays', relayStatus.relayIds)
+      this.tracker.expect('follows', followStatus.relayIds)
+
+      // Each request gives up after 10 seconds. This is for the ones that don't.
+      this.timeout = setTimeout(this.onTimeout.bind(this), MAX_WAIT)
+
+      // From here on all three events are known, and an outcome means something.
+      this.started = true
 
       return this.status
     },
@@ -64,24 +85,55 @@ export default function profilePublisher () {
       this.logger('metaResult', status)
 
       this.status.meta = status
-
-      this.callback(this.status)
+      this.onResult('meta', status)
     },
 
     relayResult(status) {
       this.logger('relayResult', status)
 
       this.status.relays = status
-
-      this.callback(this.status)
+      this.onResult('relays', status)
     },
 
     followResult(status) {
       this.logger('followResult', status)
 
       this.status.follows = status
+      this.onResult('follows', status)
+    },
+
+    // status.result is the answer of one relay, see relayPublishRequest
+    onResult(eventName, status) {
+      if(this.killed) return
+
+      if(status && status.result) {
+        this.tracker.record(eventName, status.result.relayId, status.result.status)
+      }
+
+      if(this.started) this.report()
+    },
+
+    onTimeout() {
+      if(this.killed) return
+
+      this.tracker.giveUp()
+      this.report()
+    },
+
+    report() {
+      this.status.summary = this.tracker.summary()
+
+      if(this.status.summary.outcome != OUTCOME.PENDING) {
+        clearTimeout(this.timeout)
+      }
 
       this.callback(this.status)
+    },
+
+    // Stops reporting. Requests that are under way can't be taken back.
+    kill() {
+      this.killed = true
+      clearTimeout(this.timeout)
     },
 
     // Helpers
