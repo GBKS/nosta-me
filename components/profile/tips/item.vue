@@ -12,7 +12,7 @@ const classObject = computed(() => {
 })
 
 const link = computed(() => {
-  return 'https://nostrapp.link/kind/' + props.info.kind
+  return props.info.url
 })
 </script>
 
