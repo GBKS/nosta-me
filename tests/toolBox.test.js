@@ -73,3 +73,24 @@ describe('ToolBox.trim', () => {
     expect(ToolBox.trim(null, 25)).toBe(null)
   })
 })
+
+describe('ToolBox.migrateDeprecatedProfileFields', () => {
+  it('removes the deprecated fields and leaves the rest alone', () => {
+    const content = { name: 'alice', display_name: 'Alice', displayName: 'Old Alice', username: 'old-alice', about: 'Hi', bot: true }
+
+    expect(ToolBox.migrateDeprecatedProfileFields(content)).toEqual({ name: 'alice', display_name: 'Alice', about: 'Hi', bot: true })
+  })
+
+  it('moves a value over when the field that replaced it is empty', () => {
+    expect(ToolBox.migrateDeprecatedProfileFields({ displayName: 'Alice', username: 'alice' })).toEqual({ display_name: 'Alice', name: 'alice' })
+    expect(ToolBox.migrateDeprecatedProfileFields({ name: '', username: 'alice' })).toEqual({ name: 'alice' })
+  })
+
+  it('does not move values that are not text', () => {
+    expect(ToolBox.migrateDeprecatedProfileFields({ displayName: { a: 1 }, username: '' })).toEqual({})
+  })
+
+  it('does nothing to a profile without them', () => {
+    expect(ToolBox.migrateDeprecatedProfileFields({ name: 'alice' })).toEqual({ name: 'alice' })
+  })
+})

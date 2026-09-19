@@ -19,6 +19,7 @@ import { useRelayStore } from '@/stores/relays'
 import multiRelayRequest from '@/helpers/multiRelayRequest.js'
 import metaPublisher from '@/helpers/create/metaPublisher.js'
 import sessionRelayService from '@/helpers/sessionRelayService.js'
+import ToolBox from '@/helpers/toolBox'
 
 const profileStore = useProfileStore()
 const sessionStore = useSessionStore()
@@ -152,6 +153,8 @@ function saveChanges() {
   content.banner = banner.value
   content.nip05 = handle.value
   content.lud16 = bitcoin.value
+
+  ToolBox.migrateDeprecatedProfileFields(content)
 
   if(log) {
 
