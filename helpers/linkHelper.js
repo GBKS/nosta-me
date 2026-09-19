@@ -41,8 +41,9 @@ export default {
     calendar: 'https://www.flockstr.com/calendar/<bech32>'
   },
 
+  // badges.page is gone, and there is no other web app for badges.
   badges: {
-    badge: 'https://badges.page/b/<bech32>',
+    badge: 'https://njump.me/<bech32>',
   },
 
   ostrich: {
