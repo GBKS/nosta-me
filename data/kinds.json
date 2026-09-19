@@ -13,15 +13,15 @@
     },
     "contact": {
         "kind": 3,
-        "name": "Contacts"
+        "name": "Follows"
     },
     "direct-message": {
         "kind": 4,
-        "name": "Direct messages"
+        "name": "Direct messages (old)"
     },
     "event-deletion": {
         "kind": 5,
-        "name": "Event deletion"
+        "name": "Deletion requests"
     },
     "repost": {
         "kind": 6,
@@ -34,6 +34,38 @@
     "badge-award": {
         "kind": 8,
         "name": "Badge awards"
+    },
+    "chat-message": {
+        "kind": 9,
+        "name": "Chat messages"
+    },
+    "thread": {
+        "kind": 11,
+        "name": "Forum threads"
+    },
+    "private-message": {
+        "kind": 14,
+        "name": "Private messages"
+    },
+    "generic-repost": {
+        "kind": 16,
+        "name": "Reposts"
+    },
+    "picture": {
+        "kind": 20,
+        "name": "Pictures"
+    },
+    "video": {
+        "kind": 21,
+        "name": "Videos"
+    },
+    "short-video": {
+        "kind": 22,
+        "name": "Short videos"
+    },
+    "public-message": {
+        "kind": 24,
+        "name": "Public messages"
     },
     "channel-creation": {
         "kind": 40,
@@ -55,13 +87,65 @@
         "kind": 44,
         "name": "Mute channel users"
     },
+    "gift-wrap": {
+        "kind": 1059,
+        "name": "Gift wraps"
+    },
     "file": {
         "kind": 1063,
         "name": "Files"
     },
+    "poll": {
+        "kind": 1068,
+        "name": "Polls"
+    },
+    "comment": {
+        "kind": 1111,
+        "name": "Comments"
+    },
+    "voice-message": {
+        "kind": 1222,
+        "name": "Voice messages"
+    },
+    "live-chat-message": {
+        "kind": 1311,
+        "name": "Live chat messages"
+    },
+    "code-snippet": {
+        "kind": 1337,
+        "name": "Code snippets"
+    },
+    "git-patch": {
+        "kind": 1617,
+        "name": "Git patches"
+    },
+    "git-issue": {
+        "kind": 1621,
+        "name": "Git issues"
+    },
     "report": {
         "kind": 1984,
         "name": "Reports"
+    },
+    "label": {
+        "kind": 1985,
+        "name": "Labels"
+    },
+    "torrent": {
+        "kind": 2003,
+        "name": "Torrents"
+    },
+    "community-post-approval": {
+        "kind": 4550,
+        "name": "Community post approvals"
+    },
+    "zap-goal": {
+        "kind": 9041,
+        "name": "Zap goals"
+    },
+    "nutzap": {
+        "kind": 9321,
+        "name": "Nutzaps"
     },
     "zap-request": {
         "kind": 9734,
@@ -71,21 +155,93 @@
         "kind": 9735,
         "name": "Zaps"
     },
+    "highlight": {
+        "kind": 9802,
+        "name": "Highlights"
+    },
     "mute-list": {
         "kind": 10000,
         "name": "Mute lists"
     },
     "pin-list": {
         "kind": 10001,
-        "name": "Pin lists"
+        "name": "Pinned notes"
     },
     "relay-list": {
         "kind": 10002,
         "name": "Relay lists"
     },
+    "bookmark-list": {
+        "kind": 10003,
+        "name": "Bookmarks"
+    },
+    "communities-list": {
+        "kind": 10004,
+        "name": "Communities lists"
+    },
+    "public-chats-list": {
+        "kind": 10005,
+        "name": "Public chats lists"
+    },
+    "blocked-relays-list": {
+        "kind": 10006,
+        "name": "Blocked relays"
+    },
+    "search-relays-list": {
+        "kind": 10007,
+        "name": "Search relays"
+    },
+    "profile-badges": {
+        "kind": 10008,
+        "name": "Profile badges"
+    },
+    "groups-list": {
+        "kind": 10009,
+        "name": "Groups lists"
+    },
+    "external-identities": {
+        "kind": 10011,
+        "name": "External identities"
+    },
+    "favorite-relays-list": {
+        "kind": 10012,
+        "name": "Favorite relays"
+    },
+    "interests-list": {
+        "kind": 10015,
+        "name": "Interests"
+    },
+    "nutzap-info": {
+        "kind": 10019,
+        "name": "Nutzap info"
+    },
+    "media-follows": {
+        "kind": 10020,
+        "name": "Media follows"
+    },
+    "emoji-list": {
+        "kind": 10030,
+        "name": "Emoji lists"
+    },
+    "dm-relays-list": {
+        "kind": 10050,
+        "name": "Message relays"
+    },
+    "blossom-servers": {
+        "kind": 10063,
+        "name": "Media servers"
+    },
+    "payment-targets": {
+        "kind": 10133,
+        "name": "Payment targets"
+    },
     "wallet-info": {
         "kind": 13194,
         "name": "Wallet info"
+    },
+    "cashu-wallet": {
+        "kind": 17375,
+        "name": "Cashu wallets"
     },
     "client-authentication": {
         "kind": 22242,
@@ -101,23 +257,51 @@
     },
     "nostr-connect": {
         "kind": 24133,
-        "name": "Nostr connect"
+        "name": "Remote signing"
+    },
+    "http-auth": {
+        "kind": 27235,
+        "name": "HTTP authentication"
     },
     "people-list": {
         "kind": 30000,
-        "name": "People list"
+        "name": "Follow sets"
     },
-    "bookmark-list": {
+    "bookmark-list-old": {
         "kind": 30001,
-        "name": "Bookmark list"
+        "name": "Lists (old)"
+    },
+    "relay-set": {
+        "kind": 30002,
+        "name": "Relay sets"
+    },
+    "bookmark-set": {
+        "kind": 30003,
+        "name": "Bookmark sets"
+    },
+    "curation-set": {
+        "kind": 30004,
+        "name": "Curation sets"
+    },
+    "video-set": {
+        "kind": 30005,
+        "name": "Video sets"
+    },
+    "picture-set": {
+        "kind": 30006,
+        "name": "Picture sets"
     },
     "badge": {
         "kind": 30008,
-        "name": "Badges"
+        "name": "Badge sets"
     },
     "badge-definition": {
-        "kind": 30009 ,
+        "kind": 30009,
         "name": "Badge definitions"
+    },
+    "interest-set": {
+        "kind": 30015,
+        "name": "Interest sets"
     },
     "stall": {
         "kind": 30017,
@@ -127,17 +311,73 @@
         "kind": 30018,
         "name": "Products"
     },
-    "app-data": {
-        "kind": 30078,
-        "name": "App data"
-    },
     "long-form-content": {
         "kind": 30023,
         "name": "Long-form content"
     },
-    "31337": {
+    "long-form-draft": {
+        "kind": 30024,
+        "name": "Long-form drafts"
+    },
+    "emoji-set": {
+        "kind": 30030,
+        "name": "Emoji sets"
+    },
+    "app-data": {
+        "kind": 30078,
+        "name": "App data"
+    },
+    "live-event": {
+        "kind": 30311,
+        "name": "Live streams"
+    },
+    "meeting-space": {
+        "kind": 30312,
+        "name": "Meeting spaces"
+    },
+    "meeting": {
+        "kind": 30313,
+        "name": "Meetings"
+    },
+    "user-status": {
+        "kind": 30315,
+        "name": "User statuses"
+    },
+    "classified": {
+        "kind": 30402,
+        "name": "Classifieds"
+    },
+    "git-repository": {
+        "kind": 30617,
+        "name": "Git repositories"
+    },
+    "wiki-article": {
+        "kind": 30818,
+        "name": "Wiki articles"
+    },
+    "draft": {
+        "kind": 31234,
+        "name": "Drafts"
+    },
+    "music-track": {
         "kind": 31337,
-        "name": "?"
+        "name": "Music tracks"
+    },
+    "date-calendar-event": {
+        "kind": 31922,
+        "name": "Calendar events"
+    },
+    "time-calendar-event": {
+        "kind": 31923,
+        "name": "Calendar events"
+    },
+    "calendar": {
+        "kind": 31924,
+        "name": "Calendars"
+    },
+    "calendar-rsvp": {
+        "kind": 31925,
+        "name": "Calendar RSVPs"
     },
     "handler-recommendation": {
         "kind": 31989,
@@ -146,5 +386,37 @@
     "handler-information": {
         "kind": 31990,
         "name": "App information"
+    },
+    "software-application": {
+        "kind": 32267,
+        "name": "Software applications"
+    },
+    "addressable-video": {
+        "kind": 34235,
+        "name": "Videos"
+    },
+    "addressable-short-video": {
+        "kind": 34236,
+        "name": "Short videos"
+    },
+    "community": {
+        "kind": 34550,
+        "name": "Communities"
+    },
+    "cashu-mint": {
+        "kind": 38172,
+        "name": "Cashu mints"
+    },
+    "fedimint": {
+        "kind": 38173,
+        "name": "Fedimints"
+    },
+    "p2p-order": {
+        "kind": 38383,
+        "name": "Peer-to-peer orders"
+    },
+    "starter-pack": {
+        "kind": 39089,
+        "name": "Starter packs"
     }
 }

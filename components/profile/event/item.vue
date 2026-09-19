@@ -11,13 +11,15 @@ const props = defineProps([
   'handlers'
 ])
 
+// NIP-52 uses 'title' and 'summary'. 'name' is deprecated, and 'description'
+// was never in the NIP, but older events from Flockstr have them.
 const title = computed(() => {
-  const tag = ToolBox.findTag(props.info, 'name')
+  const tag = ToolBox.findTag(props.info, 'title') || ToolBox.findTag(props.info, 'name')
   return tag ? ToolBox.trim(tag[0], 50, 'end') : null
 })
 
 const summary = computed(() => {
-  const tag = ToolBox.findTag(props.info, 'description')
+  const tag = ToolBox.findTag(props.info, 'summary') || ToolBox.findTag(props.info, 'description')
   return tag ? ToolBox.trim(tag[0], 50, 'end') : null
 })
 

@@ -158,12 +158,6 @@ export default {
       limit: 1,
     }
 
-    const relayMetaFilter = {
-      kinds: [2], // Recommended relays
-      authors: [this.publicKey],
-      limit: 1,
-    }
-
     const shortNoteFilter = {
       kinds: [1], // Short note
       authors: [this.publicKey],
@@ -206,7 +200,6 @@ export default {
       profileFilter,
       contactsFilter,
       relayFilter,
-      relayMetaFilter,
       shortNoteFilter,
       longNoteFilter,
       statusFilter,
@@ -246,7 +239,6 @@ export default {
     if(data.kind === 0) {
     } else if(data.kind == 1) {
       // console.log('!!! Seeing a short note', data)
-    } else if(data.kind == 2) {
     } else if(data.kind == 3) {
       this.contactList = data
       // this.loadContactList(data)

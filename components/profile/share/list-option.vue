@@ -23,16 +23,17 @@ function click() {
 </script>
 
 <template>
-  <NuxtLink
+  <!-- Not a NuxtLink, which leaves out the href for data: URLs (the download) -->
+  <a
     v-if="url && !webshare"
     class="share-list-option"
-    :to="url"
+    :href="url"
     target="_blank"
     rel="nofollow noopener noreferrer"
     :download="download"
   >
     <span>{{ name }}</span><span v-html="Icons[icon]" />
-  </NuxtLink>
+  </a>
   <button
     v-if="!url || webshare"
     class="share-list-option"

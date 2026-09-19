@@ -22,7 +22,6 @@ const queryRelayIds = ref(null)
 const profileData = ref(null)
 const profileDataEvents = ref(null)
 const relayData = ref(null)
-const relayEvent = ref(null)
 const relayDataEvents = ref(null)
 const followData = ref(null)
 const followDataEvents = ref(null)
@@ -131,6 +130,13 @@ const theme = computed(() => {
 const pageTitle = computed(() => {
   const name = ToolBox.digDeep(profileData.value, ['profile.display_name', 'profile.name', 'profile.displayName', 'profile.username'], null, true)
   return name ? (name + ' | Nosta') : 'Nosta'
+})
+
+// The newest relay list (kind 10002), relays can hold older versions
+const relayListEvent = computed(() => {
+  return (relayDataEvents.value || []).reduce((newest, event) => {
+    return !newest || event.created_at > newest.created_at ? event : newest
+  }, null)
 })
 
 const pageDescription = computed(() => {
@@ -359,9 +365,6 @@ function onLoadProfileEvent(data) {
     case 1:
       storeEvent(shortNotesData, data)
       break
-    case 2:
-      handleLoadedRecommendedRelay(data)
-      break
     case 3:
       handleLoadedContactList(data)
       break
@@ -471,20 +474,6 @@ function handleLoadedContactList(data) {
       followData.value = data
     }
   }
-}
-
-function handleLoadedRecommendedRelay(data) {
-  logger('handleLoadedRecommendedRelay', data)
-
-  if(!relayData.value) {
-    relayData.value = []
-  }
-
-  relayEvent.value = data
-  // console.log('Loaded relays', data)
-
-  const relayId = relayManager.addRelayByUrl(data.content)
-  relayData.value.push(relayId)
 }
 
 function handleLoadedRelayList(data) {
@@ -708,7 +697,6 @@ function reset() {
   profileData.value = null
   profileDataEvents.value = null
   relayData.value = null
-  relayEvent.value = null
   relayDataEvents.value = null
   followData.value = null
   followDataEvents.value = null
@@ -808,7 +796,7 @@ onMounted(() => {
           <ProfileInfo
             :info="profileData"
             :publicKey="publicKey"
-            :relayData="relayEvent"
+            :relayData="relayListEvent"
             :followData="followData"
             :userStatusData="userStatusData"
             :hasBanner="hasBanner"

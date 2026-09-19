@@ -51,7 +51,6 @@ let editContent = {}
 const isSaving = ref(false)
 const relayIds = ref([])
 const loadedProfileEvents = ref([])
-const loadedRelayEvents = ref([])
 
 function startTimer() {
   stopTimer()
@@ -181,7 +180,7 @@ function loadData() {
   }
 
   service.start(relaysToCheck, [{
-      kinds: [0, 2],
+      kinds: [0],
       authors: [sessionStore.publicKey]
   }])
 }
@@ -192,8 +191,6 @@ function onDataLoaded(data) {
 
   if(data.kind == 0) {
     loadedProfileEvents.value.push(data)
-  } else if(data.kind == 2) {
-    loadedRelayEvents.value.push(data)
   }
 
   updateInfoFromFoundProfiles()
@@ -266,16 +263,6 @@ function updateInfoFromFoundProfiles() {
   if(log) {
   }
 }
-
-const foundRelayIds = computed(() => {
-  const result = []
-
-  for(let i=0; i<loadedRelayEvents.value.length; i++) {
-    
-  }
-
-  return result
-})
 
 onMounted(() => {
   if(sessionStore.isLoggedIn) {

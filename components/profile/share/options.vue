@@ -41,40 +41,36 @@ const downloadUrl = computed(() => {
     delete data.follows.relay
   }
 
-  // console.log('rrr', props.relayData)
   if(props.relayData) {
-    // data.relays = JSON.parse(JSON.stringify(props.relayData))
-    data.relays = props.relayData.content
-    // console.log('rrr', props.relayData)
-     
-    try {
-      // data.relays.content = JSON.parse(data.relays.content)
-      delete data.relays.relay
-    } catch(error) {
-      console.log('Error parsing relay data', error, data.relays.content)
-    }
+    data.relays = JSON.parse(JSON.stringify(props.relayData))
+    delete data.relays.relay
   }
 
   const encodedData = encodeURIComponent(JSON.stringify(data))
   return "data:text/json;charset=utf-8," + encodedData
 })
 
-const nprofile = computed(() => {
-  const result = nprofileEncode({
-    pubkey: props.publicKey,
-    relays: [props.relayData.content]
-  })
-  
+// Where the user writes to, so that is where others find them (NIP-65).
+// relayData is their relay list event, kind 10002.
+const relayHints = computed(() => {
+  const tags = props.relayData && Array.isArray(props.relayData.tags) ? props.relayData.tags : []
 
-  return result
+  return tags
+    .filter(tag => tag[0] == 'r' && typeof tag[1] == 'string' && (!tag[2] || tag[2] == 'write'))
+    .map(tag => tag[1])
+    .slice(0, 3)
 })
 
+// A nostr: link takes a bech32 id, not the hex key (NIP-21).
 const nostrUrl = computed(() => {
-  if(props.relayData) {
-    return 'nostr:' + nprofile.value
-  } else {
-    return 'nostr:' + props.publicKey
+  if(relayHints.value.length > 0) {
+    return 'nostr:' + nprofileEncode({
+      pubkey: props.publicKey,
+      relays: relayHints.value
+    })
   }
+
+  return 'nostr:' + npub.value
 })
 
 function close() {

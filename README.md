@@ -13,34 +13,37 @@ This is a for-fun side project by [Christoph](https://nosta.me/gbks@nosta.me). I
 ## [NIPs](https://github.com/nostr-protocol/nips) supported
 
 - NIP-01: Basic protocol flow description
-- NIP-02: Contact List and Petnames
+- NIP-02: Follow List
 - NIP-05: Mapping Nostr keys to DNS-based internet identifiers
 - NIP-06: Basic key derivation from mnemonic seed phrase
 - NIP-07: window.nostr capability for web browsers
 - NIP-11: Relay Information Document
-- NIP-15: Marketplace
+- NIP-15: Nostr Marketplace (display only)
 - NIP-19: bech32-encoded entities
 - NIP-21: nostr: URI scheme
-- NIP-39: External Identities in Profiles
+- NIP-23: Long-form Content
+- NIP-38: User Statuses
+- NIP-39: Linking Profiles to Other Platforms
 - NIP-51: Lists
-- NIP-52: Calendar event
-- NIP-53: Live event
+- NIP-52: Calendar Events
+- NIP-53: Live Streaming and Spaces
 - NIP-56: Reporting
 - NIP-57: Lightning Zaps
 - NIP-58: Badges
 - NIP-65: Relay List Metadata
+- NIP-75: Zap Goals
 - NIP-89: Recommended Application Handlers
 - NIP-94: File Metadata
-- NIP-99: Classifieds listings
+- NIP-99: Classified Listings
+
+The NIP repository now marks NIP-06 and NIP-15 as unrecommended. Both still work here.
 
 ## NIPs to be supported
 
 - NIP-36: Sensitive Content
-- NIP-46: Nostr Connect
-- NIP-50: Search capability
-- NIP-72: Moderated communities
-- NIP-78: Application-specific data 
-- NIP-90: Data vending machines
+- NIP-46: Nostr Remote Signing
+- NIP-50: Search Capability
+- NIP-78: Application-specific data
 
 Probably more...
 

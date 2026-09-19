@@ -106,11 +106,11 @@ const kindTags = computed(() => {
       kind = parseInt(tags[i])
     
       for(kindId in kinds) {
-        if(kinds[kindId].kind == kind) {
+        // Some kinds share a name, like the two kinds of calendar events.
+        if(kinds[kindId].kind == kind && !result.some(item => item.name == kinds[kindId].name)) {
           result.push({
             name: kinds[kindId].name
           })
-          continue
         }
       }
     }

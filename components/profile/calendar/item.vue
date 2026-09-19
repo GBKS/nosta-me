@@ -12,9 +12,9 @@ const props = defineProps([
 ])
 
 const title = computed(() => {
-  let tag = ToolBox.findTag(props.info, 'name')
+  // NIP-52 uses 'title'. Older calendars from Flockstr use 'name', or only have 'd'.
+  let tag = ToolBox.findTag(props.info, 'title') || ToolBox.findTag(props.info, 'name')
   if(!tag) {
-    // The NIP uses 'd', but Flockstr uses 'name'
     tag = ToolBox.findTag(props.info, 'd')
   }
   return tag ? ToolBox.trim(tag[0], 50, 'end') : null
