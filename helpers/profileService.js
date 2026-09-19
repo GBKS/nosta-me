@@ -110,6 +110,7 @@ export default {
       30030, // Emoji sets (NIP 51)
 
       10008, // Profile badges
+      10011, // External identities (NIP 39), used to be tags on the profile
       30008, // Profile badges before kind 10008 (deprecated), and badge sets
       30017, // Stall
       30018, // Product

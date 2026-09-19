@@ -8,6 +8,7 @@ import { useUserStore } from '@/stores/users'
 import { useSessionStore } from '@/stores/session'
 import ToolBox from '@/helpers/toolBox'
 import badgeHelper from '@/helpers/badgeHelper.js'
+import externalIdentityHelper from '@/helpers/externalIdentityHelper.js'
 import badgeDefinitionService from '@/helpers/badgeDefinitionService.js'
 import * as nip19 from 'nostr-tools/nip19'
 import { queryProfile } from 'nostr-tools/nip05'
@@ -28,6 +29,7 @@ const followData = ref(null)
 const followDataEvents = ref(null)
 const handlerData = ref(null)
 const badgeData = ref(null) // Profile badges events, there can be old versions among them
+const externalIdentityData = ref(null) // Kind 10011 events
 const reportsData = ref(null) // Reports the user has made
 const reportedData = ref(null) // The user has been reported
 const shortNotesData = ref(null)
@@ -117,6 +119,12 @@ watch(() => route.query, () => updateFromRoute)
 
 onBeforeMount(() => {
   updateFromRoute()
+})
+
+// Accounts on other platforms the user links to
+const externalIdentities = computed(() => {
+  const profileEvent = profileData.value ? profileData.value.event : null
+  return externalIdentityHelper.identities(profileEvent, externalIdentityData.value)
 })
 
 // The individual badges the user displays
@@ -399,6 +407,9 @@ function onLoadProfileEvent(data) {
       break
     case 10002:
       handleLoadedRelayList(data)
+      break
+    case 10011:
+      storeEvent(externalIdentityData, data)
       break
     case 10008: // Profile badges
     case 30008: // Deprecated profile badges, and badge sets
@@ -725,6 +736,7 @@ function reset() {
   zapGoalData.value = null
   userStatusData.value = null
   badgeData.value = null
+  externalIdentityData.value = null
   badgeDefinitionService.kill()
   listsData.value = null
   profileDataStats.value = null
@@ -811,6 +823,7 @@ onMounted(() => {
             :relayData="relayEvent"
             :followData="followData"
             :userStatusData="userStatusData"
+            :externalIdentities="externalIdentities"
             :hasBanner="hasBanner"
             @showDataOverlay="onShowDataOverlay"
           />
