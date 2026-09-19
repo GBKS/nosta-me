@@ -113,3 +113,19 @@ describe('ToolBox.formatNostrAddress', () => {
     expect(ToolBox.formatNostrAddress({})).toBe('')
   })
 })
+
+describe('ToolBox.isBot', () => {
+  it('is true for accounts that say they are automated', () => {
+    expect(ToolBox.isBot({ bot: true })).toBe(true)
+    expect(ToolBox.isBot({ bot: 'true' })).toBe(true)
+  })
+
+  it('is false for everything else', () => {
+    for(const bot of [false, 'false', undefined, null, 0, 1, 'yes', {}, []]) {
+      expect(ToolBox.isBot({ bot }), String(bot)).toBe(false)
+    }
+
+    expect(ToolBox.isBot({})).toBe(false)
+    expect(ToolBox.isBot(null)).toBe(false)
+  })
+})

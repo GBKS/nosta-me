@@ -130,6 +130,14 @@ export default {
     }
   },
 
+  // NIP-24: "bot" says that the content of an account is automated, entirely or
+  // in part. It should be a boolean, some clients write it as text.
+  isBot(profile) {
+    if(!profile) return false
+
+    return profile.bot === true || profile.bot === 'true'
+  },
+
   // A Nostr address (NIP-05) for display. "_@bob.com" stands for the domain
   // itself, and is to be shown and treated as "bob.com".
   formatNostrAddress(address) {
