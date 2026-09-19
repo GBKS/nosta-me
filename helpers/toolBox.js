@@ -130,6 +130,26 @@ export default {
     }
   },
 
+  // NIP-24 deprecates two profile fields, "to be ignored or removed when found
+  // in the wild". Their values move to the fields that replaced them, unless
+  // those are filled in already.
+  migrateDeprecatedProfileFields(content) {
+    const replacements = { displayName: 'display_name', username: 'name' }
+
+    for(const oldField in replacements) {
+      if(!(oldField in content)) continue
+
+      const newField = replacements[oldField]
+      if(!content[newField] && typeof content[oldField] == 'string' && content[oldField].length > 0) {
+        content[newField] = content[oldField]
+      }
+
+      delete content[oldField]
+    }
+
+    return content
+  },
+
   trim(text, maxLength, position) {
     let result = text
 
