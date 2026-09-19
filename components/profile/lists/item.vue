@@ -1,6 +1,7 @@
 <script setup>
 import ToolBox from '@/helpers/toolBox'
 import linkHelper from '@/helpers/linkHelper.js'
+import listHelper from '@/helpers/listHelper.js'
 import { useRelayStore } from '@/stores/relays'
 import useAssets from  '@/composables/useAssets.js'
 import { npubEncode } from 'nostr-tools/nip19'
@@ -13,7 +14,6 @@ const props = defineProps([
   'handlers'
 ])
 
-const contentTags = ['p', 't', 'word', 'e', 'a', 'r', 'relay', 'emoji']
 const listImage = ref()
 
 const emit = defineEmits(['select'])
@@ -34,127 +34,12 @@ function fillTemplate(template, count) {
   return bits.join('')
 }
 
-const listTypes = [
-  { 
-    id: 'kind',
-    kind: 10000, 
-    tags: ['p', 't', 'word', 'e'],
-    title: '{count} {mute | mutes}',
-    image: 'mute'
-  },
-  { 
-    id: 'pin',
-    kind: 10001, 
-    tags: ['e'],
-    title: '{count} {note | notes}',
-    image: 'pin'
-  },
-  { 
-    id: 'bookmarks',
-    kind: 10003, 
-    tags: ['e', 'a', 't', 'r'],
-    title: '{count} {bookmark | bookmarks}',
-    image: 'bookmarks'
-  },
-  { 
-    id: 'communities',
-    kind: 10004, 
-    tags: ['a'],
-    title: '{count} {community | communities}',
-    image: 'pin'
-  },
-  { 
-    id: 'public-chats',
-    kind: 10005, 
-    tags: ['e'],
-    title: '{count} public {chat | chats}',
-    image: 'pin'
-  },
-  { 
-    id: 'blocked-relays',
-    kind: 10006, 
-    tags: ['relay'],
-    title: '{count} blocked {relay | relays}',
-    image: 'pin'
-  },
-  { 
-    id: 'search-relays',
-    kind: 10007, 
-    tags: ['relay'],
-    title: '{count} search {relay | relays}',
-    image: 'pin'
-  },
-  { 
-    id: 'interests',
-    kind: 10015, 
-    tags: ['t', 'a'],
-    title: '{count} {tag | tags}',
-    image: 'pin'
-  },
-  { 
-    id: 'emoji',
-    kind: 10030, 
-    tags: ['emoji', 'a'],
-    title: '{count} emoji',
-    image: 'pin'
-  },
-  { 
-    id: 'follow-set',
-    kind: 30000, 
-    tags: ['p'],
-    title: '{count} {profile | profiles}',
-    image: 'people'
-  },
-  { 
-    id: 'relay-set',
-    kind: 30002, 
-    tags: ['relay'],
-    title: '{count} {relay | relays}',
-    image: 'pin'
-  },
-  { 
-    id: 'bookmark-set',
-    kind: 30003, 
-    tags: ['e', 'a', 't', 'r'],
-    title: '{count} {bookmark | bookmarks}',
-    image: 'bookmarks'
-  },
-  { 
-    id: 'curation-set',
-    kind: 30004, 
-    tags: ['a', 'e'],
-    title: '{count} {post | posts}',
-    image: 'pin'
-  },
-  { 
-    id: 'interest-set',
-    kind: 30015, 
-    tags: ['t'],
-    title: '{count} {tag | tags}',
-    image: 'pin'
-  },
-  { 
-    id: 'emoji-set',
-    kind: 30030, 
-    tags: ['emoji'],
-    title: '{count} emoji',
-    image: 'pin'
-  }
-]
-
 const type = computed(() => {
-  const result = listTypes.find(item => item.kind == props.info.kind)
-  return result || {
-    id: 'unknown',
-    kind: 0,
-    tags: [],
-    title: ''
-  }
+  return listHelper.type(props.info)
 })
 
 const entryCount = computed(() => {
-  const tags = props.info.tags.filter(tag => contentTags.indexOf(tag[0]) !== -1)
-  return tags ? tags.length : 0
+  return listHelper.entryCount(props.info)
 })
 
 const title = computed(() => {
@@ -178,7 +63,8 @@ const title = computed(() => {
     result = result.charAt(0).toUpperCase() + result.substr(1)
   }
 
-  return result
+  // Standard lists like mutes have no title of their own.
+  return result || type.value.name
 })
 
 const description = computed(() => {
@@ -217,13 +103,15 @@ const link = computed(() => {
   const relay = relayStore.getRelay(props.info.relay)
   const npub = npubEncode(props.info.pubkey)
 
+  if(!tag || !relay) return null
+
   return linkHelper.address(
     tag[1],
     props.info.pubkey, 
     props.info.kind,
     relay.url,
     props.handlers,
-    linkHelper.listr.list,
+    type.value.link || linkHelper.listr.list,
     npub
   )
 })

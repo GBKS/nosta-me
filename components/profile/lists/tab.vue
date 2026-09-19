@@ -1,5 +1,6 @@
 <script setup>
 import listsService from '@/helpers/listsService.js'
+import listHelper from '@/helpers/listHelper.js'
 import ToolBox from '@/helpers/toolBox'
 
 const props = defineProps([
@@ -7,18 +8,17 @@ const props = defineProps([
   'handlers'
 ])
 
-const contentTags = ['p', 't', 'word', 'e', 'a', 'r', 'relay', 'emoji']
 
 const emit = defineEmits(['navigate', 'back'])
 
 const sortedLists = computed(() => {
   return props.info.sort(function(a, b) {
-    const aTags = a.tags.filter(tag => contentTags.indexOf(tag[0]) !== -1)
-    const bTags = b.tags.filter(tag => contentTags.indexOf(tag[0]) !== -1)
+    const aCount = listHelper.entryCount(a)
+    const bCount = listHelper.entryCount(b)
 
     // Filled before empty lists
-    if(aTags.length != 0 && bTags.length == 0) return -1
-    if(aTags.length == 0 && bTags.length != 0) return 1
+    if(aCount != 0 && bCount == 0) return -1
+    if(aCount == 0 && bCount != 0) return 1
 
     // Most recently edited
     if(a.created_at > b.created_at) return -1

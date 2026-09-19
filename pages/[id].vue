@@ -9,6 +9,7 @@ import { useSessionStore } from '@/stores/session'
 import ToolBox from '@/helpers/toolBox'
 import badgeHelper from '@/helpers/badgeHelper.js'
 import externalIdentityHelper from '@/helpers/externalIdentityHelper.js'
+import listHelper from '@/helpers/listHelper.js'
 import badgeDefinitionService from '@/helpers/badgeDefinitionService.js'
 import * as nip19 from 'nostr-tools/nip19'
 import { queryProfile } from 'nostr-tools/nip05'
@@ -46,7 +47,8 @@ const stallData = ref(null)
 const productData = ref(null)
 const fileData = ref(null)
 const labelData = ref(null)
-const listsData = ref(null)
+const listsData = ref(null) // List events, there can be old versions among them
+const listKinds = listHelper.kinds()
 const pinstrData = ref(null)
 const status = ref(null)
 let nip05Data = null
@@ -118,6 +120,11 @@ watch(() => route.query, () => updateFromRoute)
 
 onBeforeMount(() => {
   updateFromRoute()
+})
+
+// The newest version of each list
+const lists = computed(() => {
+  return listsData.value ? listHelper.latestVersions(listsData.value) : null
 })
 
 // Accounts on other platforms the user links to
@@ -363,6 +370,11 @@ function loadPublicKey(newPublicKey, relayIds) {
 function onLoadProfileEvent(data) {
   logger('onLoadProfile', data.kind, data)
 
+  // Lists and sets (NIP 51)
+  if(listKinds.indexOf(data.kind) !== -1) {
+    storeEvent(listsData, data)
+  }
+
   switch(data.kind) {
     case 0:
       // Profile info
@@ -390,23 +402,6 @@ function onLoadProfileEvent(data) {
       break
     case 9735:
       handleLoadedZapEvent(data)
-      break
-    case 10000:
-    case 10001:
-    case 10003:
-    case 10004:
-    case 10005:
-    case 10006:
-    case 10007:
-    case 10015:
-    case 10030:
-    case 30000:
-    case 30002:
-    case 30003:
-    case 30004:
-    case 30015:
-    case 30030: 
-      storeEvent(listsData, data)
       break
     case 10002:
       handleLoadedRelayList(data)
@@ -889,8 +884,8 @@ onMounted(() => {
                 @navigate="selectTab"
               />
               <ProfileListsSummary
-                :info="listsData"
-                :count="listsData ? listsData.length : null"
+                :info="lists"
+                :count="lists ? lists.length : null"
                 :handlers="handlerData"
                 @navigate="selectTab"
               />
@@ -963,7 +958,7 @@ onMounted(() => {
             />
             <ProfileListsTab 
               v-if="activeTabId == 'lists'" 
-              :info="listsData" 
+              :info="lists" 
               :handlers="handlerData"
               @navigate="selectTab"
               @back="selectTab"
@@ -1023,7 +1018,7 @@ onMounted(() => {
               :followData="followData"
               :badgeData="badges"
               :handlerData="handlerData"
-              :listsData="listsData"
+              :listsData="lists"
               :stallData="stallData"
               :productData="productData"
               :sentZapsData="sentZapsData"
@@ -1086,7 +1081,7 @@ onMounted(() => {
       :followData="followData"
       :badgeData="badges"
       :handlerData="handlerData"
-      :listsData="listsData"
+      :listsData="lists"
       :stallData="stallData"
       :productData="productData"
       :sentZapsData="sentZapsData"
