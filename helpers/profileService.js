@@ -127,7 +127,6 @@ export default {
         // 1985, // Labels
         // 30009, // Badge definition
         // 8, // Badge award
-        // 9802, // Highlights
 
     const profileFilter = {
       kinds: [0], // Profile info (meta data)
@@ -157,6 +156,13 @@ export default {
       kinds: [30023], // Long note
       authors: [this.publicKey],
       limit: 1,
+    }
+
+    // Some people have hundreds, the profile shows the latest.
+    const highlightFilter = {
+      kinds: [9802], // Highlights (NIP 84)
+      authors: [this.publicKey],
+      limit: 4,
     }
 
     const statusFilter = {
@@ -191,6 +197,7 @@ export default {
       relayFilter,
       shortNoteFilter,
       longNoteFilter,
+      highlightFilter,
       statusFilter,
       createdContentFilter,
       sentZapsFilter,

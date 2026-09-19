@@ -53,6 +53,11 @@ export default {
     stream: 'https://zap.stream/<bech32>'
   },
 
+  // Shows any kind of event
+  njump: {
+    any: 'https://njump.me/<bech32>'
+  },
+
   listr: {
     list: 'https://listr.lol/{npub}/{kind}/<bech32>'
   },
@@ -67,7 +72,7 @@ export default {
       kind: eventKind+'',
       identifier: eventId,
       pubkey: authorPubkey,
-      relays: [eventRelay]
+      relays: eventRelay ? [eventRelay] : []
     })
 
     const handlerUrl = this.findMatchingHandler(handlers, platform, eventKind, linkType, fallbackUrl)

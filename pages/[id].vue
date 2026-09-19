@@ -32,6 +32,7 @@ const handlerData = ref(null)
 const badgeData = ref(null) // Profile badges events, there can be old versions among them
 const externalIdentityData = ref(null) // Kind 10011 events
 const paymentTargetData = ref(null) // Kind 10133 events
+const highlightData = ref(null) // Kind 9802 events
 const reportsData = ref(null) // Reports the user has made
 const reportedData = ref(null) // The user has been reported
 const shortNotesData = ref(null)
@@ -411,6 +412,9 @@ function onLoadProfileEvent(data) {
     case 9735:
       handleLoadedZapEvent(data)
       break
+    case 9802:
+      storeEvent(highlightData, data)
+      break
     case 10002:
       handleLoadedRelayList(data)
       break
@@ -732,6 +736,7 @@ function reset() {
   badgeData.value = null
   externalIdentityData.value = null
   paymentTargetData.value = null
+  highlightData.value = null
   badgeDefinitionService.kill()
   listsData.value = null
   profileDataStats.value = null
@@ -844,6 +849,10 @@ onMounted(() => {
               <ProfileLongNotesSummary
                 :info="longNotesData"
                 :count="longNotesData ? longNotesData.length : null"
+                :handlers="handlerData"
+              />
+              <ProfileHighlightSummary
+                :info="highlightData"
                 :handlers="handlerData"
               />
               <ProfileStallSummary
