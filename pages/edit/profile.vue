@@ -47,6 +47,7 @@ const handle = ref('')
 const picture = ref('')
 const banner = ref('')
 let editContent = {}
+let editTags = [] // Tags of the profile event we're editing, kept as they are
 
 const isSaving = ref(false)
 const relayIds = ref([])
@@ -161,7 +162,7 @@ function saveChanges() {
   publisher = metaPublisher()
   publisher.showNotifications = true
   publisher.init()
-  publisher.publish(publishResult, content, relayIds.value)
+  publisher.publish(publishResult, content, relayIds.value, editTags)
 
   // Update what we have stored in cache
 }
@@ -245,6 +246,7 @@ function updateInfoFromFoundProfiles() {
   }
   // Store for updating and publishing later.
   editContent = content
+  editTags = Array.isArray(event.tags) ? JSON.parse(JSON.stringify(event.tags)) : []
 
   if(content.name) { name.value = content.name }
   if(content.about) { about.value = content.about }

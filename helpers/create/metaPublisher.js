@@ -38,7 +38,10 @@ export default function metaPublisher () {
 
     // Save NIP-01 (kind 0) profile info
     // Blast everywhere so people can discover the profile
-    publish(callback, rawContent, relayIds) {
+    // When editing a profile, pass on its tags. Publishing replaces the whole
+    // event, so tags left out here are gone, like links to other platforms
+    // (NIP-39 before kind 10011) or whatever other clients have put there.
+    publish(callback, rawContent, relayIds, tags) {
       this.callback = callback
       this.relayIds = relayIds
 
@@ -60,7 +63,7 @@ export default function metaPublisher () {
       this.cleanContent(content)
       
       event.kind = 0
-      event.tags = []
+      event.tags = Array.isArray(tags) ? tags : []
       event.content = JSON.stringify(content)
 
       this.logger('event', event, this.store.publicKey)
