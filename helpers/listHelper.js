@@ -76,6 +76,14 @@ export default {
     return (event.tags || []).filter(tag => CONTENT_TAGS.indexOf(tag[0]) !== -1).length
   },
 
+  // Nothing public in it. Some clients keep their state in sets like that, by
+  // the dozen, with the data encrypted in the content. A list with only private
+  // entries looks the same from the outside, and there is nothing to show for
+  // it either.
+  isEmpty(event) {
+    return this.entryCount(event) == 0
+  },
+
   // Lists get replaced when they change, and relays can still hold old versions.
   // Keeps the newest version of each list, in the order they were found.
   latestVersions(events) {

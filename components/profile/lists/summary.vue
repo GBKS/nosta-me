@@ -16,7 +16,7 @@ const filledLists = computed(() => {
   let result = null
 
   if(props.info) {
-    return props.info.filter(item => listHelper.entryCount(item) > 0)
+    return props.info.filter(item => !listHelper.isEmpty(item))
   }
 
   return result

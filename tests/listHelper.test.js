@@ -64,6 +64,18 @@ describe('listHelper.entryCount', () => {
   })
 })
 
+describe('listHelper.isEmpty', () => {
+  it('is true for a list with nothing public in it', () => {
+    expect(listHelper.isEmpty(list(30000, 1, [['d', 'chats/abc/lastOpened']]))).toBe(true)
+    // Clients that keep their state in a set encrypt it into the content
+    expect(listHelper.isEmpty({ kind: 30000, tags: [['d', 'chats/abc/lastOpened']], content: 'AmV5c29tZXRoaW5n' })).toBe(true)
+  })
+
+  it('is false for a list with public entries', () => {
+    expect(listHelper.isEmpty(list(30000, 1, [['d', 'friends'], ['p', BOB]]))).toBe(false)
+  })
+})
+
 describe('listHelper.type', () => {
   it('finds the type, or a stand-in for kinds we do not know', () => {
     expect(listHelper.type({ kind: 39089 }).id).toBe('starter-pack')

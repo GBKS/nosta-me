@@ -89,7 +89,7 @@ async function updateListImage() {
 const classObject = computed(() => {
   const c = ['lists-item']
 
-  if(entryCount.value === 0) c.push('-empty')
+  if(listHelper.isEmpty(props.info)) c.push('-empty')
   if(hasIdentifier.value) c.push('-link')
 
   c.push(props.layout ? ('-'+props.layout) : '-list')
