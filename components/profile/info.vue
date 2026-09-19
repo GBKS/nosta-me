@@ -155,6 +155,7 @@ function showDataOverlay() {
     <div class="text">
       <h1>{{ name }}</h1>
       <ProfileUserStatus :info="userStatusData" />
+      <ProfileBotLabel :info="info.profile" />
       <DescriptionNode v-if="description" />
       <div class="links">
         <div class="internal">
@@ -241,10 +242,15 @@ function showDataOverlay() {
       word-break: break-word;
     }
 
-    .user-status {
+    .user-status,
+    .bot-label {
       & + p {
         margin-top: 10px;
       }
+    }
+
+    .user-status + .bot-label {
+      margin-top: 5px;
     }
 
     p {
