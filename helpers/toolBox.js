@@ -130,6 +130,15 @@ export default {
     }
   },
 
+  // A Nostr address (NIP-05) for display. "_@bob.com" stands for the domain
+  // itself, and is to be shown and treated as "bob.com".
+  formatNostrAddress(address) {
+    if(typeof address != 'string') return ''
+
+    const clean = address.trim()
+    return clean.indexOf('_@') === 0 && clean.length > 2 ? clean.substr(2) : clean
+  },
+
   // NIP-24 deprecates two profile fields, "to be ignored or removed when found
   // in the wild". Their values move to the fields that replaced them, unless
   // those are filled in already.

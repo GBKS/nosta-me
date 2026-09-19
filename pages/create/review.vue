@@ -47,7 +47,7 @@ const store = useProfileStore()
         type="picture" 
         :value="store.picture" />
       <CreateReviewItem 
-        name="Handle" 
+        name="Nostr address" 
         type="handle" 
         :value="store.handle" />
       <CreateReviewItem 

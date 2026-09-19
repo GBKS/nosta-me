@@ -11,7 +11,7 @@ const props = defineProps([
 const isCopied = ref(false)
 
 const nip05 = computed(() => {
-  return props.info.profile.nip05
+  return ToolBox.formatNostrAddress(props.info.profile.nip05)
 })
 
 function copy() {

@@ -185,7 +185,7 @@ const description = computed(() => {
       result = 'These relays are loaded from your browser extension. Updating them here may not update your extension. You may want to verify.'
       break
     case 'nip05':
-      result = 'These are the relays associated with your Nostr handle (NIP-05). Updating them here may update them for some Nostr clients you use, but will not update the ones linked to your handle. You need to update them with the service that provides your handle.'
+      result = 'These are the relays associated with your Nostr address (NIP-05). Updating them here may update them for some Nostr clients you use, but will not update the ones linked to your address. You need to update them with the service that provides your address.'
       break
     default:
       result = 'Edit your relays.'

@@ -305,7 +305,7 @@ onMounted(() => {
         <div class="field-set">
           <label>Name</label>
           <UiInput
-            placeholder="Enter your handle..."
+            placeholder="Enter your name..."
             size="small"
             v-model="name"
           />
@@ -328,9 +328,9 @@ onMounted(() => {
           />
         </div>
         <div class="field-set">
-          <label>Handle</label>
+          <label>Nostr address</label>
           <UiInput
-            placeholder="Enter your handle..."
+            placeholder="name@domain.com"
             size="small"
             v-model="handle"
           />
