@@ -42,14 +42,6 @@ export default {
       })
     }
 
-    // if(!data.relays || data.relays.length == 0) {
-    //   result.push({
-    //     title: 'Get connected',
-    //     description: 'Define your Nostr relays to find and post content efficiently.',
-    //     kind: 2
-    //   })
-    // }
-
     if(!data.badges || data.badges.length == 0) {
       result.push({
         title: 'Create and earn badges',
