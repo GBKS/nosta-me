@@ -77,9 +77,12 @@ export default {
     if(this.log) console.log('handlerUrl', handlerUrl)
     if(this.log) console.log('url', url)
 
+    // Some apps don't take an naddr, but the parts of it.
     let result = url
     if(npub) result = result.split('{npub}').join(npub)
     result = result.split('{kind}').join(eventKind)
+    result = result.split('{pubkey}').join(authorPubkey)
+    result = result.split('{identifier}').join(encodeURIComponent(eventId))
 
     return result
   },

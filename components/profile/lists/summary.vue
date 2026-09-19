@@ -1,5 +1,6 @@
 <script setup>
 import Icons from '@/helpers/icons'
+import listHelper from '@/helpers/listHelper.js'
 
 const props = defineProps([
   'info',
@@ -9,19 +10,13 @@ const props = defineProps([
 
 const emit = defineEmits(['navigate'])
 
-const contentTags = ['p', 't', 'word', 'e', 'a', 'r', 'relay', 'emoji']
 
 // At least one valid content tag
 const filledLists = computed(() => {
   let result = null
 
   if(props.info) {
-    const contentTags = ['p', 't', 'word', 'e', 'a', 'r', 'relay', 'emoji']
-
-    return props.info.filter((item) => {
-      const tags = item.tags.filter(tag => contentTags.indexOf(tag[0]) !== -1)
-      return tags.length > 0
-    })
+    return props.info.filter(item => !listHelper.isEmpty(item))
   }
 
   return result

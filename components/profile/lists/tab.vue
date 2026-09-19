@@ -1,5 +1,6 @@
 <script setup>
 import listsService from '@/helpers/listsService.js'
+import listHelper from '@/helpers/listHelper.js'
 import ToolBox from '@/helpers/toolBox'
 
 const props = defineProps([
@@ -7,19 +8,13 @@ const props = defineProps([
   'handlers'
 ])
 
-const contentTags = ['p', 't', 'word', 'e', 'a', 'r', 'relay', 'emoji']
 
 const emit = defineEmits(['navigate', 'back'])
 
+// Lists with nothing public in them are left out. Some clients keep their state
+// in sets like that, and a profile can have dozens of them.
 const sortedLists = computed(() => {
-  return props.info.sort(function(a, b) {
-    const aTags = a.tags.filter(tag => contentTags.indexOf(tag[0]) !== -1)
-    const bTags = b.tags.filter(tag => contentTags.indexOf(tag[0]) !== -1)
-
-    // Filled before empty lists
-    if(aTags.length != 0 && bTags.length == 0) return -1
-    if(aTags.length == 0 && bTags.length != 0) return 1
-
+  return props.info.filter(item => !listHelper.isEmpty(item)).sort(function(a, b) {
     // Most recently edited
     if(a.created_at > b.created_at) return -1
     if(a.created_at < b.created_at) return 1
@@ -28,8 +23,17 @@ const sortedLists = computed(() => {
   })
 })
 
+const emptyListCount = computed(() => {
+  return props.info.length - sortedLists.value.length
+})
+
+const emptyListText = computed(() => {
+  const count = emptyListCount.value
+  return count + ' empty list' + (count == 1 ? ' is' : 's are') + ' not shown.'
+})
+
 const title = computed(() => {
-  const count = props.info.length
+  const count = sortedLists.value.length
   return count + ' list' + (count == 1 ? '' : 's')
 })
 
@@ -50,6 +54,7 @@ function navigate(info) {
       :handlers="handlers"
       layout="box"
     />
+    <p v-if="emptyListCount > 0" class="empty">{{ emptyListText }}</p>
   </div>
 </template>
 
@@ -64,6 +69,13 @@ function navigate(info) {
 
   .items {
     margin-top: 10px;
+  }
+
+  .empty {
+    margin-top: 25px;
+    font-size: 17px;
+    font-weight: 500;
+    color: rgba(var(--theme-front-rgb), 0.75);
   }
 }
 

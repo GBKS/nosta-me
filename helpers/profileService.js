@@ -5,6 +5,7 @@ import relayManager from '@/helpers/relayManager.js'
 import multiRelayRequest from '@/helpers/multiRelayRequest.js'
 import relayRequest from '@/helpers/relayRequest.js'
 import contactsService from '@/helpers/contactsService.js'
+import listHelper from '@/helpers/listHelper.js'
 
 /*
 
@@ -92,23 +93,6 @@ export default {
       1984, // Reports
       9041, // Zap goals
 
-      10000, // Mute list (NIP 51)
-      10001, // Pinned notes list (NIP 51)
-      10003, // Bookmarks list (NIP 51)
-      10004, // Communities list (NIP 51)
-      10005, // Public chats list (NIP 51)
-      10006, // Blocked relays list (NIP 51)
-      10007, // Search relays list (NIP 51)
-      10015, // Interests list (NIP 51)
-      10030, // Emoji list (NIP 51)
-      30000, // Follow sets (NIP 51)
-      // 30001, // Pin/bookmark/communities lists - deprecated (NIP 51)
-      30002, // Relay sets (NIP 51)
-      30003, // Bookmark sets (NIP 51)
-      30004, // Curation sets (NIP 51)
-      30015, // Interest sets (NIP 51)
-      30030, // Emoji sets (NIP 51)
-
       10008, // Profile badges
       10011, // External identities (NIP 39), used to be tags on the profile
       30008, // Profile badges before kind 10008 (deprecated), and badge sets
@@ -126,6 +110,9 @@ export default {
 
       37375 // Cashu wallet
     ]
+
+    // Lists and sets (NIP 51)
+    createdContentKinds.push(...listHelper.kinds())
 
     // If it's nos.lol, also check for Pinstr boards
     if(includePinstr) {
