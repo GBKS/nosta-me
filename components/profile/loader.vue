@@ -10,7 +10,8 @@ Shows a loader and if it loads too long shows a timeout and some tips
 
 const props = defineProps([
   'status',
-  'events'
+  'events',
+  'isOwner' // The logged-in user is looking at their own profile
 ])
 
 const steps = [
@@ -148,6 +149,12 @@ function nextStep() {
   }
 }
 
+// The last step is "could not find a profile"
+const showSetUp = computed(() => {
+  const state = props.status ? props.status.state : null
+  return props.isOwner && state != 'error' && timerStep.value == steps.length - 1
+})
+
 const statusId = computed(() => {
   let result = 'default_'+timerStep.value
 
@@ -170,6 +177,11 @@ onMounted(() => {
     <div v-if="copy" class="profile-loader">
       <p v-if="emoji">{{ emoji }}</p>
       <p v-html="copy" />
+      <!-- Nothing found, and it's the user's own key: they can create the profile here. -->
+      <div v-if="showSetUp" class="set-up">
+        <p>This is your key. If you have no profile yet, you can create one now.</p>
+        <UiButton to="/edit/profile" size="small">Set up your profile</UiButton>
+      </div>
     </div>
   </Transition>
 </template>
@@ -188,7 +200,7 @@ onMounted(() => {
   justify-content: center;
   box-sizing: border-box;
 
-  p {
+  > p {
     text-align: center;
 
     &:first-child {
@@ -206,6 +218,22 @@ onMounted(() => {
         word-break: break-all;
         color: var(--theme-front);
       }
+    }
+  }
+
+  .set-up {
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+
+    p {
+      text-align: center;
+      font-size: 15px;
+      line-height: 1.6;
+      font-weight: 600;
+      color: rgba(var(--theme-front-rgb), 0.75);
     }
   }
 }

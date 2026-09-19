@@ -21,6 +21,7 @@ import metaPublisher from '@/helpers/create/metaPublisher.js'
 import sessionRelayService from '@/helpers/sessionRelayService.js'
 import ToolBox from '@/helpers/toolBox'
 import profileFormHelper from '@/helpers/profileFormHelper.js'
+import publishTargets from '@/helpers/create/publishTargets.js'
 
 const profileStore = useProfileStore()
 const sessionStore = useSessionStore()
@@ -38,7 +39,7 @@ let publishStatus = ref(null)
 
 // If nothing was loaded after a while, show a message.
 let timer = null
-const timeOutDelay = 10000
+const timeOutDelay = 6000
 const timedOut = ref(false)
 
 const name = ref('')
@@ -113,8 +114,9 @@ const bannerPreviewStyle = computed(() => {
   return result
 })
 
-const enableForm = computed(() => {
-  return loadedProfileEvents.value.length > 0
+// Looked for a while and found nothing, or saved the first one just now.
+const hasNoProfile = computed(() => {
+  return timedOut.value && loadedProfileEvents.value.length == 0 && !hasSaved.value
 })
 
 // Compared with the profile as it was loaded, or as it was last saved.
@@ -177,9 +179,26 @@ function saveChanges() {
   publisher = metaPublisher()
   publisher.showNotifications = true
   publisher.init()
-  publisher.publish(publishResult, content, relayIds.value, editTags)
+  publisher.publish(publishResult, content, publishRelayIds(), editTags)
 
   // Update what we have stored in cache
+}
+
+// An existing profile is saved to the relays it was found on. A first profile
+// was found nowhere, so it goes to the relays of the session and to the ones
+// that help others find it. The publisher adds relay.damus.io on its own; with
+// nothing else, that one relay being down meant the profile was not saved.
+function publishRelayIds() {
+  if(relayIds.value.length > 0) return relayIds.value
+
+  const sessionRelayIds = sessionRelayService.relayIds
+  const result = Array.isArray(sessionRelayIds) ? sessionRelayIds.slice() : Object.keys(sessionRelayIds || {})
+
+  for(const relayId of publishTargets([])) {
+    if(result.indexOf(relayId) === -1) result.push(relayId)
+  }
+
+  return result
 }
 
 function loadData() {
@@ -196,6 +215,8 @@ function loadData() {
     relaysToCheck = relayStore.getAll
   }
 
+  startTimer()
+
   service.start(relaysToCheck, [{
       kinds: [0],
       authors: [sessionStore.publicKey]
@@ -208,6 +229,8 @@ function onDataLoaded(data) {
 
   if(data.kind == 0) {
     loadedProfileEvents.value.push(data)
+    stopTimer()
+    timedOut.value = false
   }
 
   updateInfoFromFoundProfiles()
@@ -295,6 +318,10 @@ function updateInfoFromFoundProfiles() {
   }
 }
 
+onBeforeUnmount(() => {
+  stopTimer()
+})
+
 onMounted(() => {
   if(sessionStore.isLoggedIn) {
     loadData()
@@ -313,6 +340,12 @@ onMounted(() => {
         class="copy" 
       >
         <p>{{ profileVersions.dates.length }} versions of your profile were found across {{ profileVersions.relays.length }} relays. Saving via this page will make them consistent.</p>
+      </div>
+      <div 
+        v-if="hasNoProfile"
+        class="copy" 
+      >
+        <p>No profile was found for your key yet. Fill in what you like and save to create it.</p>
       </div>
       <div class="fields">
         <div class="field-set">

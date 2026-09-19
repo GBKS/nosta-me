@@ -812,6 +812,7 @@ onMounted(() => {
       <ProfileLoader
         :status="status"
         :events="profileDataEvents"
+        :isOwner="isOwner"
       />
 
       <template v-if="profileData">
