@@ -101,6 +101,9 @@ export default function metaPublisher () {
         for(let i=0; i<this.relayIds.length; i++) {
           relayId = this.relayIds[i]
 
+          // Already sent there, see publishToBlastr()
+          if(relayId == this.relayId) continue
+
           this.logger('relayId', relayId)
 
           if(this.status.relayIds.indexOf(relayId) === -1) this.status.relayIds.push(relayId)
