@@ -20,6 +20,7 @@ import multiRelayRequest from '@/helpers/multiRelayRequest.js'
 import metaPublisher from '@/helpers/create/metaPublisher.js'
 import sessionRelayService from '@/helpers/sessionRelayService.js'
 import ToolBox from '@/helpers/toolBox'
+import profileFormHelper from '@/helpers/profileFormHelper.js'
 
 const profileStore = useProfileStore()
 const sessionStore = useSessionStore()
@@ -47,6 +48,7 @@ const bitcoin = ref('')
 const handle = ref('')
 const picture = ref('')
 const banner = ref('')
+let editEvent = null // The profile event we're editing, the newest one found
 let editContent = {}
 let editTags = [] // Tags of the profile event we're editing, kept as they are
 
@@ -56,7 +58,7 @@ const loadedProfileEvents = ref([])
 
 function startTimer() {
   stopTimer()
-  setTimeout(onTimer, timeOutDelay)
+  timer = setTimeout(onTimer, timeOutDelay)
 }
 
 function stopTimer() {
@@ -228,33 +230,45 @@ const profileVersions = computed(() => {
   return { dates, relays, versions }
 })
 
-function updateInfoFromFoundProfiles() {
-  let content, event
-
-  // Sort by newest
-  const sortedEvents = loadedProfileEvents.value.sort((a, b) => {
-    if(a.created_at > b.created_at) return -1
-    if(a.created_at < b.created_at) return 1
-    return 0
-  })
-
-  // Create refs for values we're editing
-  event = sortedEvents[0]
-  content = event.content
-  if(typeof content == 'string') {
-    content = JSON.parse(content)
+function formValues() {
+  return {
+    name: name.value,
+    about: about.value,
+    website: website.value,
+    picture: picture.value,
+    banner: banner.value,
+    bitcoin: bitcoin.value,
+    handle: handle.value
   }
-  // Store for updating and publishing later.
-  editContent = content
-  editTags = Array.isArray(event.tags) ? JSON.parse(JSON.stringify(event.tags)) : []
+}
 
-  if(content.name) { name.value = content.name }
-  if(content.about) { about.value = content.about }
-  if(content.website) { website.value = content.website }
-  if(content.picture) { picture.value = content.picture }
-  if(content.banner) { banner.value = content.banner }
-  if(content.lud16) { bitcoin.value = content.lud16 }
-  if(content.nip05) { handle.value = content.nip05 }
+function updateInfoFromFoundProfiles() {
+  let event
+
+  // The newest version is the one to edit. Relays answer one after the other,
+  // so it can show up when the user is already typing. What they have typed
+  // stays, the fields they haven't touched get the newer values.
+  const newestEvent = profileFormHelper.newest(loadedProfileEvents.value)
+
+  if(newestEvent && (!editEvent || newestEvent.id != editEvent.id)) {
+    const content = profileFormHelper.content(newestEvent)
+    const values = profileFormHelper.merge(formValues(), editEvent ? editContent : null, content)
+
+    name.value = values.name
+    about.value = values.about
+    website.value = values.website
+    picture.value = values.picture
+    banner.value = values.banner
+    bitcoin.value = values.bitcoin
+    handle.value = values.handle
+
+    // Store for updating and publishing later.
+    editEvent = newestEvent
+    editContent = content
+    editTags = Array.isArray(newestEvent.tags) ? JSON.parse(JSON.stringify(newestEvent.tags)) : []
+  }
+
+  const sortedEvents = loadedProfileEvents.value
 
   // Store relays we found profiles on.
   for(let i=0; i<sortedEvents.length; i++) {
