@@ -5,6 +5,7 @@ import zapGoalHelper from '@/helpers/zapGoalHelper.js'
 const props = defineProps([
   'info',
   'lightningAddress',
+  'relayListEvent', // The relay list of the profile (kind 10002), if it has one
   'handlers'
 ])
 
@@ -27,6 +28,7 @@ const titleCopy = computed(() => {
         :key="item.id"
         :info="item"
         :lightningAddress="lightningAddress"
+        :relayListEvent="relayListEvent"
         :handlers="handlers"
       />
     </div>

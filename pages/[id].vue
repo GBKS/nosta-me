@@ -865,6 +865,7 @@ onMounted(() => {
               <ProfileZapGoalSummary
                 :info="zapGoalData"
                 :lightningAddress="profileData ? profileData.profile.lud16 : null"
+                :relayListEvent="relayListEvent"
                 :handlers="handlerData"
               />
               <ProfileZapSummary

@@ -11,6 +11,7 @@ import zapProviderService, { PROVIDER_STATUS } from '@/helpers/zapProviderServic
 const props = defineProps([
   'info',
   'lightningAddress', // Of the profile, to check who signed the zap receipts
+  'relayListEvent', // Of the profile (kind 10002), zap receipts are sent to those relays
   'handlers'
 ])
 
@@ -18,6 +19,8 @@ const relayStore = useRelayStore()
 const zaps = ref([])
 const provider = ref(null)
 let request = null
+
+const MAX_PROFILE_RELAYS = 6
 
 // Zaps only count when the receipt was signed by the lightning provider of the
 // profile, see zapProviderService. If we can't ask, the checks that
@@ -61,23 +64,43 @@ function onZapReceipt(event) {
   }
 }
 
-async function load() {
-  // The relays the goal names, and the ones we are connected to anyway.
+// Receipts are published to the relays named in the zap request. That should be
+// the relays of the goal, and is often the relays of the person who gets zapped.
+// Asking more relays finds more zaps, so the total is "at least".
+function relayIdsToAsk() {
   const relayIds = Object.keys(relayStore.getAll).filter(relayId => relayManager.isConnected(relayId))
 
-  for(const url of props.info.relays) {
+  const listTags = props.relayListEvent && Array.isArray(props.relayListEvent.tags) ? props.relayListEvent.tags : []
+  const listUrls = listTags.filter(tag => tag[0] == 'r' && typeof tag[1] == 'string').map(tag => tag[1]).slice(0, MAX_PROFILE_RELAYS)
+
+  for(const url of props.info.relays.concat(listUrls)) {
     const relayId = relayManager.addRelayByUrl(url)
     if(relayId && relayIds.indexOf(relayId) === -1) relayIds.push(relayId)
   }
 
+  return relayIds
+}
+
+function startRequest() {
+  if(request) request.kill()
+
   request = multiRelayRequest()
   request.init(onZapReceipt)
-  request.start(relayIds, [{ kinds: [9735], '#e': [props.info.id], limit: 500 }])
+  request.start(relayIdsToAsk(), [{ kinds: [9735], '#e': [props.info.id], limit: 500 }])
+}
+
+async function load() {
+  startRequest()
 
   provider.value = props.lightningAddress
     ? await zapProviderService.find(props.lightningAddress)
     : { status: PROVIDER_STATUS.UNKNOWN }
 }
+
+// The relay list can arrive after the goal. Ask again then, zaps are only counted once.
+watch(() => props.relayListEvent ? props.relayListEvent.id : null, (id) => {
+  if(id) startRequest()
+})
 
 onMounted(() => {
   load()
