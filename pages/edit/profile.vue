@@ -51,6 +51,7 @@ const banner = ref('')
 let editEvent = null // The profile event we're editing, the newest one found
 let editContent = {}
 let pendingContent = null // What is being saved, until a relay confirms it
+const hasSaved = ref(false) // Saved at least once since the page was opened
 const savedContent = ref({}) // The profile the form is compared with, to know if there is something to save
 let editTags = [] // Tags of the profile event we're editing, kept as they are
 
@@ -121,6 +122,17 @@ const hasFormChanged = computed(() => {
   return profileFormHelper.hasChanges(formValues(), savedContent.value)
 })
 
+// Relays can hold different versions of the profile. Saving puts the newest one
+// on all of them, so that is worth doing even with nothing changed in the form.
+// Until it has been done once.
+const hasVersionsToAlign = computed(() => {
+  return profileVersions.value.dates.length > 1 && !hasSaved.value
+})
+
+const canSave = computed(() => {
+  return hasFormChanged.value || hasVersionsToAlign.value
+})
+
 function cancelChanges() {
   if(!hasFormChanged.value || confirm('Get ouf of here?')) {
     router.push('/'+sessionStore.publicKey)
@@ -139,6 +151,7 @@ function publishResult(status) {
   if(status && status.status == 'success' && pendingContent) {
     editContent = pendingContent
     savedContent.value = { ...pendingContent }
+    hasSaved.value = true
     pendingContent = null
   }
 }
@@ -296,7 +309,7 @@ onMounted(() => {
   <div class="edit-profile-page">
     <div class="content">
       <div 
-        v-if="profileVersions.dates.length > 1"
+        v-if="hasVersionsToAlign"
         class="copy" 
       >
         <p>{{ profileVersions.dates.length }} versions of your profile were found across {{ profileVersions.relays.length }} relays. Saving via this page will make them consistent.</p>
@@ -387,7 +400,7 @@ onMounted(() => {
         >Cancel</UiButton>
         <UiButton 
           size="tiny"
-          :disabled="!hasFormChanged"
+          :disabled="!canSave"
           @click="saveChanges" 
         >Save changes</UiButton>
       </div>
