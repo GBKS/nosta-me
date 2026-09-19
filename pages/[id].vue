@@ -10,6 +10,7 @@ import ToolBox from '@/helpers/toolBox'
 import badgeHelper from '@/helpers/badgeHelper.js'
 import externalIdentityHelper from '@/helpers/externalIdentityHelper.js'
 import listHelper from '@/helpers/listHelper.js'
+import paymentTargetHelper from '@/helpers/paymentTargetHelper.js'
 import badgeDefinitionService from '@/helpers/badgeDefinitionService.js'
 import * as nip19 from 'nostr-tools/nip19'
 import { queryProfile } from 'nostr-tools/nip05'
@@ -30,6 +31,7 @@ const followDataEvents = ref(null)
 const handlerData = ref(null)
 const badgeData = ref(null) // Profile badges events, there can be old versions among them
 const externalIdentityData = ref(null) // Kind 10011 events
+const paymentTargetData = ref(null) // Kind 10133 events
 const reportsData = ref(null) // Reports the user has made
 const reportedData = ref(null) // The user has been reported
 const shortNotesData = ref(null)
@@ -120,6 +122,12 @@ watch(() => route.query, () => updateFromRoute)
 
 onBeforeMount(() => {
   updateFromRoute()
+})
+
+// Ways to pay the user, apart from the lightning address that is on the profile already
+const paymentTargets = computed(() => {
+  const lightningAddress = profileData.value ? profileData.value.profile.lud16 : null
+  return paymentTargetHelper.targets(paymentTargetData.value, [lightningAddress])
 })
 
 // The newest version of each list
@@ -408,6 +416,9 @@ function onLoadProfileEvent(data) {
       break
     case 10011:
       storeEvent(externalIdentityData, data)
+      break
+    case 10133:
+      storeEvent(paymentTargetData, data)
       break
     case 10008: // Profile badges
     case 30008: // Deprecated profile badges, and badge sets
@@ -720,6 +731,7 @@ function reset() {
   userStatusData.value = null
   badgeData.value = null
   externalIdentityData.value = null
+  paymentTargetData.value = null
   badgeDefinitionService.kill()
   listsData.value = null
   profileDataStats.value = null
@@ -853,6 +865,7 @@ onMounted(() => {
                 direction="received"
                 @navigate="selectTab"
               />
+              <ProfilePaymentSummary :info="paymentTargets" />
               <ProfileLiveSummary
                 :info="liveData"
                 :count="liveData ? liveData.length : null"
