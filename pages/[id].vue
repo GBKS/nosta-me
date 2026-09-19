@@ -862,6 +862,12 @@ onMounted(() => {
                 :count="stallData ? stallData.length : null"
                 @navigate="selectTab"
               />
+              <ProfileZapGoalSummary
+                :info="zapGoalData"
+                :lightningAddress="profileData ? profileData.profile.lud16 : null"
+                :relayListEvent="relayListEvent"
+                :handlers="handlerData"
+              />
               <ProfileZapSummary
                 :info="sentZapsData"
                 :count="sentZapsData ? sentZapsData.length : null"
