@@ -1,6 +1,6 @@
 <script setup>
 import relayManager from '@/helpers/relayManager.js'
-import relayRequest from '@/helpers/relayRequest.js'
+import multiRelayRequest from '@/helpers/multiRelayRequest.js'
 import { useRelayStore } from '@/stores/relays'
 import ToolBox from '@/helpers/toolBox'
 import kinds from '@/data/kinds.json'
@@ -15,6 +15,7 @@ const props = defineProps([
 ])
 
 let rawHandlerData = null
+let request = null
 const handlerData = ref(null)
 const relayStore = useRelayStore()
 const handlerStore = useHandlerStore()
@@ -34,28 +35,46 @@ function loadHandlerData() {
       limit: 1
     }
 
-    const relayId = relayManager.addRelayByUrl(props.info.relay)
+    // The recommendation hints at one relay for the app. That relay may be gone
+    // (many hints point at relay.nostr.band), so the relays we are connected to
+    // are asked too.
+    const relayIds = Object.keys(relayStore.getAll).filter(relayId => relayManager.isConnected(relayId))
+    const hintedRelayId = relayManager.addRelayByUrl(props.info.relay)
+    if(hintedRelayId && relayIds.indexOf(hintedRelayId) === -1) {
+      relayIds.push(hintedRelayId)
+    }
 
-    // console.log('info', filter, relayId)
-
-    const request = relayRequest()
+    request = multiRelayRequest()
     request.init(onHandlerData)
-    request.start(relayId, [filter])
+    request.start(relayIds, [filter])
   }
 }
 
 function onHandlerData(data) {
   // console.log('onHandlerData', data)
 
+  // Several relays can answer, keep the newest version.
+  if(rawHandlerData && rawHandlerData.created_at >= data.created_at) return
+
+  if(typeof data.content == 'string') {
+    try {
+      data.content = data.content.length > 0 ? JSON.parse(data.content) : {}
+    } catch(error) {
+      data.content = {}
+    }
+  }
+
+  rawHandlerData = data
+
   const handlerId = props.info.identifier + '_' + props.info.kind + '_' + props.appId
   handlerStore.addHandler(handlerId, data)
 
-  if(typeof data.content == 'string') {
-    data.content = JSON.parse(data.content)
-  }
-
   handlerData.value = data
 }
+
+onBeforeUnmount(() => {
+  if(request) request.kill()
+})
 
 const picture = computed(() => {
   return ToolBox.dig(handlerData.value, 'content.picture')
@@ -376,6 +395,7 @@ onMounted(() => {
 
   &.-grid {
     gap: 15px;
+    align-items: flex-start; // Or the icon gets as tall as the text next to it
 
     .info {
       h5 {

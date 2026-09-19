@@ -40,7 +40,13 @@ const styleObject = computed(() => {
   const s = {}
 
   if(props.radius) s.borderRadius = props.radius + 'px'
-  if(!props.src && props.height) s.height = props.height + 'px'
+
+  // Without an image, take the space the image would have taken. Otherwise the
+  // message box is as wide as it can get, which breaks layouts with small images.
+  if(!props.src || status.value == 'error') {
+    if(props.width) s.width = props.width + 'px'
+    if(props.height) s.height = props.height + 'px'
+  }
 
   return s
 })
