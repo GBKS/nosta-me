@@ -100,7 +100,7 @@ onMounted(() => {
               />
             </Transition>
           </div>
-          <p v-if="showMessage">Please enter a handle (name@domain.com) or public key (npub..., nprofile..., or just random letters and numbers).</p>
+          <p v-if="showMessage">Please enter a Nostr address (name@domain.com) or public key (npub..., nprofile..., or just random letters and numbers).</p>
         </div>
       </div>
     </div>

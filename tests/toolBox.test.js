@@ -94,3 +94,22 @@ describe('ToolBox.migrateDeprecatedProfileFields', () => {
     expect(ToolBox.migrateDeprecatedProfileFields({ name: 'alice' })).toEqual({ name: 'alice' })
   })
 })
+
+describe('ToolBox.formatNostrAddress', () => {
+  it('shows an address for the domain itself as just the domain', () => {
+    expect(ToolBox.formatNostrAddress('_@bob.com')).toBe('bob.com')
+    expect(ToolBox.formatNostrAddress(' _@bob.com ')).toBe('bob.com')
+  })
+
+  it('leaves other addresses alone', () => {
+    expect(ToolBox.formatNostrAddress('bob@bob.com')).toBe('bob@bob.com')
+    expect(ToolBox.formatNostrAddress('_bob@bob.com')).toBe('_bob@bob.com')
+    expect(ToolBox.formatNostrAddress('bob_@bob.com')).toBe('bob_@bob.com')
+    expect(ToolBox.formatNostrAddress('_@')).toBe('_@')
+  })
+
+  it('copes with a missing address', () => {
+    expect(ToolBox.formatNostrAddress(undefined)).toBe('')
+    expect(ToolBox.formatNostrAddress({})).toBe('')
+  })
+})

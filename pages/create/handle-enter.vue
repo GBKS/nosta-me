@@ -53,7 +53,7 @@ const checkButtonLabel = computed(() => {
       result = 'Loading...'
       break
     case 'invalid':
-      result = 'Not a valid handle...'
+      result = 'Not a valid Nostr address...'
       break
     case 'not-found':
       result = 'Not found...?'
@@ -107,8 +107,8 @@ async function loadNip05(handle) {
     <div class="content">
       <div class="copy">
         <p class="-step">7 of 10</p>
-        <h1>Enter your handle</h1>
-        <p class="-description">Public keys are impossible to remember. Handles look like emails, and are an easy way for others to find you. You can get a handle via services like <a href="https://snort.social/" rel="nofollow noopener noreferrer" target="_blank">Snort</a> and <a href="https://nostrplebs.com/" rel="nofollow noopener noreferrer" target="_blank">Nostrplebs</a>.</p>
+        <h1>Enter your Nostr address</h1>
+        <p class="-description">Public keys are impossible to remember. Nostr addresses look like emails, and are an easy way for others to find you. You can get one via services like <a href="https://snort.social/" rel="nofollow noopener noreferrer" target="_blank">Snort</a> and <a href="https://nostrplebs.com/" rel="nofollow noopener noreferrer" target="_blank">Nostrplebs</a>.</p>
       </div>
     </div>
     <div class="options">
