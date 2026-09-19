@@ -12,6 +12,7 @@ const props = defineProps([
   'relayData',
   'followData',
   'userStatusData',
+  'externalIdentities',
   'hasBanner'
 ])
 
@@ -132,10 +133,6 @@ const classObject = computed(() => {
   ].join(' ')
 })
 
-const externalIdentities = computed(() => {
-  return props.info.event.tags.filter(tag => tag[0] == 'i')
-})
-
 function toggleOptions() {
   optionsVisible.value = !optionsVisible.value
 }
@@ -166,10 +163,10 @@ function showDataOverlay() {
           <ProfileWebsite :info="info" />
           <ProfilePublicKey :publicKey="publicKey" />
         </div>
-        <div class="external" v-if="externalIdentities">
+        <div class="external" v-if="externalIdentities && externalIdentities.length > 0">
           <ProfileExternalIdentity
             v-for="info in externalIdentities"
-            :key="info[2]"
+            :key="info[1]"
             :info="info"
           />
         </div>
