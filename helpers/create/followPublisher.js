@@ -1,6 +1,7 @@
 import relayPublishRequest from '@/helpers/relayPublishRequest.js'
 import { useProfileStore } from '@/stores/profile'
 import relayManager from '@/helpers/relayManager.js'
+import publishTargets from '@/helpers/create/publishTargets.js'
 import { finalizeEvent } from 'nostr-tools/pure'
 import ToolBox from '@/helpers/toolBox'
 
@@ -57,24 +58,21 @@ export default function followPublisher () {
 
       this.logger('publish', signedEvent, this.status)
 
-      let relay, request, relayId
-      for(i=0; i<this.store.relays.length; i++) {
-        relay = this.store.relays[i]
+      this.status.relayIds = publishTargets(this.store.relays)
 
-        if(relay.added) {
-          request = relayPublishRequest()
-          relayId = relayManager.addRelayByUrl(relay.url)
+      let request
+      for(const relayId of this.status.relayIds) {
+        request = relayPublishRequest()
 
-          this.logger('Publishing to', relayId)
+        this.logger('Publishing to', relayId)
 
-          this.status.requests.push(request)
+        this.status.requests.push(request)
 
-          request.publish(
-            relayId,
-            signedEvent,
-            this.onResult.bind(this)
-          )
-        }
+        request.publish(
+          relayId,
+          signedEvent,
+          this.onResult.bind(this)
+        )
       }
 
       return this.status

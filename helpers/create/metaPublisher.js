@@ -1,6 +1,7 @@
 import relayPublishRequest from '@/helpers/relayPublishRequest.js'
 import { useProfileStore } from '@/stores/profile'
 import relayManager from '@/helpers/relayManager.js'
+import publishTargets from '@/helpers/create/publishTargets.js'
 import { useSessionStore } from '@/stores/session'
 import { useUserStore } from "@/stores/users.js"
 import { finalizeEvent } from 'nostr-tools/pure'
@@ -78,6 +79,7 @@ export default function metaPublisher () {
 
       this.status.status = 'saving'
       this.status.request = request
+      this.status.relayIds = [this.relayId] // All relays the event is sent to
 
       this.logger('publishToBlastr', event, this.status)
 
@@ -101,6 +103,8 @@ export default function metaPublisher () {
 
           this.logger('relayId', relayId)
 
+          if(this.status.relayIds.indexOf(relayId) === -1) this.status.relayIds.push(relayId)
+
           request = relayPublishRequest()
           request.showNotification = this.showNotifications
           this.status.requests.push(request)
@@ -112,24 +116,23 @@ export default function metaPublisher () {
           )
         }
       } else {
-        for(let i=0; i<this.store.relays.length; i++) {
-          relay = this.store.relays [i]
+        // Creating a profile. The relay we publish to first is one of the targets.
+        const relayIds = publishTargets(this.store.relays).filter(id => id != this.relayId)
 
-          if(relay.added) {
-            relayId = relayManager.addRelayByUrl(relay.url)
+        for(relayId of relayIds) {
+          this.logger('relayId', relayId)
 
-            this.logger('relayId', relayId)
+          this.status.relayIds.push(relayId)
 
-            request = relayPublishRequest()
-            request.showNotification = this.showNotifications
-            this.status.requests.push(request)
+          request = relayPublishRequest()
+          request.showNotification = this.showNotifications
+          this.status.requests.push(request)
 
-            request.publish(
-              relayId,
-              event,
-              this.onResult.bind(this)
-            )
-          }
+          request.publish(
+            relayId,
+            event,
+            this.onResult.bind(this)
+          )
         }
       }
 
