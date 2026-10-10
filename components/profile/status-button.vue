@@ -21,11 +21,20 @@ function click() {
 
 <template>
   <button
-    :class="hasStatus ? 'status-button -edit' : 'status-button -new'"
-    :title="hasStatus ? 'Change your status' : 'Set a status'"
+    v-if="hasStatus"
+    class="status-button -edit"
+    title="Change your status"
+    aria-label="Change your status"
+    v-html="Icons.pencil"
+    @click="click"
+  />
+  <button
+    v-else
+    class="status-button -new"
+    title="Set a status"
     @click="click"
   >
-    <span v-if="!hasStatus" v-html="Icons.plus" />{{ hasStatus ? 'Change' : 'Set a status' }}
+    <span v-html="Icons.plus" />Set a status
   </button>
 </template>
 
@@ -37,27 +46,36 @@ function click() {
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
   border-radius: 3px;
   font: inherit;
-  font-size: 13px;
-  font-weight: 500;
   color: var(--theme-text-medium);
-  background-color: transparent;
   transition: all 150ms $ease;
 
-  span {
-    line-height: 0;
+  &.-edit {
+    padding: 5px;
+    background-color: transparent;
 
     :deep(svg) {
-      width: 10px;
-      height: 10px;
+      width: 12px;
+      height: 12px;
     }
   }
 
   &.-new {
+    gap: 4px;
+    padding: 3px 8px;
+    font-size: 13px;
+    font-weight: 500;
     background-color: rgba(var(--theme-active-rgb), 0.1);
+
+    span {
+      line-height: 0;
+
+      :deep(svg) {
+        width: 10px;
+        height: 10px;
+      }
+    }
   }
 
   &:hover {

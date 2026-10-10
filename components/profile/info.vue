@@ -254,6 +254,23 @@ function showDataOverlay() {
       &:not(:empty) + p {
         margin-top: 10px;
       }
+
+      // Changing your status is there when you point at it.
+      .status-button.-edit {
+        opacity: 0;
+      }
+
+      &:hover .status-button.-edit,
+      .status-button.-edit:focus-visible {
+        opacity: 1;
+      }
+
+      // Nothing to point with on touch screens.
+      @media (hover: none) {
+        .status-button.-edit {
+          opacity: 1;
+        }
+      }
     }
 
     p {

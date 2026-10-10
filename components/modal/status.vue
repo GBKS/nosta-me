@@ -5,7 +5,8 @@ Sets the status (NIP-38) of the logged-in user, from their profile.
 
 Opened with show-modal { id: 'status', events }, where events are the status
 events the profile found. A status replaces the previous one, so there is
-nothing to keep from the old event. Once a relay has it, the profile is told
+nothing to keep from the old event. Once it is signed, the modal closes and a
+notification tells how saving goes. Once a relay has it, the profile is told
 with user-status-published so it shows right away.
 
  */
@@ -32,6 +33,7 @@ const dialog = ref(null)
 let tracker = null
 let timeout = null
 let announced = false
+let notified = null // The last notification, sent again only when it changes
 
 const text = ref('')
 const link = ref('')
@@ -39,7 +41,6 @@ const durationId = ref(DURATIONS[0].id)
 
 const events = ref([])
 const isSaving = ref(false)
-const result = ref(null) // { outcome, accepted, relays, cleared }
 const signFailed = ref(false)
 
 function onShowModal(data) {
@@ -78,7 +79,6 @@ function resetForm() {
   text.value = current ? current.content : ''
   link.value = current ? (userStatusHelper.link(current) || '') : ''
   durationId.value = DURATIONS[0].id
-  result.value = null
   signFailed.value = false
 }
 
@@ -122,29 +122,8 @@ const canClear = computed(() => {
   return !!currentStatus.value && !isSaving.value
 })
 
-const resultText = computed(() => {
-  if(signFailed.value) return 'Your status was not signed, so nothing was saved.'
-
-  const info = result.value
-  if(!info) return null
-
-  const relays = info.relays + ' relay' + (info.relays == 1 ? '' : 's')
-  const action = info.cleared ? 'cleared' : 'saved'
-
-  switch(info.outcome) {
-    case OUTCOME.PENDING:
-      return info.cleared ? 'Clearing your status...' : 'Saving your status...'
-    case OUTCOME.SUCCESS:
-    case OUTCOME.PARTIAL:
-      return 'Your status was ' + action + ' on ' + info.accepted + ' of ' + relays + '.'
-    default:
-      return 'Your status could not be ' + action + '. None of the ' + relays + ' accepted it. Please try again.'
-  }
-})
-
-const resultClass = computed(() => {
-  const failed = signFailed.value || (result.value && result.value.outcome == OUTCOME.ERROR)
-  return failed ? 'result -error' : 'result'
+const errorText = computed(() => {
+  return signFailed.value ? 'Your status was not signed, so nothing was saved.' : null
 })
 
 // The relays of the session, so the user's other apps see it, and the big one
@@ -181,22 +160,25 @@ async function publish(statusText) {
   })
 
   isSaving.value = true
-  result.value = null
   signFailed.value = false
 
   const signedEvent = await signEvent(event)
   if(!signedEvent) {
-    // The user did not sign it, or there is no way to.
+    // The user did not sign it, or there is no way to. The form stays to say so.
     signFailed.value = true
     isSaving.value = false
     return
   }
+
+  // From here on the notification tells how it goes, one overlay is enough.
+  close()
 
   const relayIds = publishRelayIds()
 
   tracker = publishTracker()
   tracker.expect('status', relayIds)
   announced = false
+  notified = null
   report(signedEvent, cleared)
 
   clearTimeout(timeout)
@@ -214,33 +196,43 @@ async function publish(statusText) {
   }
 }
 
+// One relay having it is enough for the status to be up.
 function report(signedEvent, cleared) {
   const summary = tracker.summary()
   const info = summary.events.status
 
-  result.value = {
-    outcome: summary.outcome,
-    accepted: info ? info.accepted : 0,
-    relays: info ? info.relays : 0,
-    cleared
-  }
-
-  // A relay has it, so it is the status now.
   if(info && info.accepted > 0 && !announced) {
     announced = true
     events.value.push(signedEvent)
     window.emitter.emit('user-status-published', signedEvent)
+  }
 
-    if(cleared) {
-      text.value = ''
-      link.value = ''
-    }
+  if(summary.outcome == OUTCOME.PENDING) {
+    notify('progress', cleared ? 'Clearing your status' : 'Saving your status', null, null)
+  } else if(summary.outcome == OUTCOME.ERROR) {
+    const relays = info.relays + ' relay' + (info.relays == 1 ? '' : 's')
+    notify('error', cleared ? 'Status not cleared' : 'Status not saved', 'None of the ' + relays + ' accepted it. Please try again.', null)
+  } else {
+    notify('success', cleared ? 'Status cleared' : 'Status saved', null, 5000)
   }
 
   if(summary.outcome != OUTCOME.PENDING) {
     clearTimeout(timeout)
     isSaving.value = false
   }
+}
+
+function notify(theme, title, description, expiration) {
+  if(notified == theme + title) return
+  notified = theme + title
+
+  window.emitter.emit('show-notification', {
+    id: 'user-status',
+    theme,
+    title,
+    description,
+    expiration
+  })
 }
 
 function saveStatus() {
@@ -318,7 +310,7 @@ onBeforeUnmount(() => {
               </div>
             </div>
           </div>
-          <p :class="resultClass" v-if="resultText">{{ resultText }}</p>
+          <p class="result -error" v-if="errorText">{{ errorText }}</p>
           <div class="options">
             <UiButton
               size="tiny"
