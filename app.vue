@@ -104,6 +104,7 @@ updateFromRoutePath()
       <ModalHandler />
       <ModalZapMain />
       <ModalQr />
+      <ModalStatus />
       <NotificationDrawer />
     </client-only>
     <Header />

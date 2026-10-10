@@ -10,18 +10,26 @@ describe('profileTipHelper.getTips', () => {
   // An empty profile gets every tip
   const tips = profileTipHelper.getTips({})
 
-  it('gives every tip a title, a description and a link to an app', () => {
+  it('gives every tip a title, a description and a link to an app or a modal here', () => {
     expect(tips.length).toBeGreaterThan(10)
 
     for(const tip of tips) {
       expect(tip.title, tip.title).toBeTruthy()
       expect(tip.description, tip.title).toBeTruthy()
-      expect(tip.url, tip.title).toMatch(/^https:\/\/[a-z0-9.-]+\/$/)
+      if(tip.modal) {
+        expect(tip.url, tip.title).toBeUndefined()
+      } else {
+        expect(tip.url, tip.title).toMatch(/^https:\/\/[a-z0-9.-]+\/$/)
+      }
     }
   })
 
+  it('sets the status right here', () => {
+    expect(tips.find(tip => tip.kind == 30315).modal).toBe('status')
+  })
+
   it('does not link to apps that are gone', () => {
-    for(const tip of tips) {
+    for(const tip of tips.filter(tip => tip.url)) {
       expect(GONE, tip.title).not.toContain(new URL(tip.url).hostname)
     }
   })

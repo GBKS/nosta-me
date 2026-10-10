@@ -800,7 +800,19 @@ onMounted(() => {
   }
 
   window.emitter.on('set-theme', updateHistory)
+  window.emitter.on('user-status-published', onUserStatusPublished)
 })
+
+onBeforeUnmount(() => {
+  window.emitter.off('user-status-published', onUserStatusPublished)
+})
+
+// Set from the status modal, shown before relays send it back.
+function onUserStatusPublished(event) {
+  if(event && event.pubkey == publicKey.value) {
+    storeEvent(userStatusData, event)
+  }
+}
 
 </script>
 

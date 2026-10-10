@@ -154,7 +154,10 @@ function showDataOverlay() {
     </div>
     <div class="text">
       <h1>{{ name }}</h1>
-      <ProfileUserStatus :info="userStatusData" />
+      <div class="status">
+        <ProfileUserStatus :info="userStatusData" />
+        <ProfileStatusButton v-if="isOwner" :events="userStatusData" />
+      </div>
       <DescriptionNode v-if="description" />
       <div class="links">
         <div class="internal">
@@ -241,8 +244,14 @@ function showDataOverlay() {
       word-break: break-word;
     }
 
-    .user-status {
-      & + p {
+    .status {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+
+      // Holds nothing when there is no status and it isn't your profile.
+      &:not(:empty) + p {
         margin-top: 10px;
       }
     }

@@ -14,6 +14,11 @@ const classObject = computed(() => {
 const link = computed(() => {
   return props.info.url
 })
+
+// For things that can be done on this site, the tip opens the modal for it.
+function openModal() {
+  window.emitter.emit('show-modal', { id: props.info.modal })
+}
 </script>
 
 <template>
@@ -21,7 +26,13 @@ const link = computed(() => {
     <div class="index">{{ index+1 }}</div>
     <div class="copy">
       <h5>
+        <button
+          v-if="info.modal"
+          type="button"
+          @click="openModal"
+        >{{ info.title }}</button>
         <a
+          v-else
           :href="link"
           target="_blank"
           rel="nofollow noopener noreferrer"
@@ -55,13 +66,24 @@ const link = computed(() => {
       font-size: 17px;
       font-weight: 600;
 
-      a {
+      a,
+      button {
         color: var(--theme-front);
         text-decoration: none;
 
         &:hover {
           text-decoration: underline;
         }
+      }
+
+      button {
+        appearance: none;
+        border-width: 0;
+        background-color: transparent;
+        padding: 0;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
       }
     }
 
