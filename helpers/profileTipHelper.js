@@ -2,8 +2,9 @@
 
 Reviews profile events and gathers tips for things the user hasn't done yet.
 
-Each tip links to an app where it can be done. These used to link to a page per
-event kind on nostrapp.link, which is gone. Apps come and go: check that a link
+Each tip links to an app where it can be done, or opens the modal of this site
+that does it. These used to link to a page per event kind on nostrapp.link,
+which is gone. Apps come and go: check that a link
 still leads to the app before adding it, and look over these now and then.
 All checked on 2026-09-19.
 
@@ -36,10 +37,10 @@ export default {
 
     if(!data.userStatuses || data.userStatuses.length == 0) {
       result.push({
-        title: 'Update your status',
-        description: 'Keep it organized and efficient.',
+        title: 'Set a status',
+        description: 'Let people know what you are up to, right here on Nosta.',
         kind: 30315,
-        url: APP_DIRECTORY
+        modal: 'status'
       })
     }
 
