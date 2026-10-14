@@ -1,11 +1,13 @@
 <script setup>
 import Icons from '@/helpers/icons'
+import analytics from '@/helpers/analytics.js'
 
 const props = defineProps([
   'info'
 ])
 
 function click() {
+  analytics.track('profile-qr')
   window.emitter.emit('show-modal', {
     id: 'qr', 
     event: props.info.event

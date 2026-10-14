@@ -3,6 +3,7 @@ import zapHelper from '@/helpers/zapHelper.js'
 import Icons from '@/helpers/icons'
 import useAssets from  '@/composables/useAssets.js'
 import ToolBox from '@/helpers/toolBox'
+import analytics from '@/helpers/analytics.js'
 
 const active = ref(false)
 const dialog = ref(null)
@@ -165,6 +166,7 @@ async function send() {
 
     if(zapResult.status == 'error') {
       status.value = 'input'
+      analytics.track('zap-failed', { reason: zapResult.error })
 
       switch(zapResult.error) {
         case 'fetch-invoice-failed':
@@ -176,6 +178,7 @@ async function send() {
       }
     } else if(zapResult.status == 'success') {
       status.value = 'sent'
+      analytics.track('zap-sent')
 
       paymentNote.value = ToolBox.dig(zapResult, 'invoice.successAction.message', null)
     }

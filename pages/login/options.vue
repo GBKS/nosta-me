@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useSessionStore } from '@/stores/session'
 import Icons from '@/helpers/icons'
+import analytics from '@/helpers/analytics.js'
 
 const router = useRouter()
 const sessionStore = useSessionStore()
@@ -71,6 +72,7 @@ function onPublicKey(publicKey) {
     sessionStore.setLoginType('browser')
     sessionStore.setPublicKey(publicKey)
     sessionStore.setLoggedIn(true)
+    analytics.track('login', { method: 'extension' })
 
     router.push('/'+publicKey)
   }

@@ -9,6 +9,7 @@ const isValid = ref(false)
 const inputModel = ref('')
 const showMessage = ref(false)
 import Icons from '@/helpers/icons'
+import analytics from '@/helpers/analytics.js'
 
 function onKeyUp(event) {
   isValid.value = validateInput()
@@ -27,6 +28,7 @@ function commit() {
   if(validateInput()) {
     showMessage.value = false
 
+    analytics.track('search', { type: analytics.searchType(inputModel.value) })
     router.push('/'+inputModel.value)
 
     close()

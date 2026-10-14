@@ -21,6 +21,7 @@ import userStatusHelper, { MAX_LENGTH, DURATIONS } from '@/helpers/userStatusHel
 import { finalizeEvent } from 'nostr-tools/pure'
 import Icons from '@/helpers/icons'
 import ToolBox from '@/helpers/toolBox'
+import analytics from '@/helpers/analytics.js'
 
 const sessionStore = useSessionStore()
 
@@ -172,6 +173,7 @@ async function publish(statusText) {
 
   // From here on the notification tells how it goes, one overlay is enough.
   close()
+  analytics.track(cleared ? 'status-clear' : 'status-set')
 
   const relayIds = publishRelayIds()
 

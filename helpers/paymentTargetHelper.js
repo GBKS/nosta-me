@@ -80,6 +80,12 @@ function cleanAddress(value) {
 }
 
 export default {
+  // The type as we know it ("btc" is "bitcoin"), or null for one we don't.
+  knownType(type) {
+    const id = ALIASES[type] || type
+    return NAMES[id] ? id : null
+  },
+
   name(type) {
     const known = NAMES[ALIASES[type] || type]
     return known || (type.charAt(0).toUpperCase() + type.substr(1))

@@ -1,5 +1,7 @@
 <script setup>
 import ToolBox from '@/helpers/toolBox'
+import paymentTargetHelper from '@/helpers/paymentTargetHelper.js'
+import analytics from '@/helpers/analytics.js'
 
 // info is a payment target as returned by paymentTargetHelper.targets()
 const props = defineProps([
@@ -13,6 +15,7 @@ async function copy() {
   try {
     await navigator.clipboard.writeText(props.info.address)
     status.value = 'copied'
+    analytics.track('copy-payment-address', { type: paymentTargetHelper.knownType(props.info.type) || 'other' })
   } catch(error) {
     // The browser can refuse, say so instead of claiming it worked.
     status.value = 'failed'

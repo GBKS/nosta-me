@@ -3,6 +3,7 @@ import * as linkify from "linkifyjs"
 import { useSessionStore } from '@/stores/session'
 import UiUsername from '@/components/ui/username'
 import ToolBox from '@/helpers/toolBox'
+import analytics from '@/helpers/analytics.js'
 import relayManager from '@/helpers/relayManager.js'
 import * as nip19 from 'nostr-tools/nip19'
 
@@ -135,6 +136,10 @@ const classObject = computed(() => {
 
 function toggleOptions() {
   optionsVisible.value = !optionsVisible.value
+
+  if(optionsVisible.value) {
+    analytics.track('profile-share-menu')
+  }
 }
 
 function showDataOverlay() {

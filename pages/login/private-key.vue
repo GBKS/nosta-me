@@ -8,6 +8,7 @@ import { getPublicKey } from 'nostr-tools/pure'
 import { privateKeyFromSeedWords, validateWords } from 'nostr-tools/nip06'
 import { bytesToHex, hexToBytes } from 'nostr-tools/utils'
 import { decode } from 'nostr-tools/nip19'
+import analytics from '@/helpers/analytics.js'
 
 const logEnabled = false
 const privateKeyModel = ref('')
@@ -72,6 +73,7 @@ function evaluate() {
     sessionStore.setPrivateKey(privateKey)
     sessionStore.setPublicKey(publicKey)
     sessionStore.setLoggedIn(true)
+    analytics.track('login', { method: 'private-key' })
 
     router.push('/'+npub)
 

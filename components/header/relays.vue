@@ -1,5 +1,6 @@
 <script setup>
 import { useRelayStore } from '@/stores/relays'
+import analytics from '@/helpers/analytics.js'
 
 const relayStore = useRelayStore()
 
@@ -10,6 +11,7 @@ function toggle() {
   active.value = !active.value
 
   if(active.value) {
+    analytics.track('relays-panel-open')
     window.emitter.emit('show-modal', {id: 'relays'})
   } else {
     window.emitter.emit('hide-modal', {id: 'relays'})

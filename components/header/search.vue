@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import analytics from '@/helpers/analytics.js'
 
 const active = ref(false)
 
@@ -7,6 +8,7 @@ function toggle() {
   active.value = !active.value
 
   if(active.value === true) {
+    analytics.track('search-open')
     window.emitter.emit('show-modal', {id: 'search'})
   } else {
     window.emitter.emit('hide-modal', {id: 'search'})

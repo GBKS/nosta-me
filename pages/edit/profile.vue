@@ -22,6 +22,7 @@ import sessionRelayService from '@/helpers/sessionRelayService.js'
 import ToolBox from '@/helpers/toolBox'
 import profileFormHelper from '@/helpers/profileFormHelper.js'
 import publishTargets from '@/helpers/create/publishTargets.js'
+import analytics from '@/helpers/analytics.js'
 
 const profileStore = useProfileStore()
 const sessionStore = useSessionStore()
@@ -151,6 +152,7 @@ function publishResult(status) {
   // to save until the form changes again. If it failed, the button stays on
   // so the user can try again.
   if(status && status.status == 'success' && pendingContent) {
+    analytics.track('profile-saved')
     editContent = pendingContent
     savedContent.value = { ...pendingContent }
     hasSaved.value = true
@@ -160,6 +162,8 @@ function publishResult(status) {
 
 // Send to the Blastr relay
 function saveChanges() {
+  analytics.track('profile-save')
+
   if(publisher) {
     publisher.kill()
     publisher = null
