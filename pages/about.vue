@@ -7,7 +7,7 @@
 
     <p>This site is a total playground and work-in-progress. It probably doesn't properly work right now. You can find the code for this website on <NuxtLink to="https://github.com/GBKS/nosta-me" target="_blank" rel="nofollow noopener noreferrer">GitHub</NuxtLink>, and you're invited to leave feedback and contribute.</p>
 
-    <p>Nosta uses <NuxtLink to="https://umami.is" target="_blank" rel="nofollow noopener noreferrer">Umami</NuxtLink> for analytics, a privacy-respecting, GDPR-compliant tracking solution. The dashboard is <NuxtLink href="https://cloud.umami.is/share/Jmc84OrAe0BFvHB8/nosta.me" target="_blank" rel="nofollow noopener noreferrer">publicly accessible here</NuxtLink>. The site did not have tracking for the longest time, but traffic has increased quite a lot and it would be good to have a rough idea what users actually do. If tracking turns out to not be useful, it will be removed again.</p>
+    <p>Nosta uses <NuxtLink to="https://umami.is" target="_blank" rel="nofollow noopener noreferrer">Umami</NuxtLink> for analytics, a privacy-respecting, GDPR-compliant tracking solution. The dashboard is <NuxtLink href="https://cloud.umami.is/share/Jmc84OrAe0BFvHB8/nosta.me" target="_blank" rel="nofollow noopener noreferrer">publicly accessible here</NuxtLink>. Much of the traffic comes from bots and scrapers, which makes page views a poor guide to how people actually use the site. So Nosta also counts a few deliberate actions, like opening a profile section, copying an address or saving a profile. These events contain no public keys or other identifiers, only which action happened. If tracking turns out to not be useful, it will be removed again.</p>
   </div>
 </template>
 

@@ -1,6 +1,7 @@
 <script setup>
 import Icons from '@/helpers/icons'
 import ToolBox from '@/helpers/toolBox'
+import analytics from '@/helpers/analytics.js'
 import { npubEncode } from 'nostr-tools/nip19'
 
 const props = defineProps([
@@ -20,6 +21,7 @@ const formattedKey = computed(() => {
 function copy() {
   navigator.clipboard.writeText(npub.value)
   isCopied.value = true
+  analytics.track('copy-public-key')
 
   setTimeout(resetCopied, 2000)
 }

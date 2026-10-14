@@ -31,6 +31,7 @@ function click() {
     target="_blank"
     rel="nofollow noopener noreferrer"
     :download="download"
+    @click="emit('click')"
   >
     <span>{{ name }}</span><span v-html="Icons[icon]" />
   </a>

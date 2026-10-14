@@ -7,6 +7,7 @@ import { useSessionStore, LOGIN_TYPE } from '@/stores/session'
 import browserHelper from '@/helpers/browserHelper.js'
 import { finalizeEvent } from 'nostr-tools'
 import ToolBox from '@/helpers/toolBox'
+import analytics from '@/helpers/analytics.js'
 
 definePageMeta({
   layout: "edit"
@@ -139,6 +140,7 @@ async function publish() {
   }
 
   logger('event', signedEvent)
+  analytics.track('relays-save')
 
   logger('relayIds', sessionRelayService.relayIds)
   let request

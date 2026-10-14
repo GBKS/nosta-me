@@ -1,6 +1,7 @@
 <script setup>
 import { useSessionStore } from '@/stores/session'
 import Icons from '@/helpers/icons'
+import analytics from '@/helpers/analytics.js'
 
 const sessionStore = useSessionStore()
 const activeThemeId = ref('space')
@@ -31,6 +32,7 @@ function close() {
 }
 
 function selectTheme(value) {
+  analytics.track('theme-change', { theme: value })
   sessionStore.setTheme(value)
 
   window.emitter.emit('set-theme', value)

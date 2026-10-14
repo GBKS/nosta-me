@@ -22,6 +22,7 @@ import { storeToRefs } from 'pinia'
 
 import { useSessionStore } from '@/stores/session'
 import sessionContactsService from '@/helpers/sessionContactsService.js'
+import analytics from '@/helpers/analytics.js'
 
 const props = defineProps([
   'publicKey'
@@ -89,6 +90,7 @@ async function click() {
       if(confirm(unfollowText)) {
         const unfollowResult = await sessionContactsService.unfollow(props.publicKey)
         if(unfollowResult.success) {
+          analytics.track('unfollow')
           updateIsFollowing()
         }
       }
@@ -105,6 +107,7 @@ async function click() {
 
       const followResult = await sessionContactsService.follow(props.publicKey)
       if(followResult.success) {
+        analytics.track('follow')
         updateIsFollowing()
       }
     }

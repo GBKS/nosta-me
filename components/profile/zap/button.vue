@@ -1,5 +1,6 @@
 <script setup>
 import Icons from '@/helpers/icons'
+import analytics from '@/helpers/analytics.js'
 
 const props = defineProps([
   'info'
@@ -10,6 +11,7 @@ const visible = computed(() => {
 })
 
 function click() {
+  analytics.track('zap-open', { from: 'button' })
   window.emitter.emit('show-modal', {
     id: 'zap', 
     event: props.info.event

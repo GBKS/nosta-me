@@ -1,5 +1,6 @@
 <script setup>
 import Icons from '@/helpers/icons'
+import analytics from '@/helpers/analytics.js'
 
 const props = defineProps([
   'info'
@@ -58,6 +59,7 @@ const service = computed(() => {
     :title="service.title"
     target="_blank"
     rel="nofollow noreferrer"
+    @click="analytics.track('profile-link', { type: info[1].split(':')[0] })"
   ><span v-html="icon" />{{ service.name }}</a>
 </template>
 

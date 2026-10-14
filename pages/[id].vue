@@ -12,6 +12,7 @@ import externalIdentityHelper from '@/helpers/externalIdentityHelper.js'
 import listHelper from '@/helpers/listHelper.js'
 import paymentTargetHelper from '@/helpers/paymentTargetHelper.js'
 import badgeDefinitionService from '@/helpers/badgeDefinitionService.js'
+import analytics from '@/helpers/analytics.js'
 import * as nip19 from 'nostr-tools/nip19'
 import { queryProfile } from 'nostr-tools/nip05'
 
@@ -87,6 +88,9 @@ const tabInfo = ref({
 function selectTab(value, info) {
   // console.log('selectTab', value, info)
   activeTabId.value = value
+  if(value) {
+    analytics.track('profile-section', { section: value, profile: isOwner.value ? 'own' : 'other' })
+  }
   if(tabInfo.value[value] && info) {
     tabInfo.value[value].info = info
   }

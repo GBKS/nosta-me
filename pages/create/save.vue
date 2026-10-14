@@ -5,6 +5,7 @@ import profilePublisher from '@/helpers/create/profilePublisher.js'
 import { OUTCOME } from '@/helpers/create/publishTracker.js'
 import profileInitializer from '@/helpers/create/profileInitializer.js'
 import Icons from '@/helpers/icons'
+import analytics from '@/helpers/analytics.js'
 
 definePageMeta({
   layout: "create",
@@ -61,6 +62,7 @@ function onPublishStatus(status) {
       // Without the profile itself there is nothing to go on with.
       if(status.summary.events.meta && status.summary.events.meta.saved) {
         state.value = 'partial'
+        analytics.track('create-saved', { result: 'partial' })
         login()
       } else {
         onSaveError()
@@ -74,6 +76,7 @@ function onPublishStatus(status) {
 }
 
 function startSave() {
+  analytics.track('create-save')
   saveStart.value = new Date()
   state.value = 'saving'
   savedEvents.value = null
@@ -87,11 +90,13 @@ function startSave() {
 
 function onSaveSuccess() {
   state.value = 'success'
+  analytics.track('create-saved', { result: 'success' })
   login()
 }
 
 function onSaveError() {
   state.value = 'error'
+  analytics.track('create-saved', { result: 'error' })
 }
 
 function login() {

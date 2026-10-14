@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useProfileStore } from '@/stores/profile'
 import { useSessionStore } from '@/stores/session'
+import analytics from '@/helpers/analytics.js'
 
 const profileStore = useProfileStore()
 const sessionStore = useSessionStore()
@@ -16,6 +17,7 @@ const userProfileLink = computed(() => {
 })
 
 function logOut() {
+  analytics.track('logout')
   sessionStore.setLoginType(null)
   sessionStore.setPublicKey(null)
   sessionStore.setLoggedIn(false)

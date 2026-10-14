@@ -1,6 +1,7 @@
 <script setup>
 import Icons from '@/helpers/icons'
 import ToolBox from '@/helpers/toolBox'
+import analytics from '@/helpers/analytics.js'
 
 const props = defineProps([
   'info',
@@ -17,6 +18,7 @@ const nip05 = computed(() => {
 function copy() {
   navigator.clipboard.writeText(nip05.value)
   isCopied.value = true
+  analytics.track('copy-nostr-address')
 
   setTimeout(resetCopied, 2000)
 }

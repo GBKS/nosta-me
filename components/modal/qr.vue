@@ -4,6 +4,7 @@ import { useRelayStore } from '@/stores/relays'
 import Icons from '@/helpers/icons'
 import QRCodeStyling from "qr-code-styling";
 import ToolBox from '@/helpers/toolBox'
+import analytics from '@/helpers/analytics.js'
 import useAssets from  '@/composables/useAssets.js'
 import { nprofileEncode } from 'nostr-tools/nip19'
 
@@ -85,6 +86,7 @@ function close() {
 }
 
 function download() {
+  analytics.track('profile-qr-download')
   code.download({ 
     name: "qr", 
     extension: "jpeg"

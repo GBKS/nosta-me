@@ -1,6 +1,7 @@
 <script setup>
 import Icons from '@/helpers/icons'
 import ToolBox from '@/helpers/toolBox'
+import analytics from '@/helpers/analytics.js'
 
 const props = defineProps([
   'info',
@@ -36,6 +37,7 @@ const classObject = computed(() => {
 
 function select() {
   if(window.nostr && window.webln) {
+    analytics.track('zap-open', { from: 'address' })
     window.emitter.emit('show-modal', {
       id: 'zap', 
       event: props.info.event

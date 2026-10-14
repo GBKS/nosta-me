@@ -1,5 +1,6 @@
 <script setup>
 import { nprofileEncode, npubEncode } from 'nostr-tools/nip19'
+import analytics from '@/helpers/analytics.js'
 
 const props = defineProps([
   'info',
@@ -77,7 +78,18 @@ function close() {
   emit('close')
 }
 
+// Which option, never what was shared.
+function trackOption(option) {
+  analytics.track('profile-share', { option })
+}
+
+function select(option) {
+  trackOption(option)
+  close()
+}
+
 function showDataOverlay() {
+  trackOption('data')
   emit('showDataOverlay')
 }
 
@@ -123,7 +135,7 @@ const appOptions = [
           :url="item.url"
           :image="item.image"
           :npub="npub"
-          @click="close"
+          @click="select(item.id)"
         />
       </div>
       <ProfileShareListOption
@@ -132,19 +144,20 @@ const appOptions = [
         icon="share"
         :url="shareUrl"
         :webshare="true"
-        @click="close"
+        @click="select('share')"
       />
       <ProfileShareListOption
         name="Open in default client"
         icon="export"
         :url="nostrUrl"
+        @click="trackOption('client')"
       />
       <ProfileShareListOption
         name="Download"
         icon="receive"
         download="profile.json"
         :url="downloadUrl"
-        @click="close"
+        @click="select('download')"
       />
       <ProfileShareListOption
         name="View profile data"

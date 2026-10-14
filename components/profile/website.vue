@@ -1,5 +1,6 @@
 <script setup>
 import Icons from '@/helpers/icons'
+import analytics from '@/helpers/analytics.js'
 
 const props = defineProps([
   'info',
@@ -23,6 +24,7 @@ const classObject = computed(() => {
     title="Visit website"
     target="_blank"
     rel="nofollow noreferrer"
+    @click="analytics.track('profile-link', { type: 'website' })"
   ><span v-html="Icons.linkCircle" />{{ info.profile.website }}</a>
 </template>
 
