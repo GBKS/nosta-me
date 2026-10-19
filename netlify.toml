@@ -2,12 +2,6 @@
 # served by the server function, which Netlify's header rules don't apply to.
 # See nuxt.config.ts (security) and server/api/nip05.ts.
 
-[[redirects]]
-  from = "/nprofile*"
-  to = "/nprofile:splat"
-  status = 200
-  force = true
-  [redirects.rate_limit]
-    window_limit = 30
-    window_size = 60
-    aggregate_by = ["ip", "domain"]
+# The site sits behind Cloudflare, which challenges bots and does the rate
+# limiting. A limit per IP here would count Cloudflare's addresses, not
+# visitors', and block real users who share them.
