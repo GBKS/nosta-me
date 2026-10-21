@@ -14,7 +14,7 @@ const formattedAddress = computed(() => {
 })
 
 const type = computed(() => {
-  return (window.nostr && window.webln) ? 'button' : 'p'
+  return window.webln ? 'button' : 'p'
 })
 
 const title = computed(() => {
@@ -28,7 +28,7 @@ const classObject = computed(() => {
     '-'+(props.size || 'default')
   ]
 
-  if(window.nostr) {
+  if(window.webln) {
     c.push('-zap')
   }
 
@@ -36,7 +36,7 @@ const classObject = computed(() => {
 })
 
 function select() {
-  if(window.nostr && window.webln) {
+  if(window.webln) {
     analytics.track('zap-open', { from: 'address' })
     window.emitter.emit('show-modal', {
       id: 'zap', 
