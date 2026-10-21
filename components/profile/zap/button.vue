@@ -7,7 +7,8 @@ const props = defineProps([
 ])
 
 const visible = computed(() => {
-  return window.nostr && window.webln && props.info.profile.lud16
+  // Without a Nostr extension the zap request is signed another way, see zapHelper.
+  return window.webln && props.info.profile.lud16
 })
 
 function click() {

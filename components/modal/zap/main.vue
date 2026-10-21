@@ -1,5 +1,5 @@
 <script setup>
-import zapHelper from '@/helpers/zapHelper.js'
+import zapHelper, { sessionZapSigner, failureMessage } from '@/helpers/zapHelper.js'
 import Icons from '@/helpers/icons'
 import useAssets from  '@/composables/useAssets.js'
 import ToolBox from '@/helpers/toolBox'
@@ -11,6 +11,8 @@ const profileEvent = ref(null)
 const comment = ref('')
 const commentVisible = ref(false)
 const paymentNote = ref(null)
+const errorText = ref(null)
+const anonymous = ref(false)
 const amount = ref(100)
 const info = ref()
 const status = ref('input')
@@ -85,6 +87,8 @@ function onShowModal(data) {
   active.value = isActive
 
   if(isActive) {
+    // Checked on open, extensions can show up after the page has loaded.
+    anonymous.value = sessionZapSigner() == 'anonymous'
     setTimeout(showDialog, 50)
   }
 }
@@ -106,6 +110,7 @@ function reset() {
   comment.value = ''
   commentVisible.value = false
   paymentNote.value = null
+  errorText.value = null
 }
 
 function close() {
@@ -150,6 +155,7 @@ function selectPreset(newAmount) {
 async function send() {
   if(status.value == 'input') {
     status.value = 'send'
+    errorText.value = null
 
     const zapper = zapHelper()
     const zapResult = await zapper.start(
@@ -166,16 +172,8 @@ async function send() {
 
     if(zapResult.status == 'error') {
       status.value = 'input'
-      analytics.track('zap-failed', { reason: zapResult.error })
-
-      switch(zapResult.error) {
-        case 'fetch-invoice-failed':
-          break; 
-        case 'enable-webln-failed':
-          break;
-        case 'webln-sendpayment-failed':
-          break;
-      }
+      errorText.value = failureMessage(zapResult)
+      analytics.track('zap-failed', { reason: zapResult.id })
     } else if(zapResult.status == 'success') {
       status.value = 'sent'
       analytics.track('zap-sent')
@@ -286,6 +284,8 @@ const classObject = computed(() => {
           <template v-if="status == 'sent' && paymentNote">
             <p class="payment-note">"{{ paymentNote }}"</p>
           </template>
+          <p class="result -error" v-if="errorText">{{ errorText }}</p>
+          <p class="result" v-else-if="anonymous && status !== 'sent'">You're not logged in, so this zap is sent anonymously.</p>
           <UiButton
             size="small"
             :disabled="status == 'send'"
@@ -374,6 +374,16 @@ const classObject = computed(() => {
         text-align: center;
         font-weight: 600;
         @include r('font-size', 15, 19);
+      }
+
+      .result {
+        font-size: 14px;
+        text-align: center;
+        color: var(--front);
+
+        &.-error {
+          color: var(--red);
+        }
       }
 
       &.slide-enter-active,
