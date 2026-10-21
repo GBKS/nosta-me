@@ -7,8 +7,8 @@ const props = defineProps([
 ])
 
 const visible = computed(() => {
-  // Without a Nostr extension the zap request is signed another way, see zapHelper.
-  return window.webln && props.info.profile.lud16
+  // Any wallet can pay: without WebLN the zap modal shows the invoice.
+  return props.info.profile.lud16
 })
 
 function click() {

@@ -9,7 +9,27 @@ vi.mock('nostr-tools/nip57', async (importOriginal) => {
   return { ...original, getZapEndpoint: vi.fn(async () => endpoint.url) }
 })
 
-import zapHelper, { zapSigner, failureMessage } from '@/helpers/zapHelper'
+// Every receipt request the listener makes, answered by hand.
+const requests = vi.hoisted(() => [])
+
+vi.mock('@/helpers/multiRelayRequest.js', () => ({
+  default: () => {
+    const request = {
+      killed: false,
+      init(callback) { this.callback = callback },
+      start(relayIds, filters) { this.relayIds = relayIds; this.filters = filters },
+      kill() { this.killed = true }
+    }
+    requests.push(request)
+    return request
+  }
+}))
+
+vi.mock('@/helpers/relayManager.js', () => ({
+  default: { addRelayByUrl: (url) => 'id:' + url }
+}))
+
+import zapHelper, { zapSigner, failureMessage, isReceiptFor, RECEIPT_RELAYS } from '@/helpers/zapHelper'
 import { useSessionStore, LOGIN_TYPE } from '@/stores/session'
 import { useRelayStore } from '@/stores/relays'
 
@@ -34,8 +54,15 @@ let invoiceResponse
 
 function zap() {
   const zapper = zapHelper()
-  zapper.listenForReceipt = vi.fn()
   return zapper.start(profileEvent, data).then(result => ({ zapper, result }))
+}
+
+function relaysTag() {
+  return sentZapRequest().tags.find(tag => tag[0] == 'relays')
+}
+
+function receipt(bolt11) {
+  return { kind: 9735, tags: [['p', RECIPIENT], ['bolt11', bolt11]] }
 }
 
 function requestedUrl() {
@@ -103,10 +130,18 @@ describe('zapHelper.start', () => {
     expect(zapRequest.kind).toBe(9734)
     expect(verifyEvent(zapRequest)).toBe(true)
     expect(zapRequest.pubkey).not.toBe(RECIPIENT)
-    expect(zapRequest.tags).toContainEqual(['relays', 'wss://relay.example.com'])
+  })
 
-    // Without a WebLN wallet nothing can pay the invoice yet.
-    expect(result).toMatchObject({ status: 'error', id: 'no-webln' })
+  it('returns the invoice to show when there is no WebLN', async () => {
+    const { result } = await zap()
+
+    expect(result).toMatchObject({ status: 'invoice', id: 'invoice-shown', pr: 'lnbc210n1test' })
+  })
+
+  it('asks for the receipt on the profile relay and the big relays', async () => {
+    await zap()
+
+    expect(relaysTag()).toEqual(['relays', 'wss://relay.example.com', ...RECEIPT_RELAYS])
   })
 
   it('names relay addresses in the zap request, not relay ids', async () => {
@@ -115,7 +150,7 @@ describe('zapHelper.start', () => {
 
     await zap()
 
-    expect(sentZapRequest().tags).toContainEqual(['relays', 'wss://relay.nos.social'])
+    expect(relaysTag()).toEqual(['relays', 'wss://relay.nos.social', ...RECEIPT_RELAYS])
     data.relays = ['wss://relay.example.com', undefined]
   })
 
@@ -186,10 +221,9 @@ describe('zapHelper.start', () => {
   it('pays the invoice with WebLN', async () => {
     window.webln = { enable: vi.fn(async () => {}), sendPayment: vi.fn(async () => ({ preimage: 'abc' })) }
 
-    const { zapper, result } = await zap()
+    const { result } = await zap()
 
     expect(window.webln.sendPayment).toHaveBeenCalledWith('lnbc210n1test')
-    expect(zapper.listenForReceipt).toHaveBeenCalled()
     expect(result).toMatchObject({ status: 'success', id: 'payment-sent' })
   })
 
@@ -199,5 +233,95 @@ describe('zapHelper.start', () => {
     const { result } = await zap()
 
     expect(result).toMatchObject({ status: 'error', id: 'webln-sendpayment-failed' })
+  })
+})
+
+describe('isReceiptFor', () => {
+  it('matches the receipt for the invoice, in any case', () => {
+    expect(isReceiptFor(receipt('lnbc210n1test'), 'lnbc210n1test')).toBe(true)
+    expect(isReceiptFor(receipt('LNBC210N1TEST'), 'lnbc210n1test')).toBe(true)
+  })
+
+  it('ignores receipts for other invoices and other kinds', () => {
+    expect(isReceiptFor(receipt('lnbc1other'), 'lnbc210n1test')).toBe(false)
+    expect(isReceiptFor({ ...receipt('lnbc210n1test'), kind: 1 }, 'lnbc210n1test')).toBe(false)
+    expect(isReceiptFor(null, 'lnbc210n1test')).toBe(false)
+  })
+})
+
+describe('zapHelper.listenForReceipt', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    requests.length = 0
+
+    const session = useSessionStore()
+    session.isLoggedIn = false
+    delete window.nostr
+    delete window.webln
+
+    invoiceResponse = { pr: 'lnbc210n1test' }
+    globalThis.fetch = vi.fn(async () => ({ json: async () => invoiceResponse }))
+    endpoint.url = 'https://pay.example.com/callback'
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('asks the zap request relays for receipts to the recipient', async () => {
+    const { zapper } = await zap()
+    zapper.listenForReceipt(vi.fn())
+
+    const request = requests[0]
+    expect(request.relayIds).toEqual(['wss://relay.example.com', ...RECEIPT_RELAYS].map(url => 'id:' + url))
+    expect(request.filters[0]).toMatchObject({ kinds: [9735], '#p': [RECIPIENT] })
+    expect(request.filters[0].since).toBeLessThan(zapper.zapRequest.created_at)
+
+    zapper.stopListening()
+  })
+
+  it('asks again until the receipt shows up, then stops', async () => {
+    const { zapper } = await zap()
+    const onPaid = vi.fn()
+    zapper.listenForReceipt(onPaid)
+
+    requests[0].callback(receipt('lnbc1other'))
+    expect(onPaid).not.toHaveBeenCalled()
+
+    vi.advanceTimersByTime(5000)
+    expect(requests.length).toBe(2)
+    expect(requests[0].killed).toBe(true)
+
+    const paid = receipt('lnbc210n1test')
+    requests[1].callback(paid)
+    expect(onPaid).toHaveBeenCalledWith(paid)
+    expect(requests[1].killed).toBe(true)
+
+    vi.advanceTimersByTime(60000)
+    expect(requests.length).toBe(2)
+  })
+
+  it('gives up when the invoice could have expired', async () => {
+    const { zapper } = await zap()
+    const onGiveUp = vi.fn()
+    zapper.listenForReceipt(vi.fn(), onGiveUp)
+
+    vi.advanceTimersByTime(15 * 60 * 1000)
+
+    expect(onGiveUp).toHaveBeenCalled()
+    const count = requests.length
+    vi.advanceTimersByTime(60000)
+    expect(requests.length).toBe(count)
+  })
+
+  it('stops when the modal closes', async () => {
+    const { zapper } = await zap()
+    zapper.listenForReceipt(vi.fn())
+    zapper.stopListening()
+
+    vi.advanceTimersByTime(60000)
+
+    expect(requests.length).toBe(1)
+    expect(requests[0].killed).toBe(true)
   })
 })
