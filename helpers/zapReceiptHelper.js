@@ -89,9 +89,13 @@ export default {
     const requestedAmount = findTagValue(request, 'amount')
     if(requestedAmount && parseInt(requestedAmount) != millisats) return null
 
+    // What was zapped, if it was an event and not the person. Zap goals count these.
+    const eventId = findTagValue(request, 'e')
+
     return {
       id: receipt.id,
       requestId: request.id,
+      eventId: isHexKey(eventId) ? eventId : null,
       provider: receipt.pubkey,
       sender: request.pubkey,
       recipient,
