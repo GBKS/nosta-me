@@ -13,12 +13,9 @@ const formattedAddress = computed(() => {
   return ToolBox.trim(props.info.profile.lud16, 30)
 })
 
-const type = computed(() => {
-  return window.webln ? 'button' : 'p'
-})
-
-const title = computed(() => {
-  return type.value == 'button' ? 'Click to zap' : null
+// App cards show the address without a profile event to zap.
+const zappable = computed(() => {
+  return !!props.info.event
 })
 
 const classObject = computed(() => {
@@ -28,7 +25,8 @@ const classObject = computed(() => {
     '-'+(props.size || 'default')
   ]
 
-  if(window.webln) {
+  // Any wallet can pay, without WebLN the zap modal shows the invoice.
+  if(zappable.value) {
     c.push('-zap')
   }
 
@@ -36,22 +34,22 @@ const classObject = computed(() => {
 })
 
 function select() {
-  if(window.webln) {
-    analytics.track('zap-open', { from: 'address' })
-    window.emitter.emit('show-modal', {
-      id: 'zap', 
-      event: props.info.event
-    })
-  }
+  if(!zappable.value) return
+
+  analytics.track('zap-open', { from: 'address' })
+  window.emitter.emit('show-modal', {
+    id: 'zap', 
+    event: props.info.event
+  })
 }
 </script>
 
 <template>
   <component 
     v-if="info.profile.lud16" 
-    :is="type"
+    :is="zappable ? 'button' : 'p'"
     :class="classObject"
-    :title="title"
+    :title="zappable ? 'Click to zap' : null"
     aria-live="polite"
     @click="select"
   ><span v-html="Icons.bitcoin" />{{ formattedAddress }}</component>

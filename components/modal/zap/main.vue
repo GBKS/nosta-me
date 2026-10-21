@@ -4,6 +4,7 @@ import Icons from '@/helpers/icons'
 import useAssets from  '@/composables/useAssets.js'
 import ToolBox from '@/helpers/toolBox'
 import analytics from '@/helpers/analytics.js'
+import QRCodeStyling from 'qr-code-styling'
 
 const active = ref(false)
 const dialog = ref(null)
@@ -17,6 +18,11 @@ const amount = ref(100)
 const info = ref()
 const status = ref('input')
 const rankImage = ref()
+const invoicePr = ref(null) // Shown when there is no WebLN to pay it
+const invoiceCopied = ref(false)
+const receiptMissing = ref(false)
+const qrTarget = ref(null)
+let zapper = null
 
 const ranks = computed(() => {
   return [
@@ -105,6 +111,12 @@ function onHideModal(data) {
 }
 
 function reset() {
+  if(zapper) zapper.stopListening()
+  zapper = null
+
+  invoicePr.value = null
+  invoiceCopied.value = false
+  receiptMissing.value = false
   amount.value = 100
   status.value = 'input'
   comment.value = ''
@@ -132,6 +144,8 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  if(zapper) zapper.stopListening()
+
   window.emitter.off('show-modal', onShowModal)
   window.emitter.off('hide-modal', onHideModal)
 })
@@ -157,7 +171,7 @@ async function send() {
     status.value = 'send'
     errorText.value = null
 
-    const zapper = zapHelper()
+    zapper = zapHelper()
     const zapResult = await zapper.start(
       profileEvent.value,
       {
@@ -174,15 +188,65 @@ async function send() {
       status.value = 'input'
       errorText.value = failureMessage(zapResult)
       analytics.track('zap-failed', { reason: zapResult.id })
+    } else if(zapResult.status == 'invoice') {
+      status.value = 'invoice'
+      invoicePr.value = zapResult.pr
+      analytics.track('zap-invoice')
+
+      renderQr()
+      zapper.listenForReceipt(onInvoicePaid, () => { receiptMissing.value = true })
     } else if(zapResult.status == 'success') {
       status.value = 'sent'
-      analytics.track('zap-sent')
+      analytics.track('zap-sent', { via: 'webln' })
 
       paymentNote.value = ToolBox.dig(zapResult, 'invoice.successAction.message', null)
     }
   } else if(status.value == 'sent') {
     close()
   }
+}
+
+function onInvoicePaid() {
+  status.value = 'sent'
+  analytics.track('zap-sent', { via: 'invoice' })
+
+  paymentNote.value = ToolBox.dig(zapper, 'invoice.successAction.message', null)
+}
+
+async function renderQr() {
+  await nextTick()
+  if(!qrTarget.value || !invoicePr.value) return
+
+  // Upper case fits in a smaller code, wallets read it either way.
+  const code = new QRCodeStyling({
+    width: 260,
+    height: 260,
+    type: 'svg',
+    data: ('lightning:' + invoicePr.value).toUpperCase(),
+    qrOptions: {
+      errorCorrectionLevel: 'L'
+    },
+    dotsOptions: {
+      color: '#000000',
+      type: 'square'
+    },
+    backgroundOptions: {
+      color: '#ffffff'
+    }
+  })
+
+  qrTarget.value.innerHTML = ''
+  code.append(qrTarget.value)
+}
+
+function openWallet() {
+  window.location.href = 'lightning:' + invoicePr.value
+}
+
+function copyInvoice() {
+  navigator.clipboard.writeText(invoicePr.value)
+  invoiceCopied.value = true
+  setTimeout(() => { invoiceCopied.value = false }, 2000)
 }
 
 function addComment() {
@@ -207,7 +271,9 @@ const buttonLabel = computed(() => {
 const title = computed(() => {
   let result = 'How many sats to send?'
 
-  if(status.value == 'sent') {
+  if(status.value == 'invoice') {
+    result = 'Pay with your lightning wallet'
+  } else if(status.value == 'sent') {
     result = 'Success!'
   }
 
@@ -261,7 +327,7 @@ const classObject = computed(() => {
               />
             </div>
           </UiEffectCard>
-          <template v-if="status !== 'sent'">
+          <template v-if="status == 'input' || status == 'send'">
             <ModalZapPresets 
               :options="ranks" 
               :amount="amount"
@@ -284,9 +350,26 @@ const classObject = computed(() => {
           <template v-if="status == 'sent' && paymentNote">
             <p class="payment-note">"{{ paymentNote }}"</p>
           </template>
+          <div class="invoice" v-if="status == 'invoice'">
+            <div class="qr" ref="qrTarget" />
+            <div class="invoice-options">
+              <UiButton
+                size="small"
+                @click="openWallet"
+              >Open in wallet</UiButton>
+              <UiButton
+                size="small"
+                look="outline"
+                @click="copyInvoice"
+              >{{ invoiceCopied ? 'Copied' : 'Copy invoice' }}</UiButton>
+            </div>
+            <p class="result" v-if="!receiptMissing">Waiting for the payment...</p>
+            <p class="result" v-else>The payment hasn't shown up. If you paid, it may still appear on their profile.</p>
+          </div>
           <p class="result -error" v-if="errorText">{{ errorText }}</p>
-          <p class="result" v-else-if="anonymous && status !== 'sent'">You're not logged in, so this zap is sent anonymously.</p>
+          <p class="result" v-else-if="anonymous && (status == 'input' || status == 'send')">You're not logged in, so this zap is sent anonymously.</p>
           <UiButton
+            v-if="status !== 'invoice'"
             size="small"
             :disabled="status == 'send'"
             @click="send"
@@ -374,6 +457,34 @@ const classObject = computed(() => {
         text-align: center;
         font-weight: 600;
         @include r('font-size', 15, 19);
+      }
+
+      .invoice {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+
+        .qr {
+          width: 260px;
+          height: 260px;
+          max-width: 100%;
+
+          :deep(svg) {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            // No seams between the squares when scaled down, easier to scan.
+            shape-rendering: crispEdges;
+          }
+        }
+
+        .invoice-options {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 10px;
+        }
       }
 
       .result {
