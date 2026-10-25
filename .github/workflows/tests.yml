@@ -23,6 +23,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+          # Without this, the runner's cached 24.x is used, which can lag
+          # behind a security release by days.
+          check-latest: true
           cache: npm
 
       - run: npm ci
