@@ -23,6 +23,10 @@ const sessionStore = useSessionStore()
 const heaven = ref(null)
 const land = ref(null)
 const sunsElement = ref(null)
+const starsElement = ref(null)
+const cloudsElement = ref(null)
+const firefliesElement = ref(null)
+const grainElement = ref(null)
 
 const audience = ref('all') // 'all' or 'follows'
 const timeMode = ref('live') // 'live', 'scrub' or 'play'
@@ -353,7 +357,7 @@ let resizeTimer = null
 function onResize() {
   clearTimeout(resizeTimer)
   resizeTimer = setTimeout(() => {
-    scene = buildScene(heaven.value, land.value)
+    scene = buildScene(heaven.value, land.value, layers())
     applySky(scene, skyHour)
     draw(true)
   }, 120)
@@ -365,8 +369,33 @@ watch(viewer, () => {
   if(renderer) load()
 })
 
+function layers() {
+  return { stars: starsElement.value, clouds: cloudsElement.value, fireflies: firefliesElement.value }
+}
+
+// Film grain as a small tiled image. A noise filter blended over the page
+// would make the browser blend every pixel again on every frame.
+function makeGrain() {
+  const size = 128
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const context = canvas.getContext('2d')
+  const image = context.createImageData(size, size)
+  for(let i = 0; i < image.data.length; i += 4) {
+    const light = Math.random() < 0.5 ? 255 : 0
+    image.data[i] = light
+    image.data[i + 1] = light
+    image.data[i + 2] = light
+    image.data[i + 3] = Math.random() * 12
+  }
+  context.putImageData(image, 0, 0)
+  grainElement.value.style.backgroundImage = `url(${canvas.toDataURL()})`
+}
+
 onMounted(() => {
-  scene = buildScene(heaven.value, land.value)
+  makeGrain()
+  scene = buildScene(heaven.value, land.value, layers())
   applySky(scene, skyHour)
   shownHour = skyHour
 
@@ -398,15 +427,12 @@ onBeforeUnmount(() => {
 <template>
   <div class="gm-sky" :class="{ '-replay': timeMode != 'live' }" @click="select(null)">
     <svg ref="heaven" class="heaven" aria-hidden="true"></svg>
+    <div ref="starsElement" class="stars" aria-hidden="true"></div>
+    <div ref="cloudsElement" class="clouds" aria-hidden="true"></div>
     <div ref="sunsElement" class="suns"></div>
     <svg ref="land" class="land" aria-hidden="true"></svg>
-    <svg class="grain" aria-hidden="true">
-      <filter id="gm-noise">
-        <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch" />
-        <feColorMatrix type="saturate" values="0" />
-      </filter>
-      <rect width="100%" height="100%" filter="url(#gm-noise)" />
-    </svg>
+    <div ref="firefliesElement" class="fireflies" aria-hidden="true"></div>
+    <div ref="grainElement" class="grain" aria-hidden="true"></div>
     <div class="axis" aria-hidden="true">
       <div
         v-for="tick in ticks"
@@ -458,7 +484,10 @@ onBeforeUnmount(() => {
   user-select: none;
 
   > .heaven,
+  > .stars,
+  > .clouds,
   > .land,
+  > .fireflies,
   > .grain {
     position: absolute;
     inset: 0;
@@ -468,18 +497,61 @@ onBeforeUnmount(() => {
     pointer-events: none;
   }
 
-  > .heaven { z-index: 1; }
+  // Back to front; later siblings with the same z-index sit on top
+  > .heaven,
+  > .stars,
+  > .clouds { z-index: 1; }
   > .suns { position: absolute; inset: 0; z-index: 2; }
-  > .land { z-index: 3; }
-  > .grain {
-    z-index: 4;
-    opacity: 0.1;
-    mix-blend-mode: overlay;
+  > .land,
+  > .fireflies { z-index: 3; }
+  > .grain { z-index: 4; }
+
+  > .stars {
+    opacity: var(--stars);
+
+    .star-set {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+
+      & + .star-set {
+        animation: gm-twinkle 3.5s ease-in-out infinite alternate;
+        will-change: opacity;
+      }
+    }
   }
 
-  .twinkle { animation: gm-twinkle 3.5s ease-in-out infinite alternate; }
-  .cloud { animation: gm-drift 120s ease-in-out infinite alternate; }
-  .firefly { animation: gm-firefly 6s ease-in-out infinite alternate; }
+  > .clouds {
+    opacity: var(--cloudOp);
+
+    .cloud {
+      position: absolute;
+      animation: gm-drift 120s ease-in-out infinite alternate;
+      will-change: transform;
+
+      div {
+        position: absolute;
+        background-color: var(--cloud);
+      }
+    }
+  }
+
+  > .fireflies {
+    opacity: var(--stars);
+
+    .firefly {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      margin: -1.5px 0 0 -1.5px;
+      border-radius: 50%;
+      background-color: #ffeb8a;
+      box-shadow: 0 0 6px #ffeb8a;
+      animation: gm-firefly 6s ease-in-out infinite alternate;
+      will-change: transform;
+    }
+  }
 
   > .axis {
     position: absolute;
@@ -522,8 +594,8 @@ onBeforeUnmount(() => {
     max-width: 300px;
     padding: 12px 14px;
     border-radius: 16px;
-    background: rgba(10, 14, 35, 0.42);
-    backdrop-filter: blur(10px);
+    // No backdrop blur: it would blur the moving sky again on every frame
+    background: rgba(10, 14, 35, 0.6);
     font-size: 13px;
     line-height: 1.45;
 
@@ -608,6 +680,8 @@ onBeforeUnmount(() => {
   height: var(--size);
   margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
   cursor: pointer;
+  // Its own GPU layer, so a replay moves suns without repainting them
+  will-change: transform;
   transition:
     transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1),
     width 0.6s cubic-bezier(0.3, 1.6, 0.5, 1),
@@ -634,13 +708,17 @@ onBeforeUnmount(() => {
     animation-delay: var(--delay, 0s);
   }
 
+  // A drawn image rather than a masked gradient, and only busy suns spin:
+  // hundreds of spinning masks kept the GPU busy all the time.
   .rays {
     position: absolute;
-    border-radius: 50%;
     pointer-events: none;
     inset: calc(var(--size) * (-0.45 - var(--heat) * 0.75));
-    background: repeating-conic-gradient(from 0deg, rgba(255, 214, 120, calc(0.22 + var(--heat) * 0.55)) 0 7deg, transparent 7deg 22deg);
-    mask: radial-gradient(circle, transparent 30%, #000 34%, transparent 70%);
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-50 -50 100 100'%3E%3CradialGradient id='f' gradientUnits='userSpaceOnUse' cx='0' cy='0' r='50'%3E%3Cstop offset='0' stop-color='%23ffd678' stop-opacity='0'/%3E%3Cstop offset='.4' stop-color='%23ffd678' stop-opacity='0'/%3E%3Cstop offset='.48' stop-color='%23ffd678' stop-opacity='.95'/%3E%3Cstop offset='.97' stop-color='%23ffd678' stop-opacity='0'/%3E%3C/radialGradient%3E%3Cpath fill='url(%23f)' d='M0 0L50.0 0.0A50 50 0 0 1 49.6 6.1ZM0 0L46.2 19.1A50 50 0 0 1 43.5 24.6ZM0 0L35.4 35.4A50 50 0 0 1 30.8 39.4ZM0 0L19.1 46.2A50 50 0 0 1 13.4 48.2ZM0 0L0.0 50.0A50 50 0 0 1 -6.1 49.6ZM0 0L-19.1 46.2A50 50 0 0 1 -24.6 43.5ZM0 0L-35.4 35.4A50 50 0 0 1 -39.4 30.8ZM0 0L-46.2 19.1A50 50 0 0 1 -48.2 13.4ZM0 0L-50.0 0.0A50 50 0 0 1 -49.6 -6.1ZM0 0L-46.2 -19.1A50 50 0 0 1 -43.5 -24.6ZM0 0L-35.4 -35.4A50 50 0 0 1 -30.8 -39.4ZM0 0L-19.1 -46.2A50 50 0 0 1 -13.4 -48.2ZM0 0L-0.0 -50.0A50 50 0 0 1 6.1 -49.6ZM0 0L19.1 -46.2A50 50 0 0 1 24.6 -43.5ZM0 0L35.4 -35.4A50 50 0 0 1 39.4 -30.8ZM0 0L46.2 -19.1A50 50 0 0 1 48.2 -13.4Z'/%3E%3C/svg%3E") center / contain no-repeat;
+    opacity: calc(0.3 + var(--heat) * 0.6);
+  }
+
+  &.-busy .rays {
     animation: gm-spin calc(46s - var(--heat) * 38s) linear infinite;
   }
 
@@ -788,7 +866,7 @@ onBeforeUnmount(() => {
   .gm-sun .rays,
   .gm-sky .cloud,
   .gm-sky .firefly,
-  .gm-sky .twinkle {
+  .gm-sky .star-set {
     animation: none;
   }
 }

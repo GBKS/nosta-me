@@ -57,8 +57,7 @@ function onInput(event) {
   align-items: center;
   padding: 10px 16px;
   border-radius: 999px;
-  background: rgba(10, 14, 35, 0.48);
-  backdrop-filter: blur(10px);
+  background: rgba(10, 14, 35, 0.65);
   font-size: 13px;
   white-space: nowrap;
 

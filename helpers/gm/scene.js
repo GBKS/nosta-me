@@ -3,10 +3,15 @@
 The landscape behind the gm sky: a sky, two mountain ranges, hills with pine
 trees and a dark foreground, drawn as SVG.
 
-Every colour is a CSS variable set on the two SVG elements, so one palette
-blend repaints the whole scene for any time of day. The variables live on the
-SVGs and not on the page root: changing root variables makes the browser
-restyle every sun on every frame.
+Every colour is a CSS variable set on the scene's elements, so one palette
+blend repaints the whole scene for any time of day. The variables live on
+those elements and not on the page root: changing root variables makes the
+browser restyle every sun.
+
+Whatever moves all the time (twinkling stars, drifting clouds, fireflies) is
+made of HTML elements in their own layers, which the GPU moves without
+redrawing anything. Animated parts inside an SVG would make the browser
+redraw the whole landscape on every frame.
 
  */
 
@@ -155,16 +160,28 @@ function hills(group, r, W, H, base, amp, name, trees) {
   return heightAt
 }
 
-// Draws the landscape into the two SVGs, sized to the window.
-export function buildScene(heaven, land) {
+function div(className, style, parent) {
+  const element = document.createElement('div')
+  if(className) element.className = className
+  if(style) element.setAttribute('style', style)
+  parent.appendChild(element)
+  return element
+}
+
+// Draws the landscape into the two SVGs and the three moving layers
+// ({ stars, clouds, fireflies }), sized to the window.
+export function buildScene(heaven, land, layers) {
   const W = window.innerWidth
   const H = window.innerHeight
   const r = random(SEED)
   const S = Math.max(W, 900)
-  const scene = { heaven, land, W, H }
+  const scene = { heaven, land, W, H, targets: [heaven, land, layers.stars, layers.clouds, layers.fireflies] }
 
   heaven.innerHTML = ''
   land.innerHTML = ''
+  layers.stars.innerHTML = ''
+  layers.clouds.innerHTML = ''
+  layers.fireflies.innerHTML = ''
   for(const svg of [heaven, land]) svg.setAttribute('viewBox', `0 0 ${W} ${H}`)
 
   // Sky
@@ -182,16 +199,19 @@ export function buildScene(heaven, land) {
 
   mk('rect', { width: W, height: H, fill: 'url(#gm-sky)' }, heaven)
 
-  const stars = mk('g', { style: 'opacity:var(--stars)' }, heaven)
+  // Two sets of stars; the second one twinkles as a whole
+  const starSets = [0, 1].map(() => {
+    const svg = mk('svg', { viewBox: `0 0 ${W} ${H}`, class: 'star-set', 'aria-hidden': 'true' })
+    layers.stars.appendChild(svg)
+    return svg
+  })
   for(let i = 0; i < 170; i++) {
-    mk('circle', {
-      cx: r() * W,
-      cy: r() * H * 0.72,
-      r: r() < 0.12 ? 1.5 : 0.75,
-      fill: '#fff',
-      class: r() < 0.35 ? 'twinkle' : '',
-      style: `animation-delay:${(-r() * 4).toFixed(2)}s`
-    }, stars)
+    const cx = r() * W
+    const cy = r() * H * 0.72
+    const radius = r() < 0.12 ? 1.5 : 0.75
+    const twinkles = r() < 0.35
+    r() // Keeps the landscape the same as before
+    mk('circle', { cx, cy, r: radius, fill: '#fff' }, starSets[twinkles ? 1 : 0])
   }
 
   scene.glow = mk('ellipse', { rx: W * 0.55, ry: H * 0.3, fill: 'url(#gm-glow)', style: 'opacity:var(--glowOp)' }, heaven)
@@ -202,16 +222,25 @@ export function buildScene(heaven, land) {
   mk('circle', { r: 22, fill: '#f3f1ff' }, scene.moon)
   mk('circle', { r: 19, cx: 9, cy: -6, style: 'fill:var(--top);opacity:.92' }, scene.moon)
 
-  const clouds = mk('g', { style: 'fill:var(--cloud);opacity:var(--cloudOp)' }, heaven)
+  // Each cloud is a small layer of its own, just as big as the cloud
   for(let i = 0; i < 7; i++) {
-    const group = mk('g', { class: 'cloud', style: `animation-duration:${(90 + r() * 90).toFixed(0)}s;animation-delay:${(-r() * 180).toFixed(0)}s` }, clouds)
+    const timing = `animation-duration:${(90 + r() * 90).toFixed(0)}s;animation-delay:${(-r() * 180).toFixed(0)}s`
     const cx = (i + r()) / 7 * W
     const cy = H * (0.12 + r() * 0.42)
     const count = 2 + Math.floor(r() * 3)
+    const streaks = []
     for(let j = 0; j < count; j++) {
       const w = 50 + r() * 230
       const h = 5 + r() * 9
-      mk('rect', { x: cx - w / 2 + (r() - 0.5) * 90, y: cy + j * (h + 4), width: w, height: h, rx: h / 2 }, group)
+      streaks.push({ x: cx - w / 2 + (r() - 0.5) * 90, y: cy + j * (h + 4), w, h })
+    }
+    const left = Math.min(...streaks.map(streak => streak.x))
+    const top = Math.min(...streaks.map(streak => streak.y))
+    const right = Math.max(...streaks.map(streak => streak.x + streak.w))
+    const bottom = Math.max(...streaks.map(streak => streak.y + streak.h))
+    const cloud = div('cloud', `left:${left.toFixed(0)}px;top:${top.toFixed(0)}px;width:${(right - left).toFixed(0)}px;height:${(bottom - top).toFixed(0)}px;${timing}`, layers.clouds)
+    for(const streak of streaks) {
+      div('', `left:${(streak.x - left).toFixed(1)}px;top:${(streak.y - top).toFixed(1)}px;width:${streak.w.toFixed(1)}px;height:${streak.h.toFixed(1)}px;border-radius:${(streak.h / 2).toFixed(1)}px`, cloud)
     }
   }
 
@@ -237,16 +266,10 @@ export function buildScene(heaven, land) {
   for(let i = 0; i < 5; i++) { const x = W - r() * W * 0.09; d += pine(x, front(x) + 6, H * (0.22 + r() * 0.2), r) }
   mk('path', { d, style: 'fill:var(--front)' }, land)
 
-  const fireflies = mk('g', { style: 'opacity:var(--stars)' }, land)
   for(let i = 0; i < 26; i++) {
-    mk('circle', {
-      cx: r() * W,
-      cy: H * (0.83 + r() * 0.15),
-      r: 1.6,
-      fill: '#ffeb8a',
-      class: 'firefly',
-      style: `animation-delay:${(-r() * 6).toFixed(2)}s;animation-duration:${(4 + r() * 5).toFixed(1)}s`
-    }, fireflies)
+    const x = r() * W
+    const y = H * (0.83 + r() * 0.15)
+    div('firefly', `left:${x.toFixed(1)}px;top:${y.toFixed(1)}px;animation-delay:${(-r() * 6).toFixed(2)}s;animation-duration:${(4 + r() * 5).toFixed(1)}s`, layers.fireflies)
   }
 
   // The skyline per pixel column, so suns can stay above it cheaply
@@ -323,8 +346,7 @@ export function applySky(scene, hour) {
   const h = ((hour % 24) + 24) % 24
   const colors = paletteAt(h)
   const set = (name, value) => {
-    scene.heaven.style.setProperty('--' + name, value)
-    scene.land.style.setProperty('--' + name, value)
+    for(const target of scene.targets) target.style.setProperty('--' + name, value)
   }
 
   for(const name in colors) set(name, colors[name])
