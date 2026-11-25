@@ -155,6 +155,17 @@ export function createLoader() {
       }
     },
 
+    // Sends a signed event to the relays. Resolves with how many accepted it.
+    async publish(relays, event) {
+      if(closed) return 0
+      try {
+        const results = await Promise.allSettled(pool.publish(relays, event, { maxWait: 8000 }))
+        return results.filter(result => result.status == 'fulfilled').length
+      } catch(error) {
+        return 0
+      }
+    },
+
     // Closes the subscriptions first and the connections a moment later:
     // a relay sends its CLOSE message only once the socket is ready, and
     // closing the socket right away would make those messages fail.

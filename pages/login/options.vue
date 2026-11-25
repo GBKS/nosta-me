@@ -3,8 +3,11 @@ import { ref, computed, onMounted } from 'vue'
 import { useSessionStore } from '@/stores/session'
 import Icons from '@/helpers/icons'
 import analytics from '@/helpers/analytics.js'
+import { returnPath } from '@/helpers/loginReturn.js'
 
 const router = useRouter()
+const route = useRoute()
+const next = returnPath(route.query)
 const sessionStore = useSessionStore()
 
 const browserSupport = ref(false)
@@ -74,7 +77,7 @@ function onPublicKey(publicKey) {
     sessionStore.setLoggedIn(true)
     analytics.track('login', { method: 'extension' })
 
-    router.push('/'+publicKey)
+    router.push(next || '/'+publicKey)
   }
 }
 
@@ -110,7 +113,7 @@ onMounted(() => {
         </div>
         <div class="icon" v-html="Icons.arrowRight" />
       </button>
-      <NuxtLink class="option" to="/login/private-key">
+      <NuxtLink class="option" :to="next ? { path: '/login/private-key', query: { next } } : '/login/private-key'">
         <div class="info">
           <h3>Private key </h3>
           <p>Less secure. Enter a private key or recovery phrase.</p>

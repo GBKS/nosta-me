@@ -2,6 +2,8 @@
 import { useSessionStore } from '@/stores/session'
 const sessionStore = useSessionStore()
 const router = useRouter()
+const route = useRoute()
+const next = returnPath(route.query)
 
 import { npubEncode, NostrTypeGuard } from 'nostr-tools/nip19'
 import { getPublicKey } from 'nostr-tools/pure'
@@ -9,6 +11,7 @@ import { privateKeyFromSeedWords, validateWords } from 'nostr-tools/nip06'
 import { bytesToHex, hexToBytes } from 'nostr-tools/utils'
 import { decode } from 'nostr-tools/nip19'
 import analytics from '@/helpers/analytics.js'
+import { returnPath } from '@/helpers/loginReturn.js'
 
 const logEnabled = false
 const privateKeyModel = ref('')
@@ -75,7 +78,7 @@ function evaluate() {
     sessionStore.setLoggedIn(true)
     analytics.track('login', { method: 'private-key' })
 
-    router.push('/'+npub)
+    router.push(next || '/'+npub)
 
     // console.log('evaluate', privateKeyModel.value, validMnemonic, validPrivateKey)
   }
@@ -90,7 +93,7 @@ function logger(...args) {
 </script>
 <template>
   <div class="private-key-page">
-    <NuxtLink to="/login/options">Back</NuxtLink>
+    <NuxtLink :to="next ? { path: '/login/options', query: { next } } : '/login/options'">Back</NuxtLink>
     
     <h1>Log in</h1>
     <p>Enter your private key or recovery phrase.</p>

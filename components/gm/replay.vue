@@ -49,7 +49,7 @@ function onInput(event) {
 .gm-replay {
   position: absolute;
   left: 50%;
-  bottom: 22px;
+  bottom: 88px;
   transform: translateX(-50%);
   z-index: 10;
   display: flex;
