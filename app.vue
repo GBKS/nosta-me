@@ -11,6 +11,8 @@ const route = useRoute()
 const sessionStore = useSessionStore()
 const isMounted = ref(false)
 const showTheme = ref(false)
+// Pages that draw their own full-screen background, with light text on it
+const ownBackground = ref(false)
 
 watch(() => route.query, (newValue, oldValue) => updateFromRoute(newValue, oldValue))
 watch(() => route.path, (newValue, oldValue) => updateFromRoutePath(newValue, oldValue))
@@ -48,7 +50,7 @@ const classObject = computed(() => {
   if(showTheme.value && theme.value && isMounted.value) {
     c.push('-theme-'+activeThemeId.value)
     c.push('-brightness-'+theme.value.brightness)
-  } else if(!showTheme.value) {
+  } else if(!showTheme.value && !ownBackground.value) {
     c.push('-brightness-light')
   }
 
@@ -65,7 +67,9 @@ function updateFromRoute() {
 
 function updateFromRoutePath() {
   const noThemePages = ['/', '/about']
-  showTheme.value = noThemePages.indexOf(route.path) === -1
+  const ownBackgroundPages = ['/gm']
+  ownBackground.value = ownBackgroundPages.indexOf(route.path) !== -1
+  showTheme.value = noThemePages.indexOf(route.path) === -1 && !ownBackground.value
 }
 
 onBeforeMount(() => {
