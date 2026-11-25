@@ -528,6 +528,7 @@ onBeforeUnmount(() => {
     line-height: 1.45;
 
     h1 {
+      color: white;
       font-family: 'PoetsenOne';
       font-size: 22px;
       line-height: 1.1;
