@@ -1,10 +1,13 @@
 <script setup>
 import { ref, shallowRef, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useSessionStore } from '@/stores/session'
-import { DAY, createSky, addGreeting, greetingOf, pileFromEvent, addPile, statsAt } from '@/helpers/gm/greetings.js'
-import { buildScene, applySky } from '@/helpers/gm/scene.js'
+import { DAY, createSky, addGreeting, greetingOf, pileFromEvent, addPile, statsAt, activeGreeting, removeGreeting, removePile, hasPiledIn } from '@/helpers/gm/greetings.js'
+import { buildScene, applySky, isNight } from '@/helpers/gm/scene.js'
 import { createLoader } from '@/helpers/gm/loader.js'
 import { createRenderer } from '@/helpers/gm/renderer.js'
+import { createEffects } from '@/helpers/gm/effects.js'
+import { greetingTemplate, pileTemplate, sign, publishRelays, problemText } from '@/helpers/gm/publisher.js'
+import * as sounds from '@/helpers/gm/sounds.js'
 import analytics from '@/helpers/analytics.js'
 
 /*
@@ -14,12 +17,17 @@ said gn as a moon, over a landscape that follows the time of day. The replay
 runs through the last 24 hours; a single clock (T, in seconds) says which
 moment is on screen, and everything is drawn for that moment.
 
+Logged in, you can say gm or gn yourself (a short note) and pile in on
+someone's greeting (a reaction). Both show up in the sky right away and are
+taken back if no relay accepts them.
+
  */
 
 const PLAY_SECONDS = 40
 
 const sessionStore = useSessionStore()
 
+const root = ref(null)
 const heaven = ref(null)
 const land = ref(null)
 const sunsElement = ref(null)
@@ -38,6 +46,10 @@ const timeLabel = ref('now')
 const ticks = ref([])
 const selected = shallowRef(null)
 const anchor = ref(null)
+const busy = ref(null) // 'gm', 'gn' or 'pile' while signing and publishing
+const muted = ref(false)
+const night = ref(isNight(hourAt(Date.now() / 1000)))
+const toast = ref('')
 
 const viewer = computed(() => sessionStore.isLoggedIn && sessionStore.publicKey ? sessionStore.publicKey : null)
 
@@ -45,6 +57,18 @@ const countText = computed(() => {
   const { gm, gn } = counts.value
   const text = gn ? `${gm} gm · ${gn} gn` : `${gm} gm`
   return text + (timeMode.value == 'live' ? ' today' : ' in these 24 h')
+})
+
+// What the card's pile-in button can do for the selected greeting.
+const pileState = computed(() => {
+  const data = selected.value
+  if(!data) return null
+  if(!viewer.value) return 'login'
+  if(data.person.pubkey == viewer.value) return 'mine'
+  if(busy.value == 'pile') return 'busy'
+  if(hasPiledIn(data.greeting, viewer.value)) return 'done'
+  if(timeMode.value != 'live') return 'replay'
+  return 'can'
 })
 
 const legendText = computed(() => {
@@ -56,7 +80,9 @@ const legendText = computed(() => {
 let sky = createSky()
 let loader = null
 let renderer = null
+let effects = null
 let scene = null
+let toastTimer = null
 let generation = 0
 let follows = new Set()
 const profiles = new Map()
@@ -108,6 +134,23 @@ function isFriend(pubkey) {
   return audience.value == 'all' && pubkey != viewer.value && follows.has(pubkey)
 }
 
+function isMine(pubkey) {
+  return pubkey == viewer.value
+}
+
+function showToast(text) {
+  toast.value = text
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => { toast.value = '' }, 5000)
+}
+
+// Effects around a person's sun, if it's on screen.
+function burstAt(person, sparks = 10) {
+  const center = renderer.centerOf(person.key)
+  if(!center) return
+  effects.burst({ ...center, moon: person.type == 'gn', sparks })
+}
+
 function onGreeting(event, gen) {
   if(gen != generation) return
   const added = addGreeting(sky, event)
@@ -117,11 +160,156 @@ function onGreeting(event, gen) {
   else renderer.update(added.person, T)
 }
 
-function onPile(event, gen) {
+// A reaction or zap. One that arrives live flies in from the edge of the
+// screen while the sun is in view.
+function onPile(event, gen, live = false) {
   if(gen != generation) return
   const found = pileFromEvent(sky, event)
-  if(!found || !addPile(found.greeting, found.pile)) return
-  renderer.update(found.greeting.person, T)
+  if(!found) return
+  const { greeting, pile } = found
+  const person = greeting.person
+  const view = renderer.viewOf(person.key)
+
+  if(!live || timeMode.value != 'live' || !view || !view.visible || view.greeting !== greeting) {
+    if(addPile(greeting, pile)) renderer.update(person, T)
+    return
+  }
+
+  // Taken now, so the same reaction can't fly in twice
+  if(!pile.zap) greeting.reactors.add(pile.pubkey)
+  const fromLeft = Math.random() < 0.5
+  effects.flyIn({
+    from: { x: fromLeft ? -30 : window.innerWidth + 30, y: 96 + Math.random() * window.innerHeight * 0.4 },
+    to: () => renderer.centerOf(person.key) || { x: view.x, y: view.y },
+    picture: profileOf(pile.pubkey).picture,
+    duration: 1300
+  }).then(() => {
+    greeting.piles.push(pile)
+    greeting.orbit.push({ pubkey: pile.pubkey, t: pile.t })
+    renderer.update(person, T)
+    if(selectedKey == person.key) refreshCard(true)
+    burstAt(person)
+    sounds.chime(statsAt(greeting, T).people, 0.05, person.type == 'gn')
+  })
+}
+
+// Says gm or gn: shows it in the sky at once, then publishes it.
+async function say(type, from) {
+  if(busy.value || !viewer.value) return
+
+  if(timeMode.value != 'live') {
+    setTimeMode('live')
+    T = Date.now() / 1000
+    draw()
+  }
+
+  // Already said it in the last half day: the sun just lights up
+  const key = type + ':' + viewer.value
+  const person = sky.people.get(key)
+  const recent = person && activeGreeting(person, T)
+  if(recent && T - recent.t < DAY / 2) {
+    burstAt(person, 14)
+    sounds.chime(6, 0.1, type == 'gn')
+    showToast(`You already said ${type} today. Your ${type == 'gn' ? 'moon' : 'sun'} says hi.`)
+    return
+  }
+
+  busy.value = type
+  let event
+  try {
+    event = await sign(greetingTemplate(type))
+  } catch(error) {
+    busy.value = null
+    showToast(problemText(error.message))
+    return
+  }
+
+  const added = addGreeting(sky, event)
+  if(!added) {
+    busy.value = null
+    return
+  }
+
+  if(added.isNewPerson) renderer.add(added.person, T, { slow: true })
+  else renderer.update(added.person, T, { slow: true })
+  effects.glow(type)
+  if(type == 'gn') sounds.moonrise()
+  else sounds.sunrise()
+  setTimeout(() => burstAt(added.person, 18), 2400)
+  analytics.track('gm-say', { type })
+
+  const accepted = await publish(event)
+  busy.value = null
+
+  if(accepted == 0) {
+    removeGreeting(sky, added.greeting)
+    renderer.update(added.person, T)
+    showToast(problemText('no-relay'))
+  }
+}
+
+// Piles in on the selected greeting: your avatar flies onto it, then the
+// reaction gets published.
+async function pileIn(from) {
+  const view = renderer.viewOf(selectedKey)
+  if(busy.value || !viewer.value || !view || !view.greeting) return
+
+  const greeting = view.greeting
+  const person = view.person
+  if(hasPiledIn(greeting, viewer.value)) return
+
+  busy.value = 'pile'
+  let event
+  try {
+    event = await sign(pileTemplate(greeting.event, person.type))
+  } catch(error) {
+    busy.value = null
+    showToast(problemText(error.message))
+    return
+  }
+
+  // Taken now, so the reaction coming back from a relay doesn't count twice
+  greeting.reactors.add(viewer.value)
+  const pile = { id: event.id, t: event.created_at, pubkey: viewer.value, zap: false, sats: 0 }
+  const publishing = publish(event)
+  analytics.track('gm-back', { type: person.type })
+
+  await effects.flyIn({
+    from,
+    to: () => renderer.centerOf(person.key) || { x: view.x, y: view.y },
+    picture: profileOf(viewer.value).picture,
+    duration: 850
+  })
+  greeting.piles.push(pile)
+  greeting.orbit.push({ pubkey: viewer.value, t: pile.t })
+  renderer.update(person, T)
+  if(selectedKey == person.key) refreshCard(true)
+  burstAt(person)
+  sounds.chime(statsAt(greeting, T).people, 0.14, person.type == 'gn')
+
+  const accepted = await publishing
+  busy.value = null
+  if(accepted == 0) {
+    removePile(greeting, pile)
+    greeting.orbit = greeting.orbit.filter(entry => entry.pubkey != viewer.value || entry.t != pile.t)
+    renderer.update(person, T)
+    showToast(problemText('no-relay'))
+  }
+  refreshCard(true)
+}
+
+// How many relays accepted the event; 0 if something went wrong on the way.
+async function publish(event) {
+  try {
+    return await loader.publish(publishRelays(), event)
+  } catch(error) {
+    return 0
+  }
+}
+
+function toggleMute() {
+  muted.value = !muted.value
+  sounds.setMuted(muted.value)
 }
 
 function uniquePubkeys(greetings) {
@@ -160,6 +348,10 @@ async function load() {
   const accept = event => !!greetingOf(event)
   const handleGreeting = event => onGreeting(event, gen)
   const handlePile = event => onPile(event, gen)
+  const handleLivePile = event => onPile(event, gen, true)
+
+  // Your own picture, for your sun and for piling in
+  if(viewer.value && !profiles.has(viewer.value)) loader.loadProfiles([viewer.value], storeProfile)
 
   // The last 24 hours first. Everyone who arrives in the first moments
   // rises together, from left to right.
@@ -183,7 +375,7 @@ async function load() {
   if(gen != generation) return
 
   // New greetings and pile-ins as they happen
-  loader.listen({ since: Math.floor(Date.now() / 1000), authors, ids: firstIds, accept, onGreeting: handleGreeting, onPile: handlePile })
+  loader.listen({ since: Math.floor(Date.now() / 1000), authors, ids: firstIds, accept, onGreeting: handleGreeting, onPile: handleLivePile })
 
   // The day before, so the replay always has a full sky behind it
   loadingYesterday.value = true
@@ -269,6 +461,9 @@ function tick(timestamp) {
   if(Math.abs(skyHour - shownHour) > 0.0008) {
     applySky(scene, skyHour)
     shownHour = skyHour
+    // Whether to offer gn goes by your own clock, not the replay's
+    const nightNow = isNight(hourAt(now))
+    if(nightNow != night.value) night.value = nightNow
   }
 
   if(dirty || Math.abs(T - renderedT) > (timeMode.value == 'live' ? 20 : 0.5)) draw()
@@ -394,6 +589,8 @@ function makeGrain() {
 }
 
 onMounted(() => {
+  muted.value = sounds.isMuted()
+  effects = createEffects(root.value)
   makeGrain()
   scene = buildScene(heaven.value, land.value, layers())
   applySky(scene, skyHour)
@@ -404,6 +601,7 @@ onMounted(() => {
     getScene: () => scene,
     profileOf,
     isFriend,
+    isMine,
     onSelect: select,
     onHide
   })
@@ -420,12 +618,13 @@ onBeforeUnmount(() => {
   clearTimeout(resizeTimer)
   window.removeEventListener('resize', onResize)
   window.removeEventListener('keydown', onKey)
+  clearTimeout(toastTimer)
   if(loader) loader.close()
 })
 </script>
 
 <template>
-  <div class="gm-sky" :class="{ '-replay': timeMode != 'live' }" @click="select(null)">
+  <div ref="root" class="gm-sky" :class="{ '-replay': timeMode != 'live' }" @click="select(null)">
     <svg ref="heaven" class="heaven" aria-hidden="true"></svg>
     <div ref="starsElement" class="stars" aria-hidden="true"></div>
     <div ref="cloudsElement" class="clouds" aria-hidden="true"></div>
@@ -463,11 +662,27 @@ onBeforeUnmount(() => {
       @live="onLive"
     />
 
+    <GmSay
+      :logged-in="!!viewer"
+      :night="night"
+      :busy="busy == 'gm' || busy == 'gn' ? busy : null"
+      :muted="muted"
+      @say="say"
+      @mute="toggleMute"
+    />
+
+    <Transition name="gm-toast">
+      <p v-if="toast" class="toast" role="status">{{ toast }}</p>
+    </Transition>
+
     <GmCard
       v-if="selected && anchor"
       :data="selected"
       :anchor="anchor"
+      :pile="pileState"
       @close="select(null)"
+      @pile="pileIn"
+      @live="onLive"
     />
   </div>
 </template>
@@ -565,7 +780,7 @@ onBeforeUnmount(() => {
 
     .tick {
       position: absolute;
-      top: 24%;
+      top: 8%;
       transform: translateX(-50%);
       white-space: nowrap;
       color: rgba(255, 255, 255, 0.78);
@@ -837,6 +1052,129 @@ onBeforeUnmount(() => {
   }
 }
 
+// Your own sun or moon
+.gm-sun.-mine .face {
+  border-color: white;
+  border-width: 4px;
+}
+
+.gm-sun.-mine {
+  z-index: 40;
+}
+
+// Saying gm: a proper sunrise
+.gm-sun.-slow .body {
+  animation-duration: 3s;
+}
+
+// Avatars of people who piled in while the page was open
+.gm-sun .orbit {
+  position: absolute;
+  inset: calc(var(--size) * -0.32 - 8px);
+  animation: gm-spin 7s linear infinite;
+  pointer-events: none;
+
+  &:empty {
+    display: none;
+  }
+
+  .satellite {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border-radius: 50%;
+    background: #ffd76e center / cover;
+    border: 1.5px solid white;
+    transform-origin: 8px calc(50% + 8px);
+  }
+}
+
+.gm-sky {
+  .gm-flyer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 26px;
+    height: 26px;
+    margin: -13px 0 0 -13px;
+    border-radius: 50%;
+    z-index: 15;
+    background: #ffd76e center / cover;
+    border: 2px solid white;
+    box-shadow: 0 0 14px rgba(255, 200, 90, 0.9);
+    pointer-events: none;
+  }
+
+  .gm-ring {
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 220, 140, 0.95);
+    pointer-events: none;
+    z-index: 14;
+
+    &.-moon {
+      border-color: rgba(195, 208, 255, 0.95);
+    }
+  }
+
+  .gm-spark {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 6px;
+    height: 6px;
+    margin: -3px;
+    border-radius: 50%;
+    background: #fff3b0;
+    box-shadow: 0 0 8px #ffd25e;
+    pointer-events: none;
+    z-index: 14;
+  }
+
+  .gm-flash {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    opacity: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 85%, rgba(255, 210, 130, 0.9), rgba(255, 150, 90, 0.35) 45%, transparent 75%);
+
+    &.-moon {
+      background: radial-gradient(ellipse at 50% 85%, rgba(175, 190, 255, 0.75), rgba(110, 120, 220, 0.3) 45%, transparent 75%);
+    }
+  }
+
+  > .toast {
+    position: absolute;
+    left: 50%;
+    bottom: 186px;
+    transform: translateX(-50%);
+    z-index: 12;
+    max-width: calc(100% - 24px);
+    padding: 10px 16px;
+    border-radius: 14px;
+    background: rgba(10, 14, 35, 0.8);
+    color: white;
+    font-size: 14px;
+    text-align: center;
+  }
+}
+
+.gm-toast-enter-active,
+.gm-toast-leave-active {
+  transition: opacity 250ms ease, transform 250ms ease;
+}
+
+.gm-toast-enter-from,
+.gm-toast-leave-to {
+  opacity: 0;
+}
+
 @keyframes gm-rise {
   from { transform: translateY(var(--from, 300px)); }
   to { transform: none; }
@@ -864,6 +1202,7 @@ onBeforeUnmount(() => {
 
 @media (prefers-reduced-motion: reduce) {
   .gm-sun .rays,
+  .gm-sun .orbit,
   .gm-sky .cloud,
   .gm-sky .firefly,
   .gm-sky .star-set {

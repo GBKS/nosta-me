@@ -32,7 +32,7 @@ function geometry() {
   }
 }
 
-export function createRenderer({ container, getScene, profileOf, isFriend, onSelect, onHide }) {
+export function createRenderer({ container, getScene, profileOf, isFriend, isMine, onSelect, onHide }) {
   const views = new Map() // person key → view
   let wave = null
 
@@ -54,7 +54,7 @@ export function createRenderer({ container, getScene, profileOf, isFriend, onSel
     const el = document.createElement('div')
     el.className = 'gm-sun' + (person.type == 'gn' ? ' -moon' : '')
     el.style.display = 'none'
-    el.innerHTML = '<div class="body"><div class="glow"></div><div class="rays"></div><div class="face"><span class="initial"></span><img alt="" referrerpolicy="no-referrer" loading="lazy"></div><div class="badge" hidden></div><div class="crescent"></div><div class="label"></div></div>'
+    el.innerHTML = '<div class="body"><div class="glow"></div><div class="rays"></div><div class="orbit"></div><div class="face"><span class="initial"></span><img alt="" referrerpolicy="no-referrer" loading="lazy"></div><div class="badge" hidden></div><div class="crescent"></div><div class="label"></div></div>'
 
     const view = {
       person, el,
@@ -63,6 +63,8 @@ export function createRenderer({ container, getScene, profileOf, isFriend, onSel
       initial: el.querySelector('.initial'),
       label: el.querySelector('.label'),
       badge: el.querySelector('.badge'),
+      orbit: el.querySelector('.orbit'),
+      orbitCount: -1,
       greeting: null,
       visible: false,
       pending: false,
@@ -77,7 +79,8 @@ export function createRenderer({ container, getScene, profileOf, isFriend, onSel
       event.stopPropagation()
       if(view.visible) onSelect(person)
     })
-    if(isFriend(person.pubkey)) el.classList.add('-friend')
+    if(isMine(person.pubkey)) el.classList.add('-mine')
+    else if(isFriend(person.pubkey)) el.classList.add('-friend')
 
     applyProfile(view)
     container.appendChild(el)
@@ -98,6 +101,22 @@ export function createRenderer({ container, getScene, profileOf, isFriend, onSel
     view.y = y
     view.el.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`
     view.el.style.setProperty('--from', (g.H - y + view.size).toFixed(0) + 'px')
+  }
+
+  // Avatars of people who piled in while the page was open circle the sun.
+  function drawOrbit(view, greeting, T, changed) {
+    const shown = (greeting.orbit || []).filter(entry => entry.t <= T).slice(-10)
+    if(shown.length == view.orbitCount && !changed) return
+    view.orbitCount = shown.length
+    view.orbit.innerHTML = ''
+    shown.forEach((entry, i) => {
+      const satellite = document.createElement('div')
+      satellite.className = 'satellite'
+      const picture = profileOf(entry.pubkey).picture
+      if(picture) satellite.style.backgroundImage = `url("${picture.replace(/"/g, '%22')}")`
+      satellite.style.transform = `rotate(${i * 360 / shown.length}deg)`
+      view.orbit.appendChild(satellite)
+    })
   }
 
   // Draws one person as they were at moment T. Someone who comes into view
@@ -123,7 +142,9 @@ export function createRenderer({ container, getScene, profileOf, isFriend, onSel
     const pile = pileAt(greeting, T)
     if(pile !== view.pile || changed) {
       view.pile = pile
-      view.size = Math.round(clamp(30 + 9 * Math.sqrt(pile), 30, 132) * g.scale)
+      // Your own sun starts a little bigger, so you can find it
+      const boost = isMine(view.person.pubkey) ? 6 : 0
+      view.size = Math.round(clamp(30 + 9 * Math.sqrt(pile + boost), 30, 132) * g.scale)
       view.el.style.setProperty('--size', view.size + 'px')
       view.el.style.setProperty('--heat', clamp(pile / 24, 0, 1).toFixed(3))
       const stats = statsAt(greeting, T)
@@ -133,6 +154,7 @@ export function createRenderer({ container, getScene, profileOf, isFriend, onSel
     }
 
     place(view, g, T)
+    drawOrbit(view, greeting, T, changed)
 
     if(!view.visible) {
       view.el.style.setProperty('--delay', delay.toFixed(3) + 's')
@@ -147,8 +169,10 @@ export function createRenderer({ container, getScene, profileOf, isFriend, onSel
 
   return {
     // A new person. While a wave is open, they wait and rise with the others.
-    add(person, T) {
+    // A slow one rises like a proper sunrise.
+    add(person, T, { slow = false } = {}) {
       const view = createView(person)
+      if(slow) view.el.classList.add('-slow')
       views.set(person.key, view)
       if(wave) {
         view.pending = true
@@ -160,9 +184,11 @@ export function createRenderer({ container, getScene, profileOf, isFriend, onSel
     },
 
     // Redraw someone after their greetings or pile-ins changed.
-    update(person, T) {
+    update(person, T, { slow = false } = {}) {
       const view = views.get(person.key)
-      if(view) draw(view, geometry(), T)
+      if(!view) return
+      if(slow) view.el.classList.add('-slow')
+      draw(view, geometry(), T)
     },
 
     // Collect everyone who arrives in the next moments, then let them rise
@@ -207,6 +233,14 @@ export function createRenderer({ container, getScene, profileOf, isFriend, onSel
 
     setSelected(key) {
       for(const view of views.values()) view.el.classList.toggle('-selected', view.person.key == key)
+    },
+
+    // The middle of a person's sun on screen, for effects.
+    centerOf(key) {
+      const view = views.get(key)
+      if(!view) return null
+      const rect = view.el.getBoundingClientRect()
+      return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, size: view.size, face: view.el.querySelector('.face') }
     },
 
     // Where a person is on screen, for placing the card next to them.

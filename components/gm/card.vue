@@ -11,11 +11,19 @@ people piled in.
  */
 
 const props = defineProps({
-  data: Object,   // { person, greeting, stats, profile }
-  anchor: Object  // { x, y, size } of the sun on screen
+  data: Object,    // { person, greeting, stats, profile }
+  anchor: Object,  // { x, y, size } of the sun on screen
+  pile: String     // what the pile-in button can do: 'can', 'done', 'busy', 'mine', 'login' or 'replay'
 })
 
-defineEmits(['close'])
+const emit = defineEmits(['close', 'pile', 'live'])
+
+const loginLink = { path: '/login/options', query: { next: '/gm' } }
+
+function pileIn(event) {
+  const rect = event.currentTarget.getBoundingClientRect()
+  emit('pile', { x: rect.left + rect.width / 2, y: rect.top })
+}
 
 const element = ref(null)
 const height = ref(200)
@@ -77,7 +85,14 @@ onMounted(measure)
     </div>
     <p class="text" v-html="html"></p>
     <p class="stats">{{ statsText }}</p>
-    <NuxtLink :to="profileLink" class="profile">View profile</NuxtLink>
+    <div class="actions">
+      <button v-if="pile == 'can'" class="pile" @click="pileIn">{{ icon }} {{ data.person.type }} back</button>
+      <button v-else-if="pile == 'busy'" class="pile" disabled>{{ icon }} Sending…</button>
+      <button v-else-if="pile == 'done'" class="pile" disabled>{{ icon }} You piled in</button>
+      <button v-else-if="pile == 'replay'" class="pile -quiet" @click="emit('live')">Go live to pile in</button>
+      <NuxtLink v-else-if="pile == 'login'" class="pile -quiet" :to="loginLink">Log in to pile in</NuxtLink>
+      <NuxtLink :to="profileLink" class="profile">Profile</NuxtLink>
+    </div>
   </div>
 </template>
 
@@ -174,25 +189,59 @@ onMounted(measure)
     margin-bottom: 12px;
   }
 
+  .actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .pile,
   .profile {
     display: block;
     text-align: center;
     padding: 9px 14px;
     border-radius: 12px;
+    border: 0;
+    font-size: 15px;
     font-weight: 700;
     text-decoration: none;
-    background: #ffcf5c;
-    color: #4a2600;
-    transition: transform 150ms $ease;
+    cursor: pointer;
+    transition: transform 150ms $ease, opacity 150ms $ease;
 
     &:hover {
       transform: scale(1.02);
     }
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.65;
+      transform: none;
+    }
   }
 
-  &.-moon .profile {
+  .pile {
+    flex: 1;
+    background: #ffcf5c;
+    color: #4a2600;
+
+    &.-quiet {
+      background: rgba(0, 0, 0, 0.06);
+      color: inherit;
+    }
+  }
+
+  .profile {
+    background: rgba(0, 0, 0, 0.06);
+    color: inherit;
+  }
+
+  &.-moon .pile:not(.-quiet) {
     background: #c9d0f5;
     color: #1c2050;
+  }
+
+  // Only the profile link: it takes the whole width
+  .profile:only-child {
+    flex: 1;
   }
 }
 

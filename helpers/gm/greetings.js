@@ -49,6 +49,7 @@ function newGreeting(event, person) {
     person,
     piles: [],
     reactors: new Set(),
+    orbit: [], // people who piled in while the page was open, as { pubkey, t }
     j: hash01(event.id)
   }
 }
@@ -122,6 +123,26 @@ export function addPile(greeting, pile) {
   }
   greeting.piles.push(pile)
   return true
+}
+
+// Takes back a greeting that couldn't be published.
+export function removeGreeting(sky, greeting) {
+  const person = greeting.person
+  person.greetings = person.greetings.filter(other => other !== greeting)
+  sky.byId.delete(greeting.id)
+}
+
+// Takes back a pile-in that couldn't be published.
+export function removePile(greeting, pile) {
+  greeting.piles = greeting.piles.filter(other => other !== pile)
+  if(!pile.zap && !greeting.piles.some(other => !other.zap && other.pubkey == pile.pubkey)) {
+    greeting.reactors.delete(pile.pubkey)
+  }
+}
+
+// Whether someone already piled in on a greeting.
+export function hasPiledIn(greeting, pubkey) {
+  return greeting.reactors.has(pubkey)
 }
 
 // The greeting a person shows at moment T: their latest one from the 24
