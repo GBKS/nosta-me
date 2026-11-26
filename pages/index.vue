@@ -57,6 +57,10 @@ onMounted(() => {
         </nav>
       </div>
 
+      <ClientOnly>
+        <HomeGm />
+      </ClientOnly>
+
       <HomeProfiles />
 
       <div class="details" id="details" v-if="!isLoggedIn">
